@@ -435,15 +435,20 @@ class OrderForm extends Component {
     let total = nb_products * price + shipping_price;
     if (!total || isNaN(total) || (total < 0)) total = 0;
 
+
     return (
 
       <div className="widget">
 
         <div className="widget-header">
-          <img className="pull-left" src="img/logo_mini.jpg" alt="Logo Debout" />
+          <div className="logo">
+            <img className="pull-left" src="img/logo_mini.jpg" alt="Logo Debout" />
+          </div>
 
-          <h2>BON DE COMMANDE</h2>
-          <h3><strong>debout n°12</strong> // <span className="small">juin - juillet - août 2017</span> </h3>
+          <div className="row">
+            <h2>BON DE COMMANDE</h2>
+            <h3><strong>debout n°12</strong> // <span className="small">juin - juillet - août 2017</span> </h3>
+          </div>
         </div>
 
         <div className="widget-body">

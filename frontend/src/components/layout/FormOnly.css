@@ -42,6 +42,40 @@
     background-color: #fce8ef;
 }
 
+.widget-header .logo {
+  margin: auto;
+  max-width: 215px;
+  height: 100px;
+}
+
+.widget-header .row {
+  text-align: center;
+}
+
+.widget-header .logo img {
+  max-width: 100%;
+}
+
+
+@media screen and (min-width: 660px) {
+
+  .widget-header .logo img {
+    margin: 15px 15px 15px 0;
+  }
+
+  .widget-header .logo {
+    margin: 0;
+    width: inherit;
+    height: inherit;
+  }
+
+  .widget-header .row {
+    text-align: left;
+  }
+
+  
+}
+
 .widget .panel-default {
   border: white;
 }
