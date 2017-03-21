@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import path from "path";
 
 const app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -47,6 +48,14 @@ csv()
           else
             res.json({ status: "ERROR" });
         });
+
+        app.get('/', (req,res) => {
+          res.sendFile(path.join(__dirname + '/frontend/build/index.html'));
+        })
+
+        app.get('/*', (req,res) => {
+          res.sendFile(path.join(__dirname + '/frontend/build' + req.originalUrl));
+        })
 
         // START SERVER
         let port = process.env.port || 8080;
