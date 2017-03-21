@@ -1,0 +1,87 @@
+
+
+            <div className="form-group">
+              <div className="checkbox">
+                <label>
+                  <Field component={input} name="is_ngo" type="checkbox" name="is_ngo"/> 
+                  Association à but non lucratif
+                </label>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <div className="checkbox">
+                <label>
+                  <Field component={input} name="is_hub" type="checkbox" name="is_hub"/> 
+                  Associé à une Banque Alimentaire
+                </label>
+              </div>
+            </div>
+
+
+            <div className="form-group">
+              <label htmlFor="hub">Quel est votre Banque Alimentaire?</label>
+              <select className="form-control" {...hub}>
+                <option>Bordeaux</option>
+                <option>Montpellier</option>
+                <option>...</option>
+              </select>
+            </div>
+
+            <div className="gray-row">
+
+              <div className="form-group">
+                <label htmlFor="nb_products">Nombre d&#39;exemplaires</label>
+                <select className="form-control" {...nb_products}>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <div className="radio">
+                  <label>
+                    <input type="radio" name="delivery_option" value="1" checked={this.state.delivery_option === 1} onChange={this.handleChange}/>
+                     Option 1: Livraison chez vous = 30€
+                  </label>
+                </div>
+                <div className="radio">
+                  <label>
+                    <input type="radio" name="delivery_option" value="2" checked={this.state.delivery_option === 2} onChange={this.handleChange}/>
+                    Option 2: Livraison chez votre Banque Alimentaire = 0€ !!!!
+                  </label>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="address1">Adresse de livraison</label>
+              <input className="form-control" type="text" id="address1" placeholder="Ligne 1" value={this.state.delivery_address.address1}/>
+              <input className="form-control" type="text" id="address2" placeholder="Ligne 2" value={this.state.delivery_address.address2}/>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="address1">Adresse de facturation</label>
+              <input className="form-control" type="text" id="address1" placeholder="Ligne 1"/>
+              <input className="form-control" type="text" id="address2" placeholder="Ligne 2"/>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="contact_name">Nom et prénom de la/du responsable de la commande</label>
+              <input className="form-control" className="form-control" type="text" id="contact_name" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="contact_email">Email</label>
+              <input className="form-control" type="email" id="contact_email" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="contact_mobile">Téléphone mobile</label>
+              <input className="form-control" type="text" id="contact_mobile" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="contact_phone">Téléphone fix</label>
+              <input className="form-control" type="text" id="contact_phone" />
+            </div>

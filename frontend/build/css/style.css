@@ -1,0 +1,53 @@
+
+#form-wrapper .widget {
+  -webkit-box-shadow: 1px 2px 0px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: 1px 2px 0px rgba(0, 0, 0, 0.05);
+  box-shadow: 1px 2px 0px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  margin-top: 35px;
+}
+
+#form-wrapper .widget .widget-header {
+  background-color: white;
+  color: #E6006C;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border: inherit;
+}
+
+#form-wrapper form button[type="submit"] {
+  position: relative;
+  display: block;
+  padding: 19px 39px 18px 39px;
+  color: white;
+  margin: 0 auto;
+  background: #EA6596;
+  font-size: 18px;
+  text-align: center;
+  font-style: normal;
+  width: 100%;
+  border: 1px solid #f291b4;
+  border-width: 1px 1px 3px;
+  margin-bottom: 10px;  
+}
+
+.gray-row {
+  margin: 0 -20px;
+  padding: 35px 20px 20px;
+  background-color: #fce8ef;
+}
+
+
+
+/****** BOOTSTRAP *****/
+@media (min-width: 992px) {
+    .container-small {
+        width: 800px;
+    }
+} 
+
+
+.container-small {
+    max-width: 100%;
+}
+
