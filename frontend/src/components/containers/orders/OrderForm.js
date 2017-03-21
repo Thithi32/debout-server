@@ -447,7 +447,7 @@ class OrderForm extends Component {
 
           <div className="row">
             <h2>BON DE COMMANDE</h2>
-            <h3><strong>debout n°12</strong> // <span className="small">juin - juillet - août 2017</span> </h3>
+            <h3><strong>debout n°12</strong><br /> <span className="small">juin - juillet - août 2017</span> </h3>
           </div>
         </div>
 

@@ -1,0 +1,87 @@
+<html>
+<head>
+  <style type="text/css">
+    .col.right { float: right; text-align: right; }
+    .col.left { float:left; }
+    .row { clear: both; }
+    .table { border: 2px solid; }
+    .table td { border-bottom: 1px solid lightgrey; padding: 5px 10px; }
+    .table > tbody > tr > .thick-line { border-top: 2px solid; }
+  </style>
+</head>
+<body>
+  <div class="invoice-title">
+    <p>
+      Bonjour %contact.fullname%,
+    </p>
+    <p>
+      Nous avons bien reçu votre commande pour l'envoi du magazine Debout n°12. Veuillez trouver ci-dessous les détails de celle-ci.
+    </p>
+    <p>
+      Cordialement,<br />
+      L'Equipe Debout
+    </p>
+  </div>
+  <hr>
+  <div class="row">
+    <h3 class="panel-title"><strong>Résumé de la commande</strong></h3>
+  </div>
+  <div class="row">
+    <div class="col left">
+      <address>
+        <strong>Facturé à:</strong><br>
+          %invoice.contact.name% %invoice.contact.firstname%<br>
+          %invoice.address.address1%<br>
+          %invoice.address.address2%<br>
+          %invoice.address.zip% %invoice.address.city%
+      </address>
+    </div>
+    <div class="col right">
+      <address>
+        <strong>Livraison:</strong><br>
+          %shipping.hub%
+          %shipping.contact.name% %shipping.contact.firstname%<br>
+          %shipping.address.address1%<br>
+          %shipping.address.address2%<br>
+          %shipping.address.zip% %shipping.address.city%
+
+      </address>
+    </div>
+  </div>
+  
+  <div class="row">
+    <br />
+    <table class="table">
+      <thead>
+        <tr>
+            <td><strong>Edition</strong></td>
+            <td class="text-center"><strong>Prix</strong></td>
+            <td class="text-center"><strong>Quantité</strong></td>
+            <td class="text-right"><strong>Total</strong></td>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- foreach ($order->lineItems as $line) or some such thing here -->
+        <tr>
+          <td>Debout n°12</td>
+          <td class="text-center">%price%€</td>
+          <td class="text-center">%nb_products%</td>
+          <td class="text-right">%subtotal%€</td>
+        </tr>
+        <tr>
+          <td class="thick-line"></td>
+          <td class="thick-line"></td>
+          <td class="thick-line text-center"><strong>Frais de livraison</strong></td>
+          <td class="thick-line text-right">%shipping_price%€</td>
+        </tr>
+        <tr>
+          <td class="no-line"></td>
+          <td class="no-line"></td>
+          <td class="no-line text-center"><strong>Total</strong></td>
+          <td class="no-line text-right">%total%€</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

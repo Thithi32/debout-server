@@ -43,7 +43,10 @@ export function createOrder( order ) {
       if (shipping.contact_disabled) delete shipping.contact_disabled;
       if (shipping.address_disabled) delete shipping.address_disabled;
       if (shipping.use_contact_for_shipping) shipping.contact = contact;
+      forder.shipping_option = 1;
       forder.shipping = shipping;
+    } else {
+      forder.shipping_option = 2;
     }
 
     if (invoice.contact_disabled) delete invoice.contact_disabled;
