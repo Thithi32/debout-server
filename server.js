@@ -59,7 +59,7 @@ csv()
 
 
         // START SERVER
-        let port = process.env.port || 8080;
+        let port = process.env.PORT || 8080;
         console.log('Server is running on port ' + port);
         app.listen(port, () => ('Server is running on port ' + port));
       }
