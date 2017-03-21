@@ -34,10 +34,27 @@ export function fetchHubs() {
 
 export function createOrder( order ) {
   return dispatch => {
-    console.log(JSON.stringify(order));
+
+    let { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, shipping, shipping_option, order : { contact } } = order;
+    let forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact };
+    const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "0";
+
+    if (!hub_shipping_available || shipping_option === "1") {
+      if (shipping.contact_disabled) delete shipping.contact_disabled;
+      if (shipping.address_disabled) delete shipping.address_disabled;
+      if (shipping.use_contact_for_shipping) shipping.contact = contact;
+      forder.shipping = shipping;
+    }
+
+    if (invoice.contact_disabled) delete invoice.contact_disabled;
+    if (invoice.address_disabled) delete invoice.address_disabled;
+    if(invoice.use_shipping_address) invoice.address = shipping.address;
+    if(invoice.use_contact_for_invoice) invoice.contact = contact;
+    forder.invoice = invoice;
+
     fetch("/api/order", { 
       method: "POST", 
-      body: JSON.stringify( { order }),
+      body: JSON.stringify( { order: forder }),
       headers: { 'Content-Type': 'application/json' } 
     })
       .then(res => res.json())

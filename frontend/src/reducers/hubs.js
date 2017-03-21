@@ -3,6 +3,7 @@ export default function hubs(state = [], action = {}) {
   switch (action.type) {
     case SET_HUBS: 
       return action.hubs;
-    default: return state;
+    default: 
+      return state;
   }
 }

@@ -31,6 +31,11 @@
   margin-bottom: 10px;  
 }
 
+#form-wrapper form button[disabled] {
+  background: white;
+  color: #EA6596;
+}
+
 .gray-row {
     margin: 0 -20px 35px;
     padding: 30px 20px 15px;
@@ -58,7 +63,6 @@
         width: 800px;
     }
 } 
-
 
 .container-small {
     max-width: 100%;

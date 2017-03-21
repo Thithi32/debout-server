@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { fetchCompanies, fetchHubs, createOrder } from "./../../../actions";
-import { Field, reduxForm, formValueSelector, FormSection, change as changeFieldValue } from 'redux-form';
+import { Field, reduxForm, formValueSelector, getFormSubmitErrors, FormSection, change as changeFieldValue } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
 import removeDiacritics from "./../../../helpers";
 
@@ -24,6 +24,18 @@ const packs = [
   { nb: 900, shipping: 150 },
   { nb: 1000, shipping: 170 }
 ];
+
+const renderInputError = ({input, meta, ...props}) => (
+  <div>
+  { meta.error &&
+    <div {...props} className="error">
+      <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span className="sr-only">Erreur:</span>
+      &nbsp;{meta.error}
+    </div>
+  }
+  </div>
+)
 
 const FormGroupInput = ({ input, label, ...props}) => (
   <div className="form-group">
@@ -81,10 +93,10 @@ class Address extends Component {
       <FormSection name={name}>
         <div className="form-group">
           <label htmlFor="address1">{ this.props.title }</label>
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange(e); }} className="form-control" type="text" name="address1" placeholder="Ligne 1 *" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange(e); }} className="form-control" type="text" name="address2" placeholder="Ligne 2" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange(e); }} className="form-control" type="text" name="zip" placeholder="Code postal *" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange(e); }} className="form-control" type="text" name="city" placeholder="Commune *" disabled={this.props.disabled} />
+          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address1" placeholder="Ligne 1 *" disabled={this.props.disabled} />
+          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address2" placeholder="Ligne 2" disabled={this.props.disabled} />
+          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="zip" placeholder="Code postal *" disabled={this.props.disabled} />
+          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="city" placeholder="Commune *" disabled={this.props.disabled} />
         </div>
       </FormSection>
     )
@@ -126,12 +138,12 @@ class Contact extends Component {
         { title &&
           <p className="title">{title}</p>
         }
-        <Field name="honorific" onChange={(e)=>{ this.props.onChange(e); }} label="Civilité" component={FormHonorific} disabled={this.props.disabled} className="form-control"/>
-        <Field name="name" onChange={(e)=>{ this.props.onChange(e); }} label="Nom *" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="firstname" onChange={(e)=>{ this.props.onChange(e); }} label="Prénom" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="email" onChange={(e)=>{ this.props.onChange(e); }} label="Email *" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="mobile" onChange={(e)=>{ this.props.onChange(e); }} label="Téléphone mobile" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="phone" onChange={(e)=>{ this.props.onChange(e); }} label="Téléphone fixe" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
+        <Field name="honorific" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Civilité" component={FormHonorific} disabled={this.props.disabled} className="form-control"/>
+        <Field name="name" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Nom *" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
+        <Field name="firstname" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Prénom" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
+        <Field name="email" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Email *" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
+        <Field name="mobile" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Téléphone mobile" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
+        <Field name="phone" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Téléphone fixe" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
       </FormSection>
     )
   }
@@ -287,9 +299,7 @@ const validate = (values) => {
     return errors;
   }
 
-  const errors = checkIsRequired(fields_validation,values);
-
-  return errors;
+  return checkIsRequired(fields_validation,values);
 }
 
 class OrderForm extends Component {
@@ -315,7 +325,7 @@ class OrderForm extends Component {
     let { options, ...other } = fieldProps;
     return (
       <Field {...other} component="select">
-          <option key={ 0 } value={ 0 }>Choisir votre hub</option>  
+          <option key={ 0 } value={ 0 }>Choisir votre Banque Alimentaire</option>  
         { options.map((option) =>
           <option key={ option.key } value={ option.value }>{ option.text }</option>  
         )}
@@ -333,7 +343,7 @@ class OrderForm extends Component {
   }
 
   selectCompany(company) {
-console.log(company);
+
     let invoice_address = {
         address1: company["(facture)\nAdresse"],
         address2: '  ',
@@ -373,7 +383,8 @@ console.log(company);
 
     this.props.initialize({ 
       company: company['Raison sociale'], 
-      is_ngo:  (company['Type'] === "Association"),
+      is_ngo:  (company['Type'].toLowerCase() === "association"),
+      is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: (company["Asso d'une BA ?"] !== "non"),
       hub,
       nb_products: this.props.nb_products,
@@ -397,14 +408,14 @@ console.log(company);
 
   render() {
     const { 
-      handleSubmit, company, is_ngo, has_hub, hub, nb_products, shipping_option, use_shipping_address, 
-      use_contact_for_shipping, use_contact_for_invoice, pristine, submitting } = this.props;
+      handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address, 
+      use_contact_for_shipping, use_contact_for_invoice, pristine, submitting, valid } = this.props;
 
-    const price = (is_ngo) ? 0.5 : 1.5;
+    const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
 
     const company_autocomplete = this.state.company_autocomplete;
 
-    const hub_shipping_available = has_hub && is_ngo && hub !== undefined && hub !== "0";
+    const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "0";
 
     const home_delivery = !hub_shipping_available || (parseInt(shipping_option) === 1);
 
@@ -438,7 +449,7 @@ console.log(company);
         <div className="widget-body">
 
           <p>
-            Bon de commande à remplir <strong>&rArr; AVANT le 10 juin 2017</strong><br />
+            Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
             Pour toute information, contactez-nous par mail à&nbsp;
             <a href="mailto:diffusion@debout.fr">diffusion@debout.fr</a><br/>
           </p>
@@ -464,27 +475,38 @@ console.log(company);
             <div className="form-group">
               <div className="checkbox">
                 <label>
+                  <Field name="is_ccas" component="input" type="checkbox"/> 
+                  Mairie / CCAS
+                </label>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <div className="checkbox">
+                <label>
                   <Field name="is_ngo" component="input" type="checkbox"/> 
                   Association à but non lucratif
                 </label>
               </div>
             </div>
 
-            { is_ngo && 
-              <div className="form-group">
-                <div className="checkbox">
-                  <label>
-                    <Field name="has_hub" component="input" type="checkbox"/> 
-                    Vous êtes associé à une Banque Alimentaire
-                  </label>
+            { (is_ngo || is_ccas) && 
+              <div>
+                <div className="form-group">
+                  <div className="checkbox">
+                    <label>
+                      <Field name="has_hub" component="input" type="checkbox"/> 
+                      Vous êtes associé à une Banque Alimentaire
+                    </label>
+                  </div>
                 </div>
-              </div>
-            }
 
-            { has_hub && 
-              <div className="form-group">
-                <label htmlFor="hub">Quelle est votre Banque Alimentaire?</label>
-                <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() }/>
+                { has_hub && 
+                  <div className="form-group">
+                    <label htmlFor="hub">Quelle est votre Banque Alimentaire?</label>
+                    <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() }/>
+                  </div>
+                }
               </div>
             }
 
@@ -584,6 +606,11 @@ console.log(company);
 
                 </Section>
 
+                <div className="form-group">
+                  <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre votre commande</label>
+                  <Field name="order_comment" component="textarea" className="form-control" rows="3"/>  
+                </div>
+
                 <div>
                   <p>
                     <small>
@@ -608,8 +635,51 @@ console.log(company);
                     </small>
                   </p>
                 </div>
+
+                { !valid &&
+                  <div className="gray-row">
+                    <div className="panel panel-default">
+                      <div className="panel-heading">
+                        <h3 className="panel-title title">Il manque des informations pour valider votre commande</h3>
+                      </div>
+                      <div className="panel-body">
+                        <Field name="company" component={renderInputError} />
+                        <Field name="nb_products" component={renderInputError} />
+                        <Field name="order.contact.name" component={renderInputError} />
+                        <Field name="order.contact.email" component={renderInputError} />
+                        { !use_shipping_address && (shipping_option === "2" || !hub_shipping_available) &&
+                          <div>
+                            <Field name="invoice.address.address1" component={renderInputError} />
+                            <Field name="invoice.address.zip" component={renderInputError} />
+                            <Field name="invoice.address.city" component={renderInputError} />
+                          </div>
+                        }
+                        { (shipping_option === "1" || !hub_shipping_available) &&
+                          <div>
+                            <Field name="shipping.address.address1" component={renderInputError} />
+                            <Field name="shipping.address.zip" component={renderInputError} />
+                            <Field name="shipping.address.city" component={renderInputError} />
+                          </div>
+                        }
+                        { !use_contact_for_invoice &&
+                          <div>
+                            <Field name="invoice.contact.name" component={renderInputError} />
+                            <Field name="invoice.contact.email" component={renderInputError} />
+                          </div>
+                        }
+                        { !use_contact_for_shipping &&
+                          <div>
+                            <Field name="shipping.contact.name" component={renderInputError} />
+                            <Field name="shipping.contact.email" component={renderInputError} />
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+
                 <div className="form-group">
-                  <button type="submit" disabled={pristine || submitting}>
+                  <button type="submit" disabled={pristine || submitting || !valid}>
                     Commander
                   </button>
                 </div>
@@ -625,6 +695,7 @@ console.log(company);
 
 OrderForm = reduxForm({
   form: 'order',
+  fields: [ 'company', 'order_comment' ],
   initialValues: {
     shipping_option: "2",
     shipping: {
@@ -653,13 +724,15 @@ function mapStateToProps(state) {
     hubs: state.hubs,
     company: selector(state, 'company'),
     is_ngo: selector(state, 'is_ngo'),
+    is_ccas: selector(state, 'is_ccas'),
     has_hub: selector(state, 'has_hub'),
     hub: selector(state, 'hub'),
     nb_products: selector(state, 'nb_products'),
     shipping_option: selector(state, 'shipping_option'),
     use_contact_for_shipping: selector(state, 'shipping.use_contact_for_shipping'),
     use_shipping_address: selector(state, 'invoice.use_shipping_address'),
-    use_contact_for_invoice: selector(state, 'invoice.use_contact_for_invoice')
+    use_contact_for_invoice: selector(state, 'invoice.use_contact_for_invoice'),
+    order: state.form.order
   }
 }
 

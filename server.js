@@ -57,7 +57,6 @@ csv()
           res.sendFile(path.join(__dirname + '/frontend/build' + req.originalUrl));
         })
 
-
         // START SERVER
         let port = process.env.PORT || 8080;
         console.log('Server is running on port ' + port);
