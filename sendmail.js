@@ -1,8 +1,5 @@
 /* https://ashokfernandez.wordpress.com/2016/05/27/using-sendgrid-templates-with-node-js/ */
 
-// Dev keys, use enviromnent variables instead
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "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";
-const SENDGRID_API_ID = process.env.SENDGRID_API_ID || "oAO-B7_nTtGXLLDhf4G7yA";
 const MAIL_APP = process.env.MAIL_APP || "tdelbart@gmail.com";
 
 const fs = require('fs');
@@ -30,7 +27,6 @@ class sendMail {
 
       fs.readFile('./templates/new_order.html', 'utf8', function (err,template) {
 
-console.log("Starting sending mail");
         if (err) {
           console.log(err)
           reject();
