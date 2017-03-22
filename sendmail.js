@@ -1,6 +1,16 @@
 /* https://ashokfernandez.wordpress.com/2016/05/27/using-sendgrid-templates-with-node-js/ */
+import config from './config'
 
-const MAIL_APP = process.env.MAIL_APP || "tdelbart@gmail.com";
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || config.SENDGRID_API_KEY;
+const MAIL_APP = process.env.MAIL_APP || config.MAIL_APP;
+
+if (!SENDGRID_API_KEY) {
+  console.log('!!!! Missing SENDGRID_API_KEY configuration !!!!!');
+}
+
+if (!MAIL_APP) {
+  console.log('!!!! Missing MAIL_APP configuration !!!!!');
+}
 
 const fs = require('fs');
 
