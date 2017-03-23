@@ -211,6 +211,7 @@ const fields_validation = [
     fields: [
       {
         name: 'address',
+        condition: ['invoice_address'],
         fields: [
           { 
             name: 'address1',
@@ -228,6 +229,7 @@ const fields_validation = [
       },
       {
         name: 'contact',
+        condition: ['invoice_contact'],
         fields: [
           { 
             name: 'name',
@@ -243,9 +245,11 @@ const fields_validation = [
   },
   {
     name: 'shipping',
+    condition: ['shipping'],
     fields: [
       {
         name: 'address',
+        condition: ['shipping'],
         fields: [
           { 
             name: 'address1',
@@ -263,6 +267,7 @@ const fields_validation = [
       },
       {
         name: 'contact',
+        condition: ['shipping','shipping_contact'],
         fields: [
           { 
             name: 'name',
@@ -279,14 +284,31 @@ const fields_validation = [
 ];
 
 const validate = (values) => {
+  const need_shipping = !(values.shipping_option == 2 && values.hub);
+  const conditions = {
+    shipping: need_shipping,
+    shipping_contact: !(values.shipping && values.shipping.use_contact_for_shipping),
+    invoice_address: !need_shipping || !(values.invoice && values.invoice.use_shipping_address),
+    invoice_contact: !(values.invoice && values.invoice.use_contact_for_invoice)
+  }
 
   const checkIsRequired = (fields,values) => {
     let errors = {};
     fields.map((field) => {
       if (field.fields) {
+
+        let checkError = true;
+        if (field.condition) {
+          for (var i in field.condition) {
+            checkError = checkError && conditions[field.condition[i]];
+          }
+        }
+
+        if (checkError) {
           errors[field.name] = checkIsRequired(field.fields,values[field.name] || {});
+        }
       } else {
-        if (field.greater_than) {
+        if (field.greater_than ) {
           if (values[field.name] <= field.greater_than.value) {
             errors[field.name] = field.greater_than.message;
           }
@@ -652,32 +674,16 @@ class OrderForm extends Component {
                         <Field name="nb_products" component={renderInputError} />
                         <Field name="order.contact.name" component={renderInputError} />
                         <Field name="order.contact.email" component={renderInputError} />
-                        { !use_shipping_address && (shipping_option === "2" || !hub_shipping_available) &&
-                          <div>
-                            <Field name="invoice.address.address1" component={renderInputError} />
-                            <Field name="invoice.address.zip" component={renderInputError} />
-                            <Field name="invoice.address.city" component={renderInputError} />
-                          </div>
-                        }
-                        { (shipping_option === "1" || !hub_shipping_available) &&
-                          <div>
-                            <Field name="shipping.address.address1" component={renderInputError} />
-                            <Field name="shipping.address.zip" component={renderInputError} />
-                            <Field name="shipping.address.city" component={renderInputError} />
-                          </div>
-                        }
-                        { !use_contact_for_invoice &&
-                          <div>
-                            <Field name="invoice.contact.name" component={renderInputError} />
-                            <Field name="invoice.contact.email" component={renderInputError} />
-                          </div>
-                        }
-                        { !use_contact_for_shipping &&
-                          <div>
-                            <Field name="shipping.contact.name" component={renderInputError} />
-                            <Field name="shipping.contact.email" component={renderInputError} />
-                          </div>
-                        }
+                        <Field name="invoice.address.address1" component={renderInputError} />
+                        <Field name="invoice.address.zip" component={renderInputError} />
+                        <Field name="invoice.address.city" component={renderInputError} />
+                        <Field name="shipping.address.address1" component={renderInputError} />
+                        <Field name="shipping.address.zip" component={renderInputError} />
+                        <Field name="shipping.address.city" component={renderInputError} />
+                        <Field name="invoice.contact.name" component={renderInputError} />
+                        <Field name="invoice.contact.email" component={renderInputError} />
+                        <Field name="shipping.contact.name" component={renderInputError} />
+                        <Field name="shipping.contact.email" component={renderInputError} />
                       </div>
                     </div>
                   </div>

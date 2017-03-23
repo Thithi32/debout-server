@@ -1,3 +1,22 @@
+import config from './config'
+
+const GOOGLE_DOC_KEY = process.env.GOOGLE_DOC_KEY || config.GOOGLE_DOC_KEY;
+const GOOGLE_CREDS_CLIENT_EMAIL = process.env.GOOGLE_CREDS_CLIENT_EMAIL || config.GOOGLE_CREDS_CLIENT_EMAIL;
+const GOOGLE_CREDS_PRIVATE_KEY = process.env.GOOGLE_CREDS_PRIVATE_KEY || config.GOOGLE_CREDS_PRIVATE_KEY;
+
+if (!GOOGLE_DOC_KEY) {
+  console.log('!!!! Missing GOOGLE_DOC_KEY configuration !!!!!');
+}
+
+if (!GOOGLE_CREDS_CLIENT_EMAIL) {
+  console.log('!!!! Missing GOOGLE_CREDS_CLIENT_EMAIL configuration !!!!!');
+}
+
+if (!GOOGLE_CREDS_PRIVATE_KEY) {
+  console.log('!!!! Missing GOOGLE_CREDS_PRIVATE_KEY configuration !!!!!');
+}
+
+
 class Store {
 
   getFirstEmptyRow(sheet) {
@@ -30,11 +49,11 @@ class Store {
       }
 
       var GoogleSpreadsheet = require('google-spreadsheet');
-      var doc = new GoogleSpreadsheet('1LvsJd9EZa6Ta3AXC-xx-4OBnNHGtlnh7qL7JMqve5FY');
+      var doc = new GoogleSpreadsheet(GOOGLE_DOC_KEY);
 
       var creds_json = {
-        client_email: '577471873115-compute@developer.gserviceaccount.com',
-        private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCqxEyJ36zb9sV1\nv7Ied2FOQKRKMwN6TB7Dad35FKlsS9dxwJP5tan/KFdVW4jmRRrvmFVYZ7gVyScd\nP9K9dRP/mnmYnZZDDPus02b6BdmP1E6xspoQIe+l4HbahmDEwyEKt1kQHpOju/6x\nGeK3nLY1Knyqu2zksE+XMsOPXirJ7UZ9GvlbnR9W0ISAYpF0KyCsDrKrYpArSgEh\nHvjAT5A9FQPeJnf2XE3axMFKrAeEMsoVjYdOgYQS6dvswxHhWqjqHCsR3Y6ocaFr\ns16EYbxJLwwLAAMSLMklLlmXybmAKUgCWP9Exc1a+AMiFXB4heHArgyJn59U4WSN\nXIf4luXdAgMBAAECggEAebkhAapBsi1txSgWlCbuYnQrZ4SDdxppV0vQYOr8dWh+\nMuRd1kJK4clkr0BnDhS2RZElTLXp/wV6bxv+YPPihHEdOc8iu7q2bxPltFSVJzPj\nwECaFuPJykh9D/l3YungVJ4qyxWwkabAvobAF7eKHc2iPaUJ0t1mblVOFpS+FV50\nvOavZ5r8Xoa/blr3JSTIJ6jH+8Fa+VZaO0cwOEU/+CaYTeAObur9ag+esk5wwGYj\nV8PNFwR+xENcfBVm+zO0RdEiBOJD2Tx32+2WhD+ZtgjyMo36lPh7oYko7bTr7V6K\nPE05X9jRnOUetnhDvz/m0KUvNVaIlv2EKnYkENDewQKBgQDiSwiBSUfKGxKM7/1H\nhnCuWnurFzwAhZV7cDrj3fSdDb4uISykBzF007FGEhcaZ88biMJ5qhrl05hL4G+E\nLeVdAT7J8Yencuh/SHcY527MKkv9vYU3p0AGh0ohqdKCJn3EY5CS2OlJ6mOyOOQ8\nGZ5IDzPHz1Mj16Cyo48Z4m+EbQKBgQDBLzWRJvPcESDuaWzIYUJF7YwrqW2B1tqV\nXaycIm+vYjlHUJyT7XMmSllPLw/qFjguxb8V7zpCKBfvnLLYdjym+VuCRP1vVJ3h\nWFAJNobDIaw0c7JNGPtB0b6n3vvs8jno3WUyv7+uMOy44WTsioF8JyJQjQCOjSvw\n80aYpQ6hMQKBgQCOLii82qchhBsGtG8F9qFr2uwi1mlbxpLiSOSncTiVSSI555wd\nv2tChRO3+/vKGnlVSnsuaEOYLXdeDTjj6tZWtkaWKYxbGGaeOpCh9B94Zgby+ZXv\nHsWqlGxudD4QilCxCQG4UlNZnsxfGUHFxS7fBbY6D7ikJ4IPW5a4472/jQKBgQC9\nbFIFCwHQhkcZHuyYqq02Lg/kfBQxXQAlt51Z13ZVrWVmpQdzEUB4iix6NTZQnQrn\n6eRNWK5yUifuPmMrVvxv6U+uM4GhmYHZhSOtdPa8/RaCs/NgH5+20Tg2GLJDitv3\nlqb1FQmZfsWPHws72S/QEftWqnuiS5CLia9uW2I18QKBgHQYoZG+5sccg9NG7sBB\njEby7GIjXWizyQZcKwZZzQqoIYCK9pdXIoCwZFwjyC0ZWhXVsIKdQBc2S471voQD\n4X7JcT3O3lNosecIzOOwwHA2FikUB8sPHacvajpTLger5EddYWF5RB0WGPH3r61A\nucxp2+Tf3Ue2+koOZTIcVr4M\n-----END PRIVATE KEY-----\n"
+        client_email: GOOGLE_CREDS_CLIENT_EMAIL,
+        private_key: GOOGLE_CREDS_PRIVATE_KEY
       }
 
       doc.useServiceAccountAuth(creds_json, function(err) {
