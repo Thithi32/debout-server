@@ -35,8 +35,8 @@ export function fetchHubs() {
 export function createOrder( order ) {
   return dispatch => {
 
-    let { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, shipping, shipping_option, order : { contact } } = order;
-    let forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact };
+    let { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, order_comment, shipping, shipping_option, order : { contact } } = order;
+    let forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact, order_comment };
     const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "0";
 
     if (!hub_shipping_available || shipping_option === "1") {

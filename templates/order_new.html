@@ -1,0 +1,115 @@
+<html>
+<head>
+  <style type="text/css">
+    .col.right { float: left; text-align: right; width:50%; }
+    .col.left { float: left; width:50%; }
+    .row { clear: both; }
+    .table { border: 2px solid; }
+    .table td { border-bottom: 1px solid lightgrey; padding: 5px 10px; }
+    .table > tbody > tr > .thick-line { border-top: 2px solid; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    label { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="invoice-title">
+    <p>
+      Bonjour,
+    </p>
+    <p>
+      Ci-dessous la nouvelle commande de <em>%company%</em> faite par <em>%contact.fullname%</em>.
+    </p>
+  </div>
+  <hr>
+  <div class="row">
+    <h3 class="panel-title"><strong>Résumé de la commande</strong></h3>
+  </div>
+  <div class="row">
+    <h2>Commande pour:</h2>
+    <p>
+      <label>Fournisseur:</label> %company%<br />
+      <label>Association:</label> %is_ngo%<br />
+      <label>CCAS:</label> %is_ccas%<br />
+      <label>BA:</label> %hub%
+    </p>
+    <p>
+      <strong>Responsable de la commande:</strong>
+      <label>Nom:</label> %contact.name%<br />
+      <label>Prénom:</label> %contact.firstname%<br />
+      <label>Email:</label> %contact.email%<br />
+      <label>Portable:</label> %contact.mobile%<br />
+      <label>Fixe:</label> %contact.phone%
+    </p>
+    <h2>Détail de la commande:</h2>
+    <table class="table">
+      <thead>
+        <tr>
+            <td><strong>Edition</strong></td>
+            <td class="text-center"><strong>Prix</strong></td>
+            <td class="text-center"><strong>Quantité</strong></td>
+            <td class="text-right"><strong>Total</strong></td>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- foreach ($order->lineItems as $line) or some such thing here -->
+        <tr>
+          <td>Debout n°12</td>
+          <td class="text-center">%price%€</td>
+          <td class="text-center">%nb_products%</td>
+          <td class="text-right">%subtotal%€</td>
+        </tr>
+        <tr>
+          <td class="thick-line text-right" colspan="3"><strong>Frais de livraison</strong></td>
+          <td class="thick-line text-right">%shipping_price%€</td>
+        </tr>
+        <tr>
+          <td class="thick-line text-right" colspan="3"><strong>Total</strong></td>
+          <td class="no-line text-right">%total%€</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <strong>Commentaires pour la commande:</strong><br/>
+      <em>"%order_comment%"</em>
+    </p>
+  </div>
+  <div class="row">
+    <div class="col left">
+      <h2>Livraison</h2>
+      <p>
+        <label>Lieu de livraison:</label>%shipping_place%
+      <p>
+        <label>Nom:</label> %shipping.contact.name%<br />
+        <label>Prénom:</label> %shipping.contact.firstname%<br />
+        <label>Email:</label> %shipping.contact.email%<br />
+        <label>Portable:</label> %shipping.contact.mobile%<br />
+        <label>Fixe:</label> %shipping.contact.phone%
+      </p>
+      <p>
+        <label>Adresse 1:</label> %shipping.address.address1%<br />
+        <label>Adresse 2:</label> %shipping.address.address2%<br />
+        <label>Code Postal:</label> %shipping.address.zip%<br />
+        <label>Ville:</label> %shipping.address.city%
+      </p>
+    </div>
+
+    <div class="col right">
+      <h2>Facturation</h2>
+      <p>
+        <label>Nom:</label> %invoice.contact.name%<br />
+        <label>Prénom:</label> %invoice.contact.firstname%<br />
+        <label>Email:</label> %invoice.contact.email%<br />
+        <label>Portable:</label> %invoice.contact.mobile%<br />
+        <label>Fixe:</label> %invoice.contact.phone%
+      </p>
+      <p>
+        <label>Adresse 1:</label> %invoice.address.address1%<br />
+        <label>Adresse 2:</label> %invoice.address.address2%<br />
+        <label>Code Postal:</label> %invoice.address.zip%<br />
+        <label>Ville:</label> %invoice.address.city%
+      </p>
+    </div>
+  </div>
+</body>
+</html>

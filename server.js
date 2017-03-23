@@ -44,21 +44,27 @@ const validOrder = (order) => {
     }
   }
 
-  if (order['shipping_option'] === 2) order['shipping'] = { hub:  order['hub'] };
+  order['shipping_place'] = (order['shipping_option'] === 2) ? order['hub'] : order['company'];
 
   order['total'] = order['subtotal'] + order['shipping_price'];
 
   return order;
 }
 
+const findCompany = (companies, name) => {
+  return companies.find(function(company) { return tolower(company['Raison sociale']) === tolower(name) })
+}
+
 // PARSING COMPANIES FILE
 let companies = [];
 let hubs = [];
+let line = 2
 const csv=require('csvtojson');
 csv()
 .fromFile('./companies.csv')
 .on('json',(jsonObj)=>{
-    companies.push(jsonObj);
+  jsonObj.line = line++;
+  companies.push(jsonObj);
 })
 .on('done',(error)=>{
   if (error) {
@@ -66,10 +72,12 @@ csv()
   } else {
     console.log('Companies parsed successfully!');
 
+    line = 2;
     csv()
     .fromFile('./hubs.csv')
     .on('json',(jsonObj)=>{
-        hubs.push(jsonObj);
+      jsonObj.line = line++;
+      hubs.push(jsonObj);
     })
     .on('done',(error)=>{
       if (error) {
@@ -86,54 +94,16 @@ csv()
           res.json({ hubs });
         });
 
-        app.get('/mail/test', (req,res) => {
-
-          let order = {
-            "company": "Epicerie Solidaire -Cœur de Nacre Entraide",
-            "is_ngo": true,
-            "is_ccas": false,
-            "has_hub": true,
-            "hub": "BANQUE ALIMENTAIRE DU CALVADOS",
-            "nb_products": "100",
-            "shipping_option": 2,
-            "contact": {
-              "name": "Delbart",
-              "firstname": "Thierry",
-              "email": "tdelbart@yahoo.fr",
-              "mobile": "998007651",
-              "phone": "30763225"
-            },
-            "invoice": {
-              "address": {
-                "address1": "204 rue de Crimée",
-                "address2": "  ",
-                "zip": "75019",
-                "city": "PARIS"
-              },
-              "use_shipping_address": false,
-              "contact": {
-                "honorific": "Mme",
-                "name": "CHARLES",
-                "email": "berengere.charles@voisin-malin.fr",
-                "mobile": "06 61 23 73 43",
-                "phone": "01 42 09 59 39"
-              },
-              "use_contact_for_invoice": false
-            }
-          };
-
-          let mail = new sendMail();
-          mail.new_order(validOrder(order))
-            .then((message)=> res.json({ status: "OK", message }))
-            .catch((error) => res.json({ status: "ERROR", error }));
-        })
-
         app.post('/api/order', (req,res) => {
           let mail = new sendMail();
-          mail.new_order(validOrder(req.body.order))
-            .then((message)=> res.json({ status: "OK", message }))
+          const order = validOrder(req.body.order);
+          mail.order_new(order)
+            .then((message) => {
+              mail.order_confirmation(order)
+                .then((message2)=> res.json({ status: "OK", response: {'order_new': message, 'order_confirmation': message2 }}))
+                .catch((error) => res.json({ status: "ERROR", error }));
+            })
             .catch((error) => res.json({ status: "ERROR", error }));
-
         });
 
         app.get('/', (req,res) => {
