@@ -1,6 +1,8 @@
+import {reset} from 'redux-form';
+
 export const SET_COMPANIES = "SET_COMPANIES";
 export const SET_HUBS = "SET_HUBS";
-export const CREATE_ORDER = "CREATE_ORDER";
+export const CREATE_ORDER = "ORDER_CREATED";
 
 export function setCompanies(companies) {
   return {
@@ -62,12 +64,12 @@ export function createOrder( order ) {
     })
       .then(res => res.json())
       .then(data => {
-        alert("Commande envoyée avec succès");
-        console.log(data);
-        dispatch({
-          type: CREATE_ORDER,
-          response: data
-        });
+        if (data.status == "OK") {
+          alert("Votre commande a été envoyée et enregistrée avec succès. Vous devriez recevoir un email de confirmation à l'adresse " + forder.contact.email);
+//          dispatch(reset('order'));  // requires form name 
+        } else {
+          alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email diffusion@debout.fr");
+        }
       });
   }
 }

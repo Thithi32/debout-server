@@ -1,7 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import path from "path";
-import sendMail from "./sendmail";
+import SendMail from "./sendmail";
+import Store from "./store";
+import moment from "moment";
 
 const app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -27,6 +29,17 @@ const packs = [
   { nb: 1000, shipping: 170 }
 ];
 
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
 const validOrder = (order) => {
 
   let fullname = [];
@@ -48,11 +61,19 @@ const validOrder = (order) => {
 
   order['total'] = order['subtotal'] + order['shipping_price'];
 
+  order['date'] = moment().format('DD/MM/YY, HH:mm:ss');
+  order['id'] = (moment().format('YYMMDDHHmmss') + order.company).hashCode();
+
+  let bdd = findCompany(order['company']);
+  if (bdd) order['bdd'] = bdd;
+
+  order['transport'] = (order.nb_products > 450) || (order.shipping_option === 2) ? "OPTITRANS" : "EUROPE ROUTAGE";
+
   return order;
 }
 
-const findCompany = (companies, name) => {
-  return companies.find(function(company) { return tolower(company['Raison sociale']) === tolower(name) })
+const findCompany = (name) => {
+  return companies.find(function(company) { return company['Raison sociale'].toLowerCase() === name.toLowerCase() })
 }
 
 // PARSING COMPANIES FILE
@@ -95,16 +116,47 @@ csv()
         });
 
         app.post('/api/order', (req,res) => {
-          let mail = new sendMail();
+          let mail = new SendMail();
           const order = validOrder(req.body.order);
           mail.order_new(order)
             .then((message) => {
-              mail.order_confirmation(order)
-                .then((message2)=> res.json({ status: "OK", response: {'order_new': message, 'order_confirmation': message2 }}))
-                .catch((error) => res.json({ status: "ERROR", error }));
+              const store = new Store();
+              store.order_new(order)
+                .then((message2) => {
+                  mail.order_confirmation(order)
+                    .then((message3) => res.json({ 
+                      status: "OK", 
+                      response: {
+                        'order_new': message, 
+                        'store_order': message2,
+                        'order_confirmation': message3
+                      }
+                    }))
+                    .catch((error) => {
+                      console.log("- ERROR -- " + error,order);
+                      res.json({ status: "ERROR", error });
+                    })
+                })
+                .catch((error) => {
+                  console.log("- ERROR -- " + error,order);
+                  res.json({ status: "ERROR", error });
+                })
+            })
+            .catch((error) => {
+              console.log("- ERROR -- " + error,order);
+              res.json({ status: "ERROR", error });
+            })
+        });
+
+        app.get('/test', (req,res) => {
+          const store = new Store();
+
+          store.order_new()
+            .then((message) => {
+              res.json({ status: "OK", message });
             })
             .catch((error) => res.json({ status: "ERROR", error }));
-        });
+        })
 
         app.get('/', (req,res) => {
           res.sendFile(path.join(__dirname + '/frontend/build/index.html'));

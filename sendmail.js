@@ -21,14 +21,14 @@ const template_replace = (text,object,base) => {
     if (typeof(object[key]) === 'object') {
       text = template_replace(text,object[key],newbase);
     } else {
-      text = text.replace("%" + newbase + "%",object[key]);
+      text = text.replace(new RegExp("%" + newbase + "%","g"),object[key]);
     }
   }
   if (base === "") text = text.replace(/%.+%/g,'');
   return text;
 }
 
-class sendMail {
+class SendMail {
 
   order_new(order) {
     const self = this;
@@ -99,4 +99,4 @@ class sendMail {
 
 }
 
-export default sendMail;
+export default SendMail;
