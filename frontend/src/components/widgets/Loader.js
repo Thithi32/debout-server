@@ -7,7 +7,7 @@ class Loader extends Component {
     return (
       <div className="loader-container">
         { this.props.loading &&
-          <div className="wait-layer">
+          <div className="loader-layer">
             <div className='loader'>
               <div className='loader_overlay'></div>
               <div className='loader_cogs'>
