@@ -1,8 +1,8 @@
-import {reset} from 'redux-form';
-
 export const SET_COMPANIES = "SET_COMPANIES";
 export const SET_HUBS = "SET_HUBS";
 export const CREATE_ORDER = "ORDER_CREATED";
+export const START_LOADING = "START_LOADING";
+export const STOP_LOADING = "STOP_LOADING";
 
 export function setCompanies(companies) {
   return {
@@ -34,9 +34,27 @@ export function fetchHubs() {
   }
 }
 
+export function startLoading() {
+  return dispatch => {
+    dispatch({
+      type: START_LOADING
+    });
+  }
+}
+
+export function stopLoading() {
+  return dispatch => {
+    dispatch({
+      type: STOP_LOADING
+    });
+  }
+}
+
 export function createOrder( order ) {
   return dispatch => {
-
+    dispatch({
+      type: START_LOADING
+    });
     let { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, order_comment, shipping, shipping_option, order : { contact } } = order;
     let forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact, order_comment };
     const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "0";
@@ -65,11 +83,17 @@ export function createOrder( order ) {
       .then(res => res.json())
       .then(data => {
         if (data.status == "OK") {
+          dispatch({
+            type: STOP_LOADING
+          });
           alert("Votre commande a été envoyée et enregistrée avec succès. Vous devriez recevoir un email de confirmation à l'adresse " + forder.contact.email);
-//          dispatch(reset('order'));  // requires form name 
+          window.location = 'http://debout.fr';
         } else {
           alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email diffusion@debout.fr");
         }
+      })
+      .catch(error => {
+        alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email diffusion@debout.fr");
       });
   }
 }

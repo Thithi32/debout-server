@@ -1,1 +1,9 @@
-
+.wait-layer {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  background-color: rgba(252,232,239,.8);
+}
