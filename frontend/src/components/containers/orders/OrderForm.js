@@ -719,7 +719,7 @@ OrderForm = reduxForm({
   fields: [ 'company', 'order_comment' ],
   initialValues: {
     shipping_option: "2",
-    order_signed: true,
+    order_signed: false,
     shipping: {
       use_contact_for_shipping: true
     },
