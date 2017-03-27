@@ -82,7 +82,7 @@ export function createOrder( order ) {
     })
       .then(res => res.json())
       .then(data => {
-        if (data.status == "OK") {
+        if (data.status === "OK") {
           dispatch({
             type: STOP_LOADING
           });

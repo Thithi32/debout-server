@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { fetchCompanies, fetchHubs, createOrder } from "./../../../actions";
-import { Field, reduxForm, formValueSelector, getFormSubmitErrors, FormSection, change as changeFieldValue } from 'redux-form';
+import { Field, reduxForm, formValueSelector, FormSection, change as changeFieldValue } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
 import removeDiacritics from "./../../../helpers";
 
@@ -271,11 +271,11 @@ const fields_validation = [
         fields: [
           { 
             name: 'name',
-            isRequired: "Le nom du responsable de la réception de la livraison est obligatoire" 
+            isRequired: "Le nom du contact pour la livraison est obligatoire" 
           },
           { 
             name: 'email',
-            isRequired: "L'email du responsable de la réception de la livraison est obligatoire" 
+            isRequired: "L'email du contact pour la livraison est obligatoire" 
           }
         ]
       }
@@ -284,7 +284,7 @@ const fields_validation = [
 ];
 
 const validate = (values) => {
-  const need_shipping = !(values.shipping_option == 2 && values.hub);
+  const need_shipping = !(parseInt(values.shipping_option,10) === 2 && values.hub);
   const conditions = {
     shipping: need_shipping,
     shipping_contact: !(values.shipping && values.shipping.use_contact_for_shipping),
@@ -317,11 +317,18 @@ const validate = (values) => {
           errors[field.name] = field.isRequired;
         }
       } 
+      return true;
     });
     return errors;
   }
 
-  return checkIsRequired(fields_validation,values);
+  let errors = checkIsRequired(fields_validation,values);
+
+  if (!values.order_signed) {
+    errors.order_signed = "Vous devez accepter les termes d'engagement de la commande";
+  }
+
+  return errors;
 }
 
 class OrderForm extends Component {
@@ -408,6 +415,7 @@ class OrderForm extends Component {
       is_ngo:  (company['Type'].toLowerCase() === "association"),
       is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: (company["Asso d'une BA ?"] !== "non"),
+      order_sgned: false,
       hub,
       nb_products: this.props.nb_products,
       shipping_option: "2",
@@ -435,11 +443,9 @@ class OrderForm extends Component {
 
     const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
 
-    const company_autocomplete = this.state.company_autocomplete;
-
     const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "0";
 
-    const home_delivery = !hub_shipping_available || (parseInt(shipping_option) === 1);
+    const home_delivery = !hub_shipping_available || (parseInt(shipping_option,10) === 1);
 
     let shipping_price = 0;
     let shipping_home_price = 0;
@@ -523,7 +529,7 @@ class OrderForm extends Component {
                   <div className="checkbox">
                     <label>
                       <Field name="has_hub" component="input" type="checkbox"/> 
-                      Vous êtes associé à une Banque Alimentaire
+                      Vous êtes partenaire d&#39;une Banque Alimentaire
                     </label>
                   </div>
                 </div>
@@ -600,7 +606,7 @@ class OrderForm extends Component {
                       </div>
                     </div>
 
-                    <ContactDisable disabled={use_contact_for_shipping} title="Responsable de la réception"/>
+                    <ContactDisable disabled={use_contact_for_shipping} title="Contact pour la livraison"/>
  
                   </Section>
                 }
@@ -645,20 +651,23 @@ class OrderForm extends Component {
                     </small>
                   </p>
                   <p>
+
+                    <Field name="order_signed" component="input" type="checkbox" /> 
+
                     <small>
-                      En envoyant ce bon de commande, je m’engage
+                      &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
+                      &nbsp;Je m’engage
                       { (!hub_shipping_available || parseInt(shipping_option,10) !== 2) &&
                         <span>
-                          &nbsp;à régler les frais de livraison et de traitement de ma commande à réception de la facture.
+                          &nbsp;à régler les frais de livraison et de traitement de ma commande ({total}€) à réception de la facture.
                         </span>
                       }
                       { hub_shipping_available && parseInt(shipping_option,10) === 2 &&
                         <span>
-                          &nbsp;à respecter les dates de récupération de ma commande sur la plateforme relais de distribution que j’ai choisie. 
+                          &nbsp;à régler les frais de traitement de ma commande ({total}€) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution <em>{hub}</em>.
                         </span>
                       }
                       <br />
-                      <strong>Ce bon de commande vaut commande définitive.</strong>
                     </small>
                   </p>
                 </div>
@@ -684,6 +693,7 @@ class OrderForm extends Component {
                         <Field name="invoice.contact.email" component={renderInputError} />
                         <Field name="shipping.contact.name" component={renderInputError} />
                         <Field name="shipping.contact.email" component={renderInputError} />
+                        <Field name="order_signed" component={renderInputError} />
                       </div>
                     </div>
                   </div>
@@ -709,6 +719,7 @@ OrderForm = reduxForm({
   fields: [ 'company', 'order_comment' ],
   initialValues: {
     shipping_option: "2",
+    order_signed: true,
     shipping: {
       use_contact_for_shipping: true
     },

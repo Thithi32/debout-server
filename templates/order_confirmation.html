@@ -30,6 +30,7 @@
     <div class="col left">
       <address>
         <strong>Facturé à:</strong><br>
+          %company%<br />
           %invoice.contact.name% %invoice.contact.firstname%<br>
           %invoice.address.address1%<br>
           %invoice.address.address2%<br>
@@ -39,12 +40,11 @@
     <div class="col right">
       <address>
         <strong>Livraison:</strong><br>
-          %shipping_place%
           %shipping.contact.name% %shipping.contact.firstname%<br>
+          %shipping_place%<br />
           %shipping.address.address1%<br>
           %shipping.address.address2%<br>
           %shipping.address.zip% %shipping.address.city%
-
       </address>
     </div>
   </div>
@@ -82,6 +82,9 @@
         </tr>
       </tbody>
     </table>
+    <p>
+      Date approximative de livraison: <strong>le 15 Juin 2017</strong>
+    </p>
   </div>
 </body>
 </html>
