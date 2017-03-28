@@ -355,7 +355,7 @@ class OrderForm extends Component {
     let { options, ...other } = fieldProps;
     return (
       <Field {...other} component="select">
-          <option key={ 0 } value={ 0 }>Choisir votre Banque Alimentaire</option>  
+          <option key={ "BEEOTOP" } value={ "BEEOTOP" }>Choisir votre Banque Alimentaire</option>  
         { options.map((option) =>
           <option key={ option.key } value={ option.value }>{ option.text }</option>  
         )}
@@ -444,9 +444,9 @@ class OrderForm extends Component {
 
     const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
 
-    const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "0";
+    const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "BEEOTOP";
 
-    const home_delivery = !hub_shipping_available || (parseInt(shipping_option,10) === 1);
+    const home_delivery = (parseInt(shipping_option,10) === 1);
 
     let shipping_price = 0;
     let shipping_home_price = 0;
@@ -550,22 +550,30 @@ class OrderForm extends Component {
                 <small>À noter : Un paquet de 25 exemplaires du magazine pèse environ 3,5 kg.</small>
               </div>
 
-              { hub_shipping_available &&
-                <div className="form-group">
-                  <label htmlFor="nb_products">Choisir votre mode de livraison</label>
-                  <div className="radio">
-                    <label>
-                      <Field component="input" type="radio" name="shipping_option" value="1"/>
-                       Option 1: Livraison chez vous = { shipping_home_price }€
-                    </label>
-                  </div>
-                  <div className="radio">
-                    <label>
-                      <Field component="input" type="radio" name="shipping_option" value="2"/>
-                      Option 2: Livraison chez votre Banque Alimentaire = 0€ !!!!
-                    </label>
-                  </div>
+              <div className="form-group">
+                <label htmlFor="nb_products">Choisir votre mode de livraison</label>
+                <div className="radio">
+                  <label>
+                    <Field component="input" type="radio" name="shipping_option" value="1"/>
+                     Option 1: Livraison chez vous = { shipping_home_price }€
+                  </label>
                 </div>
+                <div className="radio">
+                  <label>
+                    <Field component="input" type="radio" name="shipping_option" value="2"/>
+                     
+                    { hub_shipping_available &&
+                      <span>Option 2: Livraison chez votre Banque Alimentaire = 0€ !!!!</span>
+                    }
+                    { !hub_shipping_available &&
+                      <div>
+                        <span>Option 2: Livraison au BEEOTOP de Paris = 0€ !!!!</span>
+                        <p><em>Adresse: 14 boulevard de Douaumont – 75017 Paris</em></p>
+                      </div>
+                    }
+                  </label>
+                </div>
+              </div>
               }
 
               <OrderFormTable 
@@ -656,12 +664,12 @@ class OrderForm extends Component {
                     <small>
                       &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
                       &nbsp;Je m’engage
-                      { (!hub_shipping_available || parseInt(shipping_option,10) !== 2) &&
+                      { (parseInt(shipping_option,10) === 1) &&
                         <span>
                           &nbsp;à régler les frais de livraison et de traitement de ma commande ({total}€) à réception de la facture.
                         </span>
                       }
-                      { hub_shipping_available && parseInt(shipping_option,10) === 2 &&
+                      { (parseInt(shipping_option,10) === 2) &&
                         <span>
                           &nbsp;à régler les frais de traitement de ma commande ({total}€) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution <em>{hub}</em>.
                         </span>
@@ -717,8 +725,9 @@ OrderForm = reduxForm({
   form: 'order',
   fields: [ 'company', 'order_comment' ],
   initialValues: {
-    shipping_option: "2",
+    shipping_option: "1",
     order_signed: false,
+    hub: "BEEOTOP",
     shipping: {
       use_contact_for_shipping: true
     },

@@ -59,15 +59,16 @@ export function createOrder( order ) {
     });
     let { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, order_comment, shipping, shipping_option, order : { contact } } = order;
     let forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact, order_comment };
-    const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "0";
 
-    if (!hub_shipping_available || shipping_option === "1") {
+    if (shipping_option === "1") {
       if (shipping.contact_disabled) delete shipping.contact_disabled;
       if (shipping.address_disabled) delete shipping.address_disabled;
       if (shipping.use_contact_for_shipping) shipping.contact = contact;
       forder.shipping_option = 1;
       forder.shipping = shipping;
     } else {
+      const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "BEEOTOP";
+      if (!ba_shipping_available) forder.hub = "BEEOTOP";
       forder.shipping_option = 2;
     }
 
