@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { OrderForm } from '../containers';
 import './FormOnly.css' 
 
 class FormOnly extends Component {
@@ -13,7 +12,7 @@ class FormOnly extends Component {
 
               <div className="row">
                 <div className="col-xs-12">
-                  <OrderForm />
+                  {this.props.children}
                 </div>
               </div>
 

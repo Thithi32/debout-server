@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { fetchCompanies, fetchHubs, createOrder } from "./../../../actions";
-import { Field, reduxForm, formValueSelector, FormSection, change as changeFieldValue } from 'redux-form';
+import { Field, reduxForm, formValueSelector, FormSection } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
+import { ContactUs } from "./../../widgets";
 import removeDiacritics from "./../../../helpers";
 
 const packs = [
@@ -60,6 +61,7 @@ const FormHonorific = ({ input, label, meta, ...props}) => (
     </select>
   </div>
 )
+
 
 const Section = (props) => (
   <FormSection name={props.name}>
@@ -174,7 +176,6 @@ class ContactDisable extends Component {
     )
   }
 }
-
 
 const fields_validation = [
   { 
@@ -483,10 +484,8 @@ class OrderForm extends Component {
 
           <p>
             Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
-            Pour toute information, contactez-nous par mail à&nbsp;
-            <a href="mailto:diffusion@debout.fr">diffusion@debout.fr</a><br/>
+            Pour toute information, contactez-nous <ContactUs />.<br/>
           </p>
-
 
           <form onSubmit={ handleSubmit(this.props.createOrder) } autoComplete="off">
 
@@ -758,4 +757,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { fetchCompanies, fetchHubs, createOrder, changeFieldValue })(OrderForm);
+export default connect(mapStateToProps, { fetchCompanies, fetchHubs, createOrder })(OrderForm);

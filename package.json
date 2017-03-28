@@ -19,7 +19,8 @@
     "google-spreadsheet": "^2.0.3",
     "moment": "^2.18.1",
     "nodemon": "^1.11.0",
-    "sendgrid": "^4.8.4"
+    "sendgrid": "^4.8.4",
+    "uid": "0.0.2"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",

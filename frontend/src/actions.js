@@ -3,6 +3,8 @@ export const SET_HUBS = "SET_HUBS";
 export const CREATE_ORDER = "ORDER_CREATED";
 export const START_LOADING = "START_LOADING";
 export const STOP_LOADING = "STOP_LOADING";
+export const ORDER_CONFIRMED = "ORDER_CONFIRMED";
+export const ORDER_NOT_CONFIRMED = "ORDER_NOT_CONFIRMED";
 
 export function setCompanies(companies) {
   return {
@@ -75,7 +77,9 @@ export function createOrder( order ) {
     if(invoice.use_contact_for_invoice) invoice.contact = contact;
     forder.invoice = invoice;
 
-    fetch("/api/order", { 
+    forder.confirmation_url = document.location.origin + "/order/confirm";
+
+    fetch("/api/order/new", { 
       method: "POST", 
       body: JSON.stringify( { order: forder }),
       headers: { 'Content-Type': 'application/json' } 
@@ -83,17 +87,57 @@ export function createOrder( order ) {
       .then(res => res.json())
       .then(data => {
         if (data.status === "OK") {
-          dispatch({
-            type: STOP_LOADING
-          });
           alert("Votre commande a été envoyée et enregistrée avec succès. Vous devriez recevoir un email de confirmation à l'adresse " + forder.contact.email);
           window.location = 'http://debout.fr';
         } else {
+          dispatch({
+            type: STOP_LOADING
+          });
           alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email diffusion@debout.fr");
         }
       })
       .catch(error => {
+        dispatch({
+          type: STOP_LOADING
+        });
         alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email diffusion@debout.fr");
+      });
+  }
+}
+
+export function confirmOrder(id) {
+  return dispatch => {
+
+    fetch("/api/order/confirm", { 
+      method: "POST", 
+      body: JSON.stringify( { order_id: id }),
+      headers: { 'Content-Type': 'application/json' } 
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "OK") {
+          dispatch({
+            type: ORDER_CONFIRMED,
+            order: data.order
+          });
+        } else {
+          dispatch({
+            type: ORDER_NOT_CONFIRMED,
+            error: data.error
+          });
+        }
+        dispatch({
+          type: STOP_LOADING
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: ORDER_NOT_CONFIRMED,
+          error: error
+        });
+        dispatch({
+          type: STOP_LOADING
+        });
       });
   }
 }

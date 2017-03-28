@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import "./OrderFormTable.css";
 
-export default class OrderFormTable extends Component {
+class OrderFormTable extends Component {
   render() {
     return (
       <div className="table-responsive order-form-table">
@@ -39,3 +39,5 @@ export default class OrderFormTable extends Component {
     )
   }
 }
+
+export default OrderFormTable;

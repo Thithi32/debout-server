@@ -1,9 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import path from "path";
+import moment from "moment";
+import uid from "uid";
+
 import SendMail from "./sendmail";
 import Store from "./store";
-import moment from "moment";
 
 const app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -29,17 +31,6 @@ const packs = [
   { nb: 1000, shipping: 170 }
 ];
 
-String.prototype.hashCode = function() {
-  var hash = 0, i, chr;
-  if (this.length === 0) return hash;
-  for (i = 0; i < this.length; i++) {
-    chr   = this.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
-
 const validOrder = (order) => {
 
   let fullname = [];
@@ -62,7 +53,7 @@ const validOrder = (order) => {
   order['total'] = order['subtotal'] + order['shipping_price'];
 
   order['date'] = moment().format('DD/MM/YY, HH:mm:ss');
-  order['id'] = (moment().format('YYMMDDHHmmss') + order.company).hashCode();
+  order['id'] = uid().toUpperCase();
 
   let bdd = findCompany(order['company']);
   if (bdd) order['bdd'] = bdd;
@@ -115,7 +106,25 @@ csv()
           res.json({ hubs });
         });
 
-        app.post('/api/order', (req,res) => {
+        app.post('/api/order/confirm', (req,res) => {
+          const order_id = req.body.order_id;
+          if (!order_id) {
+            res.json({ status: "ERROR", error: "Le numéro de commande n'est pas renseigné" });
+          } else {
+            const store = new Store();
+            store.order_confirm(order_id)
+              .then((order) => res.json({
+                status: "OK",
+                order: order
+              }))
+              .catch((error) => {
+                console.log("- ERROR -- " + error,order_id);
+                res.json({ status: "ERROR", error: error });
+              });
+          }
+        });
+
+        app.post('/api/order/new', (req,res) => {
           let mail = new SendMail();
           const order = validOrder(req.body.order);
           mail.order_new(order)
@@ -146,7 +155,7 @@ csv()
               console.log("- ERROR -- " + error,order);
               res.json({ status: "ERROR", error });
             })
-        });
+        })
 
         app.get('/test', (req,res) => {
           const store = new Store();
