@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import path from "path";
 import moment from "moment";
+import tz from "moment-timezone";
 import uid from "uid";
 
 import SendMail from "./sendmail";
@@ -38,13 +39,15 @@ const validOrder = (order) => {
   fullname.push(order.contact.name);
   order.contact.fullname = fullname.join(' ');
 
-  order['price'] = (order.is_ccas || order.is_ngo) ? .5 : 1.5;
+  order['price'] = (order.is_ccas || order.is_ngo) ? 0.5 : 1.5;
   order['subtotal'] = order['price'] * order['nb_products'];
   order['shipping_price'] = 0;
 
-  for (var i = 0; i < packs.length; i++) {
-    if (packs[i].nb === parseInt(order['nb_products'], 10)) {
-      order['shipping_price'] = packs[i].shipping;
+  if (order['shipping_option'] === 1) {
+    for (var i = 0; i < packs.length; i++) {
+      if (packs[i].nb === parseInt(order['nb_products'], 10)) {
+        order['shipping_price'] = packs[i].shipping;
+      }
     }
   }
 
@@ -52,7 +55,7 @@ const validOrder = (order) => {
 
   order['total'] = order['subtotal'] + order['shipping_price'];
 
-  order['date'] = moment().format('DD/MM/YY, HH:mm:ss');
+  order['date'] = moment().tz('Europe/Paris').format('DD/MM/YY, HH:mm:ss');
   order['id'] = uid().toUpperCase();
 
   let bdd = findCompany(order['company']);

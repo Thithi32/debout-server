@@ -464,7 +464,6 @@ class OrderForm extends Component {
     let total = nb_products * price + shipping_price;
     if (!total || isNaN(total) || (total < 0)) total = 0;
 
-
     return (
 
       <div className="widget">
@@ -707,7 +706,7 @@ class OrderForm extends Component {
                 }
 
                 <div className="form-group">
-                  <button type="submit" disabled={pristine || submitting || !valid}>
+                  <button type="submit" disabled={!valid}>
                     Commander
                   </button>
                 </div>

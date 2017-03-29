@@ -53,19 +53,22 @@ export function stopLoading() {
 }
 
 export function createOrder( order ) {
+  console.log("ORDER",order);
+
   return dispatch => {
     dispatch({
       type: START_LOADING
     });
+
     let { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, order_comment, shipping, shipping_option, order : { contact } } = order;
     let forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact, order_comment };
-
     if (shipping_option === "1") {
       if (shipping.contact_disabled) delete shipping.contact_disabled;
       if (shipping.address_disabled) delete shipping.address_disabled;
       if (shipping.use_contact_for_shipping) shipping.contact = contact;
       forder.shipping_option = 1;
       forder.shipping = shipping;
+      delete forder.hub;
     } else {
       const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "BEEOTOP";
       if (!ba_shipping_available) forder.hub = "BEEOTOP";
@@ -89,7 +92,7 @@ export function createOrder( order ) {
       .then(data => {
         if (data.status === "OK") {
           alert("Votre commande a été envoyée et enregistrée avec succès. Vous devriez recevoir un email de confirmation à l'adresse " + forder.contact.email);
-          window.location = 'http://debout.fr';
+           window.location = 'http://debout.fr';
         } else {
           dispatch({
             type: STOP_LOADING
