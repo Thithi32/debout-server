@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { fetchCompanies, fetchHubs, createOrder } from "./../../../actions";
-import { Field, reduxForm, formValueSelector, FormSection } from 'redux-form';
+import { Field, reduxForm, formValueSelector, FormSection, change as changeFieldValue } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
 import { ContactUs } from "./../../widgets";
 import removeDiacritics from "./../../../helpers";
@@ -285,7 +285,7 @@ const fields_validation = [
 ];
 
 const validate = (values) => {
-  const need_shipping = !(parseInt(values.shipping_option,10) === 2 && values.hub);
+  const need_shipping = parseInt(values.shipping_option,10) !== 2;
   const conditions = {
     shipping: need_shipping,
     shipping_contact: !(values.shipping && values.shipping.use_contact_for_shipping),
@@ -373,7 +373,6 @@ class OrderForm extends Component {
   }
 
   selectCompany(company) {
-
     let invoice_address = {
         address1: company["(facture)\nAdresse"],
         address2: '  ',
@@ -409,17 +408,17 @@ class OrderForm extends Component {
     }
     const has_shipping_contact = shipping_contact.name && shipping_contact.email;
 
-    const hub = (this.props.hubs.find((hub) => { return (hub['NOM 1'] + ' ' + hub['NOM 2']) === company['Livraison via hub']})) ? company['Livraison via hub'] : '';
+    const hub = (this.props.hubs.find((hub) => { return (hub['NOM 1'] + ' ' + hub['NOM 2']) === company['Livraison via hub']})) ? company['Livraison via hub'] : 'BEEOTOP';
 
     this.props.initialize({ 
       company: company['Raison sociale'], 
       is_ngo:  (company['Type'].toLowerCase() === "association"),
       is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: (company["Asso d'une BA ?"] !== "non"),
-      order_sgned: false,
+      order_signed: false,
       hub,
       nb_products: this.props.nb_products,
-      shipping_option: "2",
+      shipping_option: (hub === "BEEOTOP") ? "1" : "2",
       shipping: {
         address: shipping_address,
         contact: shipping_contact,
@@ -440,7 +439,7 @@ class OrderForm extends Component {
   render() {
     const { 
       handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address, 
-      use_contact_for_shipping, use_contact_for_invoice, pristine, submitting, valid } = this.props;
+      use_contact_for_shipping, use_contact_for_invoice, valid } = this.props;
 
     const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
 
@@ -765,4 +764,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { fetchCompanies, fetchHubs, createOrder })(OrderForm);
+export default connect(mapStateToProps, { fetchCompanies, fetchHubs, createOrder, changeFieldValue })(OrderForm);

@@ -53,7 +53,6 @@ export function stopLoading() {
 }
 
 export function createOrder( order ) {
-  console.log("ORDER",order);
 
   return dispatch => {
     dispatch({
@@ -66,6 +65,7 @@ export function createOrder( order ) {
       if (shipping.contact_disabled) delete shipping.contact_disabled;
       if (shipping.address_disabled) delete shipping.address_disabled;
       if (shipping.use_contact_for_shipping) shipping.contact = contact;
+      if (invoice.use_shipping_address) invoice.address = shipping.address;
       forder.shipping_option = 1;
       forder.shipping = shipping;
       delete forder.hub;
@@ -77,8 +77,7 @@ export function createOrder( order ) {
 
     if (invoice.contact_disabled) delete invoice.contact_disabled;
     if (invoice.address_disabled) delete invoice.address_disabled;
-    if(invoice.use_shipping_address) invoice.address = shipping.address;
-    if(invoice.use_contact_for_invoice) invoice.contact = contact;
+    if (invoice.use_contact_for_invoice) invoice.contact = contact;
     forder.invoice = invoice;
 
     forder.confirmation_url = document.location.origin + "/order/confirm";
@@ -92,7 +91,7 @@ export function createOrder( order ) {
       .then(data => {
         if (data.status === "OK") {
           alert("Votre commande a été envoyée et enregistrée avec succès. Vous devriez recevoir un email de confirmation à l'adresse " + forder.contact.email);
-           window.location = 'http://debout.fr';
+          window.location = 'http://debout.fr';
         } else {
           dispatch({
             type: STOP_LOADING
