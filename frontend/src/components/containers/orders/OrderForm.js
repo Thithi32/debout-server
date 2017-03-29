@@ -436,6 +436,13 @@ class OrderForm extends Component {
     this.setState({company_autocomplete: {}});
   }
 
+
+  changeHub(e, new_value, old_value) {
+    if (new_value !== "BEEOTOP" && old_value=== "BEEOTOP") {
+      this.props.change("shipping_option","2");
+    }
+  }
+
   render() {
     const { 
       handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address, 
@@ -534,7 +541,7 @@ class OrderForm extends Component {
                 { has_hub && 
                   <div className="form-group">
                     <label htmlFor="hub">Quelle est votre Banque Alimentaire?</label>
-                    <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() }/>
+                    <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() } onChange={ this.changeHub.bind(this) }/>
                   </div>
                 }
               </div>
@@ -669,7 +676,8 @@ class OrderForm extends Component {
                       }
                       { (parseInt(shipping_option,10) === 2) &&
                         <span>
-                          &nbsp;à régler les frais de traitement de ma commande ({total}€) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution <em>{hub}</em>.
+                          &nbsp;à régler les frais de traitement de ma commande ({total}€) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
+                          <em>{(hub && hub_shipping_available) ? hub : "BEEOTOP Paris"}</em>.
                         </span>
                       }
                       <br />
