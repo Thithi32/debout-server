@@ -436,7 +436,6 @@ class OrderForm extends Component {
     this.setState({company_autocomplete: {}});
   }
 
-
   changeHub(e, new_value, old_value) {
     if (new_value !== "BEEOTOP" && old_value=== "BEEOTOP") {
       this.props.change("shipping_option","2");
