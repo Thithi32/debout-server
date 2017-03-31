@@ -396,7 +396,15 @@ class OrderForm extends Component {
     )
   }
 
-  changeCompany(e, str) {
+  changeCompany(e, str, old_str) {
+    // First sync other company_name fields
+    if (this.props.order.values.shipping && this.props.order.values.shipping.company_name === old_str) {
+      this.props.change("shipping.company_name", str);
+    }
+    if (this.props.order.values.invoice && this.props.order.values.invoice.company_name === old_str) {
+      this.props.change("invoice.company_name", str);
+    }
+
     let choices = [];
     let tolower = (str) => { return removeDiacritics(str.toLowerCase()); }
     if (str.length >= 3) 
@@ -406,6 +414,8 @@ class OrderForm extends Component {
   }
 
   selectCompany(company) {
+    const company_name = company['Raison sociale'];
+
     let invoice_address = {
         address1: company["(facture)\nAdresse"],
         zip: company["(facture)\nCP"],
@@ -420,6 +430,8 @@ class OrderForm extends Component {
       city: company["(livraison)\nVille"]
     }
     const has_shipping_address = shipping_address.address1 && shipping_address.zip && shipping_address.city;
+
+    const invoice_company_name = company["(facture)\nRaison Sociale"];
 
     let invoice_contact = {
         honorific: company["(facture)\nCivilité"],
@@ -440,10 +452,10 @@ class OrderForm extends Component {
     }
     const has_shipping_contact = shipping_contact.name && shipping_contact.email;
 
-    const hub = (this.props.hubs.find((hub) => { console.log((hub['NOM 1'].trim() + ' ' + hub['NOM 2'].trim()).toLowerCase(), company['Livraison via hub'].toLowerCase()); return (hub['NOM 1'].trim() + ' ' + hub['NOM 2'].trim()).toLowerCase() === company['Livraison via hub'].toLowerCase()})) ? company['Livraison via hub'] : 'BEEOTOP';
+    const hub = (this.props.hubs.find((hub) => { return (hub['NOM 1'].trim() + ' ' + hub['NOM 2'].trim()).toLowerCase() === company['Livraison via hub'].toLowerCase()})) ? company['Livraison via hub'] : 'BEEOTOP';
 
     this.props.initialize({ 
-      company: company['Raison sociale'], 
+      company: company_name, 
       is_ngo:  (company['Type'].toLowerCase() === "association"),
       is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: (company["Asso d'une BA ?"] !== "non"),
@@ -452,11 +464,13 @@ class OrderForm extends Component {
       nb_products: this.props.nb_products,
       shipping_option: (hub === "BEEOTOP") ? "1" : "2",
       shipping: {
+        company_name: company_name,
         address: shipping_address,
         contact: shipping_contact,
         use_contact_for_shipping: !has_shipping_contact  
       },
       invoice: {
+        company_name: invoice_company_name || company_name,
         address: invoice_address,
         address_disabled: shipping_address,
         use_shipping_address: has_shipping_address && !has_invoice_address,
@@ -528,7 +542,6 @@ class OrderForm extends Component {
             <div className="dropdown open">
               <Field name="company" label="Nom de la structure" 
                 component={FormGroupInput} type="text" className="form-control"
-
                 onChange={this.changeCompany.bind(this)}/>  
 
               { this.state.company_autocomplete && this.state.company_autocomplete.length > 0 &&
@@ -636,6 +649,8 @@ class OrderForm extends Component {
                 { home_delivery &&
                   <Section name="shipping" title="Détail de la livraison">
 
+                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
+
                    <Address title="Adresse de livraison" onChange={(e)=>{
                       const { name, value } = e.target;
                       this.props.change(name.replace('shipping','invoice').replace('address','address_disabled'), value);
@@ -657,6 +672,8 @@ class OrderForm extends Component {
                 }
 
                 <Section name="invoice" title="Informations de facturation">
+
+                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
 
                   { home_delivery &&
                     <div>

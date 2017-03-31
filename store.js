@@ -153,6 +153,7 @@ class Store {
                 let name = parts[i];
                 if (order[i]) {
                   let obj = order[i];
+                  companyRow[`${name}raisonsociale`] = obj.company_name || 'Mr';
                   if (obj.contact) {
                     let contact = obj.contact;
                     companyRow[`${name}civilite`] = contact.honorific || 'Mr';
