@@ -45,7 +45,7 @@
     <table class="table">
       <thead>
         <tr>
-            <td><strong>Edition</strong></td>
+            <td><strong>Produit</strong></td>
             <td class="text-center"><strong>Prix</strong></td>
             <td class="text-center"><strong>Quantité</strong></td>
             <td class="text-right"><strong>Total</strong></td>
@@ -55,17 +55,17 @@
         <!-- foreach ($order->lineItems as $line) or some such thing here -->
         <tr>
           <td>Debout n°12</td>
-          <td class="text-center">%price%€</td>
+          <td class="text-center">%price%</td>
           <td class="text-center">%nb_products%</td>
-          <td class="text-right">%subtotal%€</td>
+          <td class="text-right">%subtotal%</td>
         </tr>
         <tr>
-          <td class="thick-line text-right" colspan="3"><strong>Frais de livraison</strong></td>
-          <td class="thick-line text-right">%shipping_price%€</td>
+          <td class="text-right" colspan="3"><strong>Frais de livraison</strong></td>
+          <td class="text-right">%shipping_price%</td>
         </tr>
         <tr>
           <td class="thick-line text-right" colspan="3"><strong>Total</strong></td>
-          <td class="no-line text-right">%total%€</td>
+          <td class="thick-line text-right">%total%</td>
         </tr>
       </tbody>
     </table>

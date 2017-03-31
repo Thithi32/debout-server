@@ -56,6 +56,32 @@
   max-width: 100%;
 }
 
+@media screen and (min-width: 660px) {
+  i { width: 36px; }
+
+  .contact-form .honorific {
+    width: 60px;
+    float: left;
+  }
+
+  .contact-form .name-group {
+    margin-left: 60px;
+  }
+
+  .contact-form .name-group > input {
+    width: 50%;
+    float: left;
+  }
+
+  .contact-form .email-group {
+    float: left;
+  }
+
+  .contact-form .phone-group, .contact-form .mobile-group{
+    width:50%;
+    float: left;
+  }
+}
 
 @media screen and (min-width: 660px) {
 

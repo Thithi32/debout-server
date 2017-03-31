@@ -51,9 +51,10 @@ const validOrder = (order) => {
     }
   }
 
-  order['shipping_place'] = (order['shipping_option'] === 2) ? order['hub'] : order['company'];
-
   order['total'] = order['subtotal'] + order['shipping_price'];
+
+  const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
+  ['price','subtotal','shipping_price','total'].map((f) => ( order[f] = toMoney(order[f])));
 
   order['date'] = moment().tz('Europe/Paris').format('DD/MM/YY, HH:mm:ss');
   order['id'] = uid().toUpperCase();
@@ -62,6 +63,49 @@ const validOrder = (order) => {
   if (bdd) order['bdd'] = bdd;
 
   order['transport'] = (order.nb_products > 450) || (order.shipping_option === 2) ? "OPTITRANS" : "EUROPE ROUTAGE";
+
+
+  const getContactFullname = (contact) => {
+    let contact_fullname = [
+      (contact.honorific && contact.honorific.length!==0) ? contact.honorific : "M",
+      (contact.name)
+    ];
+    if (contact.firstname) contact_fullname.push(contact.firstname);
+    return contact_fullname.join(' ');
+  }
+
+  const getAddressFull = (address) => {
+    let address_full = [
+      address.address1
+    ];
+    if (address.address2 && address.address2.trim().length) address_full.push(address.address2);
+    address_full.push(address.zip + ' ' + address.city);
+    return address_full.join("<br />");
+  }
+
+  if (order.invoice) {
+    let full = [
+      order.company,
+      getContactFullname(order.invoice.contact),
+      getAddressFull(order.invoice.address)
+    ];
+    order.invoice.full = full.join("<br />");
+  }
+
+  if (order.shipping) {
+    if (order['shipping_option'] === 2) {
+      order.shipping = {
+        full: order['hub']
+      }
+    } else {
+      let full = [
+        getContactFullname(order.invoice.contact),
+        order.company,
+        getAddressFull(order.invoice.address)
+      ];
+      order.shipping.full = full.join("<br />");
+    }
+  }
 
   return order;
 }

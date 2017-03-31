@@ -53,13 +53,10 @@ const FormInput = ({ input, type, meta: { touched, error }, ...props}) => (
 )
 
 const FormHonorific = ({ input, label, meta, ...props}) => (
-  <div className="form-group">
-    <label htmlFor={input.name}>{label}</label>
-    <select {...input} {...props} >
-      <option value="M">M</option>
-      <option value="Mme">Mme</option>
-    </select>
-  </div>
+  <select {...input} {...props}>
+    <option value="M">M</option>
+    <option value="Mme">Mme</option>
+  </select>
 )
 
 
@@ -94,7 +91,9 @@ class Address extends Component {
     return (
       <FormSection name={name}>
         <div className="form-group">
-          <label htmlFor="address1">{ this.props.title }</label>
+          { this.props.title &&
+            <label htmlFor="address1">{ this.props.title }</label>
+          }
           <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address1" placeholder="Ligne 1 *" disabled={this.props.disabled} />
           <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address2" placeholder="Ligne 2" disabled={this.props.disabled} />
           <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="zip" placeholder="Code postal *" disabled={this.props.disabled} />
@@ -134,18 +133,39 @@ class AddressDisable extends Component {
 class Contact extends Component {
   render() {
     const name = this.props.name || 'contact';
-    const title = this.props.title;
+    const section = this.props.section || '';
+    const mobile_label = "Téléphone mobile" + ((this.props.needPhone) ? " ¹" : "");
+    const phone_label = "Téléphone fixe" + ((this.props.needPhone) ? " ¹" : "");
     return (
       <FormSection name={name}>
-        { title &&
-          <p className="title">{title}</p>
-        }
-        <Field name="honorific" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Civilité" component={FormHonorific} disabled={this.props.disabled} className="form-control"/>
-        <Field name="name" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Nom *" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="firstname" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Prénom" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="email" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Email *" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="mobile" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Téléphone mobile" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
-        <Field name="phone" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Téléphone fixe" disabled={this.props.disabled} component={FormGroupInput} type="text" className="form-control"/>  
+        <div className="form-group contact-form">
+          { this.props.title &&
+            <label>{ this.props.title }</label>
+          }
+          <Field name="honorific" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Civilité" component={FormHonorific} disabled={this.props.disabled} className="honorific form-control"/>
+          <div className="name-group">
+            <Field name="name" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Nom *" disabled={this.props.disabled} component="input" type="text" className="form-control"/>  
+            <Field name="firstname" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Prénom" disabled={this.props.disabled} component="input" type="text" className="form-control"/>  
+          </div>
+          <Field name={`${section}.${name}.name`} component={renderInputError} />
+          <div className="input-group email-group">
+            <span className="input-group-addon" id="email_label"><i className="glyphicon glyphicon-envelope"></i></span>
+            <Field name="email" placeholder="Email *" disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="email_label"
+               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
+          </div>
+          <Field name={`${section}.${name}.email`} component={renderInputError} />
+          <div className="input-group mobile-group">
+            <span className="input-group-addon" id="mobile_label"><i className="glyphicon glyphicon-phone"></i></span>
+            <Field name="mobile" placeholder={mobile_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="mobile_label"
+               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
+          </div>
+          <div className="input-group phone-group">
+            <span className="input-group-addon" id="phone_label"><i className="glyphicon glyphicon-phone-alt"></i></span>
+            <Field name="phone" placeholder={phone_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="phone_label"
+               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
+          </div>
+          <Field name={`${section}.${name}.mobile`} component={renderInputError} />
+        </div>
       </FormSection>
     )
   }
@@ -329,6 +349,19 @@ const validate = (values) => {
     errors.order_signed = "Vous devez accepter les termes d'engagement de la commande";
   }
 
+  if (values.shipping.use_contact_for_shipping && (!values.order || !values.order.contact || (!values.order.contact.mobile && !values.order.contact.phone))) {
+    if (!errors.order) errors.order = {};
+    if (!errors.order.contact) errors.order.contact = {};
+    errors.order.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone";
+    errors.order.contact.phone = errors.order.contact.mobile;
+  }
+
+  if (!values.shipping.use_contact_for_shipping && (!values.shipping.contact || (!values.shipping.contact.mobile && !values.shipping.contact.phone))) {
+    if (!errors.shipping.contact) errors.shipping.contact = {};
+    errors.shipping.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone au contact de livraison";
+    errors.shipping.contact.phone = errors.shipping.contact.mobile;
+  }
+
   return errors;
 }
 
@@ -375,7 +408,6 @@ class OrderForm extends Component {
   selectCompany(company) {
     let invoice_address = {
         address1: company["(facture)\nAdresse"],
-        address2: '  ',
         zip: company["(facture)\nCP"],
         city: company["(facture)\nVille"]
     }
@@ -383,7 +415,7 @@ class OrderForm extends Component {
 
     let shipping_address = {
       address1: company["(livraison)\nAdresse 1"],
-      address2: company["(livraison)\nAdresse 2"] || "  ",
+      address2: company["(livraison)\nAdresse 2"],
       zip: company["(livraison)\nCP"],
       city: company["(livraison)\nVille"]
     }
@@ -408,7 +440,7 @@ class OrderForm extends Component {
     }
     const has_shipping_contact = shipping_contact.name && shipping_contact.email;
 
-    const hub = (this.props.hubs.find((hub) => { return (hub['NOM 1'] + ' ' + hub['NOM 2']) === company['Livraison via hub']})) ? company['Livraison via hub'] : 'BEEOTOP';
+    const hub = (this.props.hubs.find((hub) => { console.log((hub['NOM 1'].trim() + ' ' + hub['NOM 2'].trim()).toLowerCase(), company['Livraison via hub'].toLowerCase()); return (hub['NOM 1'].trim() + ' ' + hub['NOM 2'].trim()).toLowerCase() === company['Livraison via hub'].toLowerCase()})) ? company['Livraison via hub'] : 'BEEOTOP';
 
     this.props.initialize({ 
       company: company['Raison sociale'], 
@@ -449,7 +481,7 @@ class OrderForm extends Component {
 
     const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
 
-    const hub_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "BEEOTOP";
+    const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "BEEOTOP";
 
     const home_delivery = (parseInt(shipping_option,10) === 1);
 
@@ -509,10 +541,11 @@ class OrderForm extends Component {
             </div>
 
             <div className="form-group">
+              <label>Vous êtes?</label>
               <div className="checkbox">
                 <label>
                   <Field name="is_ccas" component="input" type="checkbox"/> 
-                  Mairie / CCAS
+                  une mairie ou un CCAS
                 </label>
               </div>
             </div>
@@ -521,7 +554,7 @@ class OrderForm extends Component {
               <div className="checkbox">
                 <label>
                   <Field name="is_ngo" component="input" type="checkbox"/> 
-                  Association à but non lucratif
+                  une association à but non lucratif
                 </label>
               </div>
             </div>
@@ -532,7 +565,7 @@ class OrderForm extends Component {
                   <div className="checkbox">
                     <label>
                       <Field name="has_hub" component="input" type="checkbox"/> 
-                      Vous êtes partenaire d&#39;une Banque Alimentaire
+                      partenaire d&#39;une Banque Alimentaire
                     </label>
                   </div>
                 </div>
@@ -549,35 +582,35 @@ class OrderForm extends Component {
             <div className="gray-row">
 
               <div className="form-group">
-                <label htmlFor="nb_products">Nombre d&#39;exemplaires</label>
+                <label htmlFor="nb_products">Nombre d&#39;exemplaires du magazine</label>
                 <Field name="nb_products" price={price} component={FieldNbProducts} className="form-control"/>  
                 <small>À noter : Un paquet de 25 exemplaires du magazine pèse environ 3,5 kg.</small>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="nb_products">Choisir votre mode de livraison</label>
-                <div className="radio">
-                  <label>
-                    <Field component="input" type="radio" name="shipping_option" value="1"/>
-                     Option 1: Livraison chez vous = { shipping_home_price }€
-                  </label>
+              { (is_ngo || is_ccas) && 
+                <div className="form-group">
+                  <label htmlFor="nb_products">Choisir votre mode de livraison</label>
+                  <div className="radio">
+                    <label>
+                      <Field component="input" type="radio" name="shipping_option" value="1"/>
+                       Option 1: Livraison dans votre structure = { shipping_home_price }€
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <Field component="input" type="radio" name="shipping_option" value="2"/>
+                       
+                      { ba_shipping_available &&
+                        <span>Option 2: Livraison dans votre Banque Alimentaire (gratuite)</span>
+                      }
+                      { !ba_shipping_available &&
+                        <div>
+                          <span>Option 2: Livraison gratuite au BEEOTOP de Paris, <em>14 boulevard de Douaumont – 75017 Paris</em></span>
+                        </div>
+                      }
+                    </label>
+                  </div>
                 </div>
-                <div className="radio">
-                  <label>
-                    <Field component="input" type="radio" name="shipping_option" value="2"/>
-                     
-                    { hub_shipping_available &&
-                      <span>Option 2: Livraison chez votre Banque Alimentaire = 0€ !!!!</span>
-                    }
-                    { !hub_shipping_available &&
-                      <div>
-                        <span>Option 2: Livraison au BEEOTOP de Paris = 0€ !!!!</span>
-                        <p><em>Adresse: 14 boulevard de Douaumont – 75017 Paris</em></p>
-                      </div>
-                    }
-                  </label>
-                </div>
-              </div>
               }
 
               <OrderFormTable 
@@ -593,7 +626,7 @@ class OrderForm extends Component {
               <div>
 
                 <Section name="order" title="Responsable de la commande">
-                  <Contact onChange={(e)=>{
+                  <Contact needPhone section="order" onChange={(e)=>{
                     const { name, value } = e.target;
                     this.props.change(name.replace('order','invoice').replace('contact','contact_disabled'), value);
                     this.props.change(name.replace('order','shipping').replace('contact','contact_disabled'), value);
@@ -609,6 +642,7 @@ class OrderForm extends Component {
                     }} />
 
                     <div className="form-group">
+                      <label>Contact pour la livraison</label>
                       <div className="checkbox">
                         <label>
                           <Field name="use_contact_for_shipping" component="input" type="checkbox" /> 
@@ -617,7 +651,7 @@ class OrderForm extends Component {
                       </div>
                     </div>
 
-                    <ContactDisable disabled={use_contact_for_shipping} title="Contact pour la livraison"/>
+                    <ContactDisable needPhone section="shipping" disabled={use_contact_for_shipping} />
  
                   </Section>
                 }
@@ -625,19 +659,26 @@ class OrderForm extends Component {
                 <Section name="invoice" title="Informations de facturation">
 
                   { home_delivery &&
-                    <div className="form-group">
-                      <div className="checkbox">
-                        <label>
-                          <Field name="use_shipping_address" component="input" type="checkbox" /> 
-                          Utiliser l&#39;adresse de livraison pour la facturation
-                        </label>
+                    <div>
+                      <div className="form-group">
+                        <label>Adresse de facturation</label>
+                        <div className="checkbox">
+                          <label>
+                            <Field name="use_shipping_address" component="input" type="checkbox" /> 
+                            Utiliser l&#39;adresse de livraison pour la facturation
+                          </label>
+                        </div>
                       </div>
+                      <AddressDisable disabled={ use_shipping_address && home_delivery } />
                     </div>
                   }
 
-                  <AddressDisable title="Adresse de facturation" disabled={use_shipping_address && home_delivery} />
+                  { !home_delivery &&
+                    <Address title="Adresse de facturation" />
+                  }
 
                   <div className="form-group">
+                    <label>Responsable de la facture</label>
                     <div className="checkbox">
                       <label>
                         <Field name="use_contact_for_invoice" component="input" type="checkbox" /> 
@@ -646,12 +687,12 @@ class OrderForm extends Component {
                     </div>
                   </div>
 
-                  <ContactDisable disabled={use_contact_for_invoice} title="Responsable de la facture"/>
+                  <ContactDisable section="invoice" disabled={use_contact_for_invoice} />
 
                 </Section>
 
                 <div className="form-group">
-                  <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre votre commande</label>
+                  <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre à votre commande</label>
                   <Field name="order_comment" component="textarea" className="form-control" rows="3"/>  
                 </div>
 
@@ -659,6 +700,9 @@ class OrderForm extends Component {
                   <p>
                     <small>
                     * : information obligatoire
+                    </small><br />
+                    <small>
+                    &sup1; : pour la livraison, veuillez renseigner au moins un numéro de téléphone
                     </small>
                   </p>
                   <p>
@@ -670,13 +714,13 @@ class OrderForm extends Component {
                       &nbsp;Je m’engage
                       { (parseInt(shipping_option,10) === 1) &&
                         <span>
-                          &nbsp;à régler les frais de livraison et de traitement de ma commande ({total}€) à réception de la facture.
+                          &nbsp;à régler la totalité de ma commande ({total}€) à réception de la facture.
                         </span>
                       }
                       { (parseInt(shipping_option,10) === 2) &&
                         <span>
                           &nbsp;à régler les frais de traitement de ma commande ({total}€) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
-                          <em>{(hub && hub_shipping_available) ? hub : "BEEOTOP Paris"}</em>.
+                          <em>{(hub && ba_shipping_available) ? hub : "BEEOTOP Paris"}</em>.
                         </span>
                       }
                       <br />
@@ -695,16 +739,18 @@ class OrderForm extends Component {
                         <Field name="nb_products" component={renderInputError} />
                         <Field name="order.contact.name" component={renderInputError} />
                         <Field name="order.contact.email" component={renderInputError} />
+                        <Field name="order.contact.mobile" component={renderInputError} />
                         <Field name="invoice.address.address1" component={renderInputError} />
                         <Field name="invoice.address.zip" component={renderInputError} />
                         <Field name="invoice.address.city" component={renderInputError} />
+                        <Field name="invoice.contact.name" component={renderInputError} />
+                        <Field name="invoice.contact.email" component={renderInputError} />
                         <Field name="shipping.address.address1" component={renderInputError} />
                         <Field name="shipping.address.zip" component={renderInputError} />
                         <Field name="shipping.address.city" component={renderInputError} />
-                        <Field name="invoice.contact.name" component={renderInputError} />
-                        <Field name="invoice.contact.email" component={renderInputError} />
                         <Field name="shipping.contact.name" component={renderInputError} />
                         <Field name="shipping.contact.email" component={renderInputError} />
+                        <Field name="shipping.contact.mobile" component={renderInputError} />
                         <Field name="order_signed" component={renderInputError} />
                       </div>
                     </div>
