@@ -396,6 +396,14 @@ class OrderForm extends Component {
     )
   }
 
+  checkDeliveryOptions() {
+    const values = this.props.order.values;
+
+    if (!values.is_ngo && !values.is_ccas) {
+      this.props.change('shipping_option','1');
+    }
+  }
+
   changeCompany(e, str, old_str) {
     // First sync other company_name fields
     if (this.props.order.values.shipping && this.props.order.values.shipping.company_name === old_str) {
@@ -458,11 +466,11 @@ class OrderForm extends Component {
       company: company_name, 
       is_ngo:  (company['Type'].toLowerCase() === "association"),
       is_ccas:  (company['Type'].toLowerCase() === "ccas"),
-      has_hub: (company["Asso d'une BA ?"] !== "non"),
+      has_hub: false,
       order_signed: false,
       hub,
       nb_products: this.props.nb_products,
-      shipping_option: (hub === "BEEOTOP") ? "1" : "2",
+      shipping_option: "2",
       shipping: {
         company_name: company_name,
         address: shipping_address,
@@ -480,12 +488,6 @@ class OrderForm extends Component {
     },false)
 
     this.setState({company_autocomplete: {}});
-  }
-
-  changeHub(e, new_value, old_value) {
-    if (new_value !== "BEEOTOP" && old_value=== "BEEOTOP") {
-      this.props.change("shipping_option","2");
-    }
   }
 
   render() {
@@ -557,7 +559,7 @@ class OrderForm extends Component {
               <label>Vous êtes?</label>
               <div className="checkbox">
                 <label>
-                  <Field name="is_ccas" component="input" type="checkbox"/> 
+                  <Field name="is_ccas" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/> 
                   une mairie ou un CCAS
                 </label>
               </div>
@@ -566,7 +568,7 @@ class OrderForm extends Component {
             <div className="form-group">
               <div className="checkbox">
                 <label>
-                  <Field name="is_ngo" component="input" type="checkbox"/> 
+                  <Field name="is_ngo" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/> 
                   une association à but non lucratif
                 </label>
               </div>
@@ -578,7 +580,7 @@ class OrderForm extends Component {
                   <div className="checkbox">
                     <label>
                       <Field name="has_hub" component="input" type="checkbox"/> 
-                      partenaire d&#39;une Banque Alimentaire
+                      partenaire d&#39;une Banque Alimentaire (livraison gratuite)
                     </label>
                   </div>
                 </div>
@@ -586,7 +588,7 @@ class OrderForm extends Component {
                 { has_hub && 
                   <div className="form-group">
                     <label htmlFor="hub">Quelle est votre Banque Alimentaire?</label>
-                    <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() } onChange={ this.changeHub.bind(this) }/>
+                    <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() } />
                   </div>
                 }
               </div>
