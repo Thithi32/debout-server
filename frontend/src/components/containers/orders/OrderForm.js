@@ -396,10 +396,12 @@ class OrderForm extends Component {
     )
   }
 
-  checkDeliveryOptions() {
-    const values = this.props.order.values;
-
-    if (!values.is_ngo && !values.is_ccas) {
+  checkDeliveryOptions(e, value) {
+    const form = this.props.order;
+    const target = e.target.name;
+    const is_ngo = (target === "is_ngo") ? value : form.values.is_ngo;
+    const is_ccas = (target === "is_ccas") ? value : form.values.is_ccas;
+    if (!is_ngo && !is_ccas) {
       this.props.change('shipping_option','1');
     }
   }
@@ -470,7 +472,7 @@ class OrderForm extends Component {
       order_signed: false,
       hub,
       nb_products: this.props.nb_products,
-      shipping_option: "2",
+      shipping_option: "1",
       shipping: {
         company_name: company_name,
         address: shipping_address,
@@ -509,6 +511,7 @@ class OrderForm extends Component {
           shipping_home_price = packs[i].shipping;
         }
       }
+
     }
     if (home_delivery) {
       shipping_price = shipping_home_price;
@@ -608,7 +611,11 @@ class OrderForm extends Component {
                   <div className="radio">
                     <label>
                       <Field component="input" type="radio" name="shipping_option" value="1"/>
-                       Option 1: Livraison dans votre structure = { shipping_home_price }€
+                       Option 1: Livraison dans votre structure{ shipping_home_price > 0 &&
+                        <span>
+                          &nbsp;= { shipping_home_price }€
+                        </span>
+                       }
                     </label>
                   </div>
                   <div className="radio">

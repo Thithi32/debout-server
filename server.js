@@ -49,6 +49,9 @@ const validOrder = (order) => {
         order['shipping_price'] = packs[i].shipping;
       }
     }
+    order['shipping_place'] = order['company'];
+  } else {
+    order['shipping_place'] = order['hub'];
   }
 
   order['total'] = order['subtotal'] + order['shipping_price'];
@@ -63,7 +66,6 @@ const validOrder = (order) => {
   if (bdd) order['bdd'] = bdd;
 
   order['transport'] = (order.nb_products > 450) || (order.shipping_option === 2) ? "OPTITRANS" : "EUROPE ROUTAGE";
-
 
   const getContactFullname = (contact) => {
     let contact_fullname = [
