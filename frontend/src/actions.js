@@ -90,8 +90,8 @@ export function createOrder( order ) {
       .then(res => res.json())
       .then(data => {
         if (data.status === "OK") {
-          alert("Votre commande a été envoyée et enregistrée avec succès. Vous devriez recevoir un email de confirmation à l'adresse " + forder.contact.email);
-          window.location = 'http://debout.fr';
+          alert("Merci pour votre commande. Vous allez recevoir dans quelques minutes une confirmation de votre commande à " + forder.contact.email + ". Merci de valider formellement votre commande en cliquant dans le lien de cet email");
+          window.location = 'http://debout.fr/donner';
         } else {
           dispatch({
             type: STOP_LOADING

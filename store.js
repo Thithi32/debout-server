@@ -105,6 +105,7 @@ class Store {
 
   order_new(order) {
     const self = this;
+
     return new Promise(function(resolve, reject) {
       if (!order.company || !order.nb_products) {
         reject("Commande invalide pour manque d'informations");
@@ -140,7 +141,7 @@ class Store {
               let companyRow = {
                 commande: order.id,
                 raisonsociale: order.company,
-                type: (order.is_ngo ? "Association" : (order.is_ccas ? "Mairie / CCAS" : '')),
+                type: (order.is_ngo ? "Association" : (order.is_ccas ? "Mairie / CCAS" : 'Entreprise')),
                 assoba: order.hasOwnProperty('hub') && (order.hub !== "BEEOTOP") ? "oui" : "non",
                 hublivraison: order.hub || '',
                 num: 12,
@@ -153,7 +154,8 @@ class Store {
                 let name = parts[i];
                 if (order[i]) {
                   let obj = order[i];
-                  companyRow[`${name}raisonsociale`] = obj.company_name || 'Mr';
+
+                  companyRow[`${name}raisonsociale`] = obj.company_name;
                   if (obj.contact) {
                     let contact = obj.contact;
                     companyRow[`${name}civilite`] = contact.honorific || 'Mr';

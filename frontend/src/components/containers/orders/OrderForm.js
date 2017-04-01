@@ -6,6 +6,8 @@ import OrderFormTable from "./OrderFormTable";
 import { ContactUs } from "./../../widgets";
 import removeDiacritics from "./../../../helpers";
 
+const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
+
 const packs = [
   { nb: 10, shipping: 10 },
   { nb: 25, shipping: 22 },
@@ -59,7 +61,6 @@ const FormHonorific = ({ input, label, meta, ...props}) => (
   </select>
 )
 
-
 const Section = (props) => (
   <FormSection name={props.name}>
     <div className="panel panel-default">
@@ -78,7 +79,7 @@ const FieldNbProducts = ({ input, price, meta: { touched, error }, ...props}) =>
     <select {...input} {...props}>
         <option key={ 0 } value="0">Choisir le nombre d&#39;exemplaires</option>  
       { packs.map((pack,i) =>
-        <option key={ i } value={ pack.nb }>{ pack.nb } exemplaires = { pack.nb * price }€</option>  
+        <option key={ i } value={ pack.nb }>{ pack.nb } exemplaires = { toMoney(pack.nb * price) }</option>  
       )}
     </select>
     { touched && error && <div className="form-message"><small>{error}</small></div> }
@@ -740,12 +741,12 @@ class OrderForm extends Component {
                       &nbsp;Je m’engage
                       { (parseInt(shipping_option,10) === 1) &&
                         <span>
-                          &nbsp;à régler la totalité de ma commande ({total}€) à réception de la facture.
+                          &nbsp;à régler la totalité de ma commande ({toMoney(total)}) à réception de la facture.
                         </span>
                       }
                       { (parseInt(shipping_option,10) === 2) &&
                         <span>
-                          &nbsp;à régler les frais de traitement de ma commande ({total}€) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
+                          &nbsp;à régler les frais de traitement de ma commande ({toMoney(total)}) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
                           <em>{(hub && ba_shipping_available) ? hub : "BEEOTOP Paris"}</em>.
                         </span>
                       }
