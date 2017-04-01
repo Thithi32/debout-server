@@ -87,7 +87,7 @@ const validOrder = (order) => {
 
   if (order.invoice) {
     let full = [
-      order.company,
+      order.invoice.company_name || order.company,
       getContactFullname(order.invoice.contact),
       getAddressFull(order.invoice.address)
     ];
@@ -101,8 +101,8 @@ const validOrder = (order) => {
       }
     } else {
       let full = [
+        order.shipping.company_name || order.company,
         getContactFullname(order.invoice.contact),
-        order.company,
         getAddressFull(order.invoice.address)
       ];
       order.shipping.full = full.join("<br />");
