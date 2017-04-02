@@ -68,7 +68,6 @@ export function createOrder( order ) {
       if (invoice.use_shipping_address) invoice.address = shipping.address;
       forder.shipping_option = 1;
       forder.shipping = shipping;
-      delete forder.hub;
     } else {
       const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "BEEOTOP";
       if (!ba_shipping_available) forder.hub = "BEEOTOP";
@@ -81,6 +80,8 @@ export function createOrder( order ) {
     forder.invoice = invoice;
 
     forder.confirmation_url = document.location.origin + "/order/confirm";
+
+    console.log("Order sent",forder);
 
     fetch("/api/order/new", { 
       method: "POST", 

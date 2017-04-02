@@ -49,7 +49,7 @@ const validOrder = (order) => {
         order['shipping_price'] = packs[i].shipping;
       }
     }
-    order['shipping_place'] = order['company'];
+    order['shipping_place'] = (order.shipping && order.shipping.company_name) || order['company'];
   } else {
     order['shipping_place'] = order['hub'];
   }
@@ -102,12 +102,14 @@ const validOrder = (order) => {
     } else {
       let full = [
         order.shipping.company_name || order.company,
-        getContactFullname(order.invoice.contact),
-        getAddressFull(order.invoice.address)
+        getContactFullname(order.shipping.contact),
+        getAddressFull(order.shipping.address)
       ];
       order.shipping.full = full.join("<br />");
     }
   }
+
+  console.log("Order received and filtered",order);
 
   return order;
 }
