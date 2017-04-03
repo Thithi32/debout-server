@@ -94,18 +94,20 @@ const validOrder = (order) => {
     order.invoice.full = full.join("<br />");
   }
 
-  if (order.shipping) {
-    if (order['shipping_option'] === 2) {
-      order.shipping = {
-        full: order['hub']
-      }
-    } else {
+  if (order['shipping_option'] === 2) {
+    order.shipping = {
+      full: order['hub']
+    }
+  } else {
+    if (order.shipping) {
       let full = [
         order.shipping.company_name || order.company,
         getContactFullname(order.shipping.contact),
         getAddressFull(order.shipping.address)
       ];
       order.shipping.full = full.join("<br />");
+    } else {
+      console.log("Error: shipping should be option 2 or having shipping details");
     }
   }
 
