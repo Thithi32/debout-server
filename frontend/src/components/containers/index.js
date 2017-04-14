@@ -1,10 +1,10 @@
+import { CompanyAutoComplete } from './companies'
 import { OrderForm, OrderConfirm } from './orders'
-import { CompaniesList } from './companies'
 
 export {
-  
+
+  CompanyAutoComplete,
   OrderForm,
   OrderConfirm,
-  CompaniesList
   
 }

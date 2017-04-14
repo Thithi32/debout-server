@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { fetchCompanies, fetchHubs, createOrder } from "./../../../actions";
+import { fetchHubs, createOrder } from "./../../../actions";
 import { Field, reduxForm, formValueSelector, FormSection, change as changeFieldValue } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
-import { ContactUs } from "./../../widgets";
-import removeDiacritics from "./../../../helpers";
+import OrderShippingOptions from "./OrderShippingOptions";
+import CompanyAutoComplete from "./../companies/CompanyAutoComplete";
+import { ContactUs, FormGroupInput, FormInput } from "./../../widgets";
 
 const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
 
@@ -28,6 +29,8 @@ const packs = [
   { nb: 1000, shipping: 170 }
 ];
 
+
+
 const renderInputError = ({input, meta, ...props}) => (
   <div>
   { meta.error &&
@@ -37,20 +40,6 @@ const renderInputError = ({input, meta, ...props}) => (
       &nbsp;{meta.error}
     </div>
   }
-  </div>
-)
-
-const FormGroupInput = ({ input, label, ...props}) => (
-  <div className="form-group">
-    <label htmlFor={input.name}>{label}</label>
-    <FormInput input={input} {...props} />
-  </div>
-)
-
-const FormInput = ({ input, type, meta: { touched, error }, ...props}) => (
-  <div className={ touched && error && ' error' }>
-    <input type={type} {...input} {...props} />  
-    { touched && error && <div className="form-message"><small>{error}</small></div> }        
   </div>
 )
 
@@ -374,8 +363,10 @@ class OrderForm extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchCompanies();
-    this.props.fetchHubs();
+    if (!this.props.hubs.length && !this.state.hubsFetched) {
+      this.props.fetchHubs();
+      this.setState({ hubsFetched: true});
+    }
   }
 
   getHubOptions() {
@@ -383,6 +374,21 @@ class OrderForm extends Component {
       let name = hub['NOM 1'] + " " + hub['NOM 2']; 
       return { key: idx, value: name, text: name}; //hub['BA']
     });
+  }
+
+  getHubOption(name) {
+    if (!name || name === "BEEOTOP") {
+      return { name: "BEEOTOP" }
+    } else {
+      let hub = this.props.hubs.find((hub) => { 
+        let hub_name = hub['NOM 1'] + " " + hub['NOM 2']; 
+        return hub_name.toLowerCase() === hub.toLowerCase();
+      });
+
+      hub.name = hub['NOM 1'] + " " + hub['NOM 2'];
+      hub.address_inline = hub['ADRESSE 1'] + ' ' + hub['CP'] + ' ' + hub['VILLE'];
+      return hub;
+    }
   }
 
   FieldHub(fieldProps) {
@@ -407,24 +413,7 @@ class OrderForm extends Component {
     }
   }
 
-  changeCompany(e, str, old_str) {
-    // First sync other company_name fields
-    if (this.props.order.values.shipping && this.props.order.values.shipping.company_name === old_str) {
-      this.props.change("shipping.company_name", str);
-    }
-    if (this.props.order.values.invoice && this.props.order.values.invoice.company_name === old_str) {
-      this.props.change("invoice.company_name", str);
-    }
-
-    let choices = [];
-    let tolower = (str) => { return removeDiacritics(str.toLowerCase()); }
-    if (str.length >= 3) 
-      choices = this.props.companies.filter( (company) => ( tolower(company['Raison sociale']).indexOf(tolower(str)) > -1 ) ? company['Raison sociale'] : false );
-
-    this.setState( { 'company_autocomplete': choices} );
-  }
-
-  selectCompany(company) {
+  onCompanyChange(company) {
     const company_name = company['Raison sociale'];
 
     let invoice_address = {
@@ -489,8 +478,6 @@ class OrderForm extends Component {
         use_contact_for_invoice: !has_invoice_contact
       }
     },false)
-
-    this.setState({company_autocomplete: {}});
   }
 
   render() {
@@ -498,13 +485,12 @@ class OrderForm extends Component {
       handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address, 
       use_contact_for_shipping, use_contact_for_invoice, valid } = this.props;
 
-    const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
+    const is_ngo_ccas = is_ngo || is_ccas;
 
-    const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "BEEOTOP";
+    const price = is_ngo_ccas ? 0.5 : 1.5;
 
-    const home_delivery = (parseInt(shipping_option,10) === 1);
+    const hub_shipping = (parseInt(shipping_option,10) === 2);
 
-    let shipping_price = 0;
     let shipping_home_price = 0;
     if (parseInt(nb_products, 10) > 0) {
       for (var i = 0; i < packs.length; i++) {
@@ -512,11 +498,9 @@ class OrderForm extends Component {
           shipping_home_price = packs[i].shipping;
         }
       }
+    }
 
-    }
-    if (home_delivery) {
-      shipping_price = shipping_home_price;
-    }
+    let shipping_price = (hub_shipping) ? 0 : shipping_home_price;
 
     let total = nb_products * price + shipping_price;
     if (!total || isNaN(total) || (total < 0)) total = 0;
@@ -545,19 +529,7 @@ class OrderForm extends Component {
 
           <form onSubmit={ handleSubmit(this.props.createOrder) } autoComplete="off">
 
-            <div className="dropdown open">
-              <Field name="company" label="Nom de la structure" 
-                component={FormGroupInput} type="text" className="form-control"
-                onChange={this.changeCompany.bind(this)}/>  
-
-              { this.state.company_autocomplete && this.state.company_autocomplete.length > 0 &&
-                <ul className="dropdown-menu">
-                  { this.state.company_autocomplete.map((company, key) => 
-                      <li key={key}><a href="#" onClick={() => this.selectCompany(company)}>{ company['Raison sociale'] }</a></li>
-                  )}
-                </ul>
-              }
-            </div>
+            <CompanyAutoComplete onCompanyChange={ this.onCompanyChange.bind(this) }/>
 
             <div className="form-group">
               <label>Vous êtes?</label>
@@ -578,7 +550,7 @@ class OrderForm extends Component {
               </div>
             </div>
 
-            { (is_ngo || is_ccas) && 
+            { is_ngo_ccas && 
               <div>
                 <div className="form-group">
                   <div className="checkbox">
@@ -606,34 +578,10 @@ class OrderForm extends Component {
                 <small>À noter : Un paquet de 25 exemplaires du magazine pèse environ 3,5 kg.</small>
               </div>
 
-              { (is_ngo || is_ccas) && 
-                <div className="form-group">
-                  <label htmlFor="nb_products">Choisir votre mode de livraison</label>
-                  <div className="radio">
-                    <label>
-                      <Field component="input" type="radio" name="shipping_option" value="1"/>
-                       Option 1: Livraison dans votre structure{ shipping_home_price > 0 &&
-                        <span>
-                          &nbsp;= { shipping_home_price }€
-                        </span>
-                       }
-                    </label>
-                  </div>
-                  <div className="radio">
-                    <label>
-                      <Field component="input" type="radio" name="shipping_option" value="2"/>
-                       
-                      { ba_shipping_available &&
-                        <span>Option 2: Livraison dans votre Banque Alimentaire (gratuite)</span>
-                      }
-                      { !ba_shipping_available &&
-                        <div>
-                          <span>Option 2: Livraison gratuite au BEEOTOP de Paris, <em>14 boulevard de Douaumont – 75017 Paris</em></span>
-                        </div>
-                      }
-                    </label>
-                  </div>
-                </div>
+              { is_ngo_ccas && 
+                <OrderShippingOptions
+                  hub={ this.getHubOption(hub) }
+                  shipping_price={shipping_home_price} />
               }
 
               <OrderFormTable 
@@ -656,7 +604,7 @@ class OrderForm extends Component {
                   }}/>
                 </Section>
 
-                { home_delivery &&
+                { !hub_shipping &&
                   <Section name="shipping" title="Détail de la livraison">
 
                   <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
@@ -685,7 +633,7 @@ class OrderForm extends Component {
 
                   <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
 
-                  { home_delivery &&
+                  { !hub_shipping &&
                     <div>
                       <div className="form-group">
                         <label>Adresse de facturation</label>
@@ -696,11 +644,11 @@ class OrderForm extends Component {
                           </label>
                         </div>
                       </div>
-                      <AddressDisable disabled={ use_shipping_address && home_delivery } />
+                      <AddressDisable disabled={ use_shipping_address && !hub_shipping } />
                     </div>
                   }
 
-                  { !home_delivery &&
+                  { !hub_shipping &&
                     <Address title="Adresse de facturation" />
                   }
 
@@ -747,7 +695,7 @@ class OrderForm extends Component {
                       { (parseInt(shipping_option,10) === 2) &&
                         <span>
                           &nbsp;à régler les frais de traitement de ma commande ({toMoney(total)}) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
-                          <em>{(hub && ba_shipping_available) ? hub : "BEEOTOP Paris"}</em>.
+                          <em>{ hub === 'BEEOTOP' ? "BEEOTOP Paris" : hub }</em>.
                         </span>
                       }
                       <br />
@@ -818,8 +766,6 @@ OrderForm = reduxForm({
 }, null, { createOrder })(OrderForm);
 
 OrderForm.propTypes = {
-  companies: React.PropTypes.array.isRequired,
-  fetchCompanies: React.PropTypes.func.isRequired,
   hubs: React.PropTypes.array.isRequired,
   fetchHubs: React.PropTypes.func.isRequired,
   createOrder: React.PropTypes.func.isRequired
@@ -828,8 +774,8 @@ OrderForm.propTypes = {
 const selector = formValueSelector('order');
 function mapStateToProps(state) {
   return {
-    companies: state.companies,
-    hubs: state.hubs,
+    companies: state.companies || [],
+    hubs: state.hubs || [],
     company: selector(state, 'company'),
     is_ngo: selector(state, 'is_ngo'),
     is_ccas: selector(state, 'is_ccas'),
@@ -840,8 +786,8 @@ function mapStateToProps(state) {
     use_contact_for_shipping: selector(state, 'shipping.use_contact_for_shipping'),
     use_shipping_address: selector(state, 'invoice.use_shipping_address'),
     use_contact_for_invoice: selector(state, 'invoice.use_contact_for_invoice'),
-    order: state.form.order
+    order: state.form.order || {}
   }
 }
 
-export default connect(mapStateToProps, { fetchCompanies, fetchHubs, createOrder, changeFieldValue })(OrderForm);
+export default connect(mapStateToProps, { fetchHubs, createOrder, changeFieldValue })(OrderForm);

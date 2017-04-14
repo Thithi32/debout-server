@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import './Loader.css';
 
-class Loader extends Component {
+export class Loader extends Component {
   render() {
     return (
       <div className="loader-container">
