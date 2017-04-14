@@ -382,7 +382,7 @@ class OrderForm extends Component {
     } else {
       let hub = this.props.hubs.find((hub) => { 
         let hub_name = hub['NOM 1'] + " " + hub['NOM 2']; 
-        return hub_name.toLowerCase() === hub.toLowerCase();
+        return hub_name.toLowerCase() === name.toLowerCase();
       });
 
       hub.name = hub['NOM 1'] + " " + hub['NOM 2'];

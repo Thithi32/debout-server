@@ -31,8 +31,8 @@ export class CompanyAutoComplete extends Component {
   }
 
   selectCompany(company) {
-    this.props.onCompanyChange(company);
     this.setState({company_autocomplete: {}});
+    this.props.onCompanyChange(company);
   }
 
   render() {

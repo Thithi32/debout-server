@@ -17,38 +17,46 @@ const default_props = {
   onCompanyChange: sinon.spy()
 }
 
+const isRendered = (wrapper) => (expect(wrapper.find('.dropdown').length).toBe(1));
+const isDropdownOpen = (wrapper) => (expect(wrapper.find('.dropdown-menu').length).toBe(1));
+const isDropdownClose = (wrapper) => (expect(wrapper.find('.dropdown-menu').length).toBe(0));
+const nbDropdownOptions = (wrapper) => (wrapper.find('.dropdown-menu > li').length);
+const clickOnFirstDropdownOption = (wrapper) => (wrapper.find('.dropdown-menu > li').first().find('a').simulate('click'));
+
 it('renders without crashing', () => {
   let wrapper = shallow( <CompanyAutoComplete { ...default_props } /> );
-  expect(wrapper.find('.dropdown').length).toBe(1);
+  isRendered(wrapper);
 });
 
 it('should open dropdown', () => {
   let wrapper = shallow( <CompanyAutoComplete { ...default_props } /> );
   let input = wrapper.instance().changeCompany(null,"AAJT","");
-  expect(wrapper.find('.dropdown-menu').length).toBe(1);
+  isDropdownOpen(wrapper);
 });
 
 it('should not open dropdown because input value to short', () => {
   let wrapper = shallow( <CompanyAutoComplete { ...default_props } /> );
   let input = wrapper.instance().changeCompany(null,"AA","");
-  expect(wrapper.find('.dropdown-menu').length).toBe(0);
+  isDropdownClose(wrapper);
 });
 
 it('should open dropdown with 2 results', () => {
   let wrapper = shallow( <CompanyAutoComplete { ...default_props } /> );
   let input = wrapper.instance().changeCompany(null,"acc","");
-  expect(wrapper.find('.dropdown-menu > li').length).toBe(2);
+  expect(nbDropdownOptions(wrapper)).toBe(2);
 });
 
 it('should open dropdown and select first option', () => {
   let props = default_props;
   props.onCompanyChange = sinon.spy();
   let wrapper = shallow( <CompanyAutoComplete { ...props } /> );
+  isRendered(wrapper);
   expect(default_props.onCompanyChange.callCount).toBe(0);
   let input = wrapper.instance().changeCompany(null,"acc","");
-  expect(wrapper.find('.dropdown-menu > li').length).toBe(2);
-  wrapper.find('.dropdown-menu > li').first().find('a').simulate('click');
+  expect(nbDropdownOptions(wrapper)).toBe(2);
+  clickOnFirstDropdownOption(wrapper);
   expect(props.onCompanyChange.callCount).toBe(1);
+  isDropdownClose(wrapper);
 });
 
 
