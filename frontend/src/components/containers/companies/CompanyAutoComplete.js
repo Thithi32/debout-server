@@ -28,11 +28,12 @@ export class CompanyAutoComplete extends Component {
       choices = this.props.companies.filter( (company) => ( tolower(company['Raison sociale']).indexOf(tolower(str)) > -1 ) ? company['Raison sociale'] : false );
 
     this.setState( { 'company_autocomplete': choices} );
+    this.props.onChangeCompany && this.props.onChangeCompany(e, str, old_str);
   }
 
   selectCompany(company) {
     this.setState({company_autocomplete: {}});
-    this.props.onCompanyChange(company);
+    this.props.onSelectCompany && this.props.onSelectCompany(company);
   }
 
   render() {
@@ -57,7 +58,8 @@ export class CompanyAutoComplete extends Component {
 CompanyAutoComplete.propTypes = {
   companies: React.PropTypes.array.isRequired,
   fetchCompanies: React.PropTypes.func.isRequired,
-  onCompanyChange: React.PropTypes.func.isRequired
+  onChangeCompany: React.PropTypes.func,
+  onSelectCompany: React.PropTypes.func,
 }
 
 function mapStateToProps(state) {

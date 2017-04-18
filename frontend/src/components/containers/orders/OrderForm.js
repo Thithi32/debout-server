@@ -1,191 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { fetchHubs, createOrder } from "./../../../actions";
-import { Field, reduxForm, formValueSelector, FormSection, change as changeFieldValue } from 'redux-form';
+import { Field, reduxForm, change as changeFieldValue } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
 import OrderShippingOptions from "./OrderShippingOptions";
-import CompanyAutoComplete from "./../companies/CompanyAutoComplete";
-import { ContactUs, FormGroupInput, FormInput } from "./../../widgets";
+import OrderNbProducts from "./OrderNbProducts";
+import OrderFormErrors from "./OrderFormErrors";
+import { CompanyAutoComplete, CompanyTypeInput } from "./../companies";
+import { ContactUs, FormGroupInput, FormSectionPanel , FormContact, FormContactDisable, 
+          FormAddress, FormAddressDisable } from "./../../widgets";
 
 const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
-
-const packs = [
-  { nb: 10, shipping: 10 },
-  { nb: 25, shipping: 22 },
-  { nb: 50, shipping: 30 },
-  { nb: 100, shipping: 38 },
-  { nb: 150, shipping: 42 },
-  { nb: 200, shipping: 50 },
-  { nb: 250, shipping: 53 },
-  { nb: 300, shipping: 58 },
-  { nb: 350, shipping: 65 },
-  { nb: 400, shipping: 70 },
-  { nb: 450, shipping: 80 },
-  { nb: 500, shipping: 90 },
-  { nb: 600, shipping: 102 },
-  { nb: 700, shipping: 120 },
-  { nb: 800, shipping: 135 },
-  { nb: 900, shipping: 150 },
-  { nb: 1000, shipping: 170 }
-];
-
-
-
-const renderInputError = ({input, meta, ...props}) => (
-  <div>
-  { meta.error &&
-    <div {...props} className="error">
-      <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      <span className="sr-only">Erreur:</span>
-      &nbsp;{meta.error}
-    </div>
-  }
-  </div>
-)
-
-const FormHonorific = ({ input, label, meta, ...props}) => (
-  <select {...input} {...props}>
-    <option value="M">M</option>
-    <option value="Mme">Mme</option>
-  </select>
-)
-
-const Section = (props) => (
-  <FormSection name={props.name}>
-    <div className="panel panel-default">
-      <div className="panel-heading">
-        <h3 className="panel-title title">{ props.title }</h3>
-      </div>
-      <div className="panel-body">
-        {props.children}
-      </div>
-    </div>
-  </FormSection>
-)
-
-const FieldNbProducts = ({ input, price, meta: { touched, error }, ...props}) => (
-  <div className={ touched && error && ' error' }>
-    <select {...input} {...props}>
-        <option key={ 0 } value="0">Choisir le nombre d&#39;exemplaires</option>  
-      { packs.map((pack,i) =>
-        <option key={ i } value={ pack.nb }>{ pack.nb } exemplaires = { toMoney(pack.nb * price) }</option>  
-      )}
-    </select>
-    { touched && error && <div className="form-message"><small>{error}</small></div> }
-  </div>
-)
-
-class Address extends Component {
-  render() {
-    const name = this.props.name || 'address';
-    return (
-      <FormSection name={name}>
-        <div className="form-group">
-          { this.props.title &&
-            <label htmlFor="address1">{ this.props.title }</label>
-          }
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address1" placeholder="Ligne 1 *" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address2" placeholder="Ligne 2" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="zip" placeholder="Code postal *" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="city" placeholder="Commune *" disabled={this.props.disabled} />
-        </div>
-      </FormSection>
-    )
-  }
-}
-
-class AddressDisable extends Component {
-  render() {
-    const { disabled, ...props } = this.props;
-    return (
-      <div>
-        { !disabled &&
-          <div>
-            <Address { ...props } />
-            <div className="hide">
-              <Address name="address_disabled" disabled { ...props } />
-            </div>
-          </div>
-        }
-        { disabled &&
-          <div>
-            <div className="hide">
-              <Address { ...props } />
-            </div>
-            <Address name="address_disabled" disabled { ...props } />
-          </div>
-        }
-      </div>
-    )
-  }
-}
-
-class Contact extends Component {
-  render() {
-    const name = this.props.name || 'contact';
-    const section = this.props.section || '';
-    const mobile_label = "Téléphone mobile" + ((this.props.needPhone) ? " ¹" : "");
-    const phone_label = "Téléphone fixe" + ((this.props.needPhone) ? " ¹" : "");
-    return (
-      <FormSection name={name}>
-        <div className="form-group contact-form">
-          { this.props.title &&
-            <label>{ this.props.title }</label>
-          }
-          <Field name="honorific" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Civilité" component={FormHonorific} disabled={this.props.disabled} className="honorific form-control"/>
-          <div className="name-group">
-            <Field name="name" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Nom *" disabled={this.props.disabled} component="input" type="text" className="form-control"/>  
-            <Field name="firstname" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Prénom" disabled={this.props.disabled} component="input" type="text" className="form-control"/>  
-          </div>
-          <Field name={`${section}.${name}.name`} component={renderInputError} />
-          <div className="input-group email-group">
-            <span className="input-group-addon" id="email_label"><i className="glyphicon glyphicon-envelope"></i></span>
-            <Field name="email" placeholder="Email *" disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="email_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
-          </div>
-          <Field name={`${section}.${name}.email`} component={renderInputError} />
-          <div className="input-group mobile-group">
-            <span className="input-group-addon" id="mobile_label"><i className="glyphicon glyphicon-phone"></i></span>
-            <Field name="mobile" placeholder={mobile_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="mobile_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
-          </div>
-          <div className="input-group phone-group">
-            <span className="input-group-addon" id="phone_label"><i className="glyphicon glyphicon-phone-alt"></i></span>
-            <Field name="phone" placeholder={phone_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="phone_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
-          </div>
-          <Field name={`${section}.${name}.mobile`} component={renderInputError} />
-        </div>
-      </FormSection>
-    )
-  }
-}
-
-class ContactDisable extends Component {
-  render() {
-    const { disabled, ...props } = this.props;
-    return (
-      <div>
-        { !disabled &&
-          <div>
-            <Contact { ...props } />
-            <div className="hide">
-              <Contact name="contact_disabled" disabled { ...props } />
-            </div>
-          </div>
-        }
-        { disabled &&
-          <div>
-            <div className="hide">
-              <Contact { ...props } />
-            </div>
-            <Contact name="contact_disabled" disabled { ...props } />
-          </div>
-        }
-      </div>
-    )
-  }
-}
 
 const fields_validation = [
   { 
@@ -362,45 +187,12 @@ class OrderForm extends Component {
     this.state = {};
   }
 
-  componentDidMount() {
-    if (!this.props.hubs.length && !this.state.hubsFetched) {
-      this.props.fetchHubs();
-      this.setState({ hubsFetched: true});
-    }
+  onChangeHub(hub) {
+    this.setState({ hub });
   }
 
-  getHubOptions() {
-    return this.props.hubs.map((hub, idx) => { 
-      let name = hub['NOM 1'] + " " + hub['NOM 2']; 
-      return { key: idx, value: name, text: name}; //hub['BA']
-    });
-  }
-
-  getHubOption(name) {
-    if (!name || name === "BEEOTOP") {
-      return { name: "BEEOTOP" }
-    } else {
-      let hub = this.props.hubs.find((hub) => { 
-        let hub_name = hub['NOM 1'] + " " + hub['NOM 2']; 
-        return hub_name.toLowerCase() === name.toLowerCase();
-      });
-
-      hub.name = hub['NOM 1'] + " " + hub['NOM 2'];
-      hub.address_inline = hub['ADRESSE 1'] + ' ' + hub['CP'] + ' ' + hub['VILLE'];
-      return hub;
-    }
-  }
-
-  FieldHub(fieldProps) {
-    let { options, ...other } = fieldProps;
-    return (
-      <Field {...other} component="select">
-          <option key={ "BEEOTOP" } value={ "BEEOTOP" }>Choisir votre Banque Alimentaire</option>  
-        { options.map((option) =>
-          <option key={ option.key } value={ option.value }>{ option.text }</option>  
-        )}
-      </Field>
-    )
+  onChangeShippingPrice(home_shipping_price) {
+    this.setState({ home_shipping_price });
   }
 
   checkDeliveryOptions(e, value) {
@@ -413,7 +205,17 @@ class OrderForm extends Component {
     }
   }
 
-  onCompanyChange(company) {
+  onChangeCompany(e, str, old_str) {
+    // First sync other company_name fields
+    if (this.props.order.values.shipping && this.props.order.values.shipping.company_name === old_str) {
+      this.props.change("shipping.company_name", str);
+    }
+    if (this.props.order.values.invoice && this.props.order.values.invoice.company_name === old_str) {
+      this.props.change("invoice.company_name", str);
+    }
+  }
+
+  onSelectCompany(company) {
     const company_name = company['Raison sociale'];
 
     let invoice_address = {
@@ -481,26 +283,20 @@ class OrderForm extends Component {
   }
 
   render() {
-    const { 
-      handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address, 
-      use_contact_for_shipping, use_contact_for_invoice, valid } = this.props;
+    const { handleSubmit, valid, order } = this.props;
+    const values = (order && order.values) || {};
+    const { is_ngo, is_ccas, hub, nb_products, shipping, invoice } = values;
+    const { use_shipping_address, use_contact_for_invoice } = invoice || {};
+    const { use_contact_for_shipping } = shipping || {};
+    const shipping_option = parseInt(values.shipping_option,10);
 
     const is_ngo_ccas = is_ngo || is_ccas;
-
     const price = is_ngo_ccas ? 0.5 : 1.5;
 
-    const hub_shipping = (parseInt(shipping_option,10) === 2);
+    const hub_shipping = (shipping_option === 2);
 
-    let shipping_home_price = 0;
-    if (parseInt(nb_products, 10) > 0) {
-      for (var i = 0; i < packs.length; i++) {
-        if (packs[i].nb === parseInt(nb_products, 10)) {
-          shipping_home_price = packs[i].shipping;
-        }
-      }
-    }
-
-    let shipping_price = (hub_shipping) ? 0 : shipping_home_price;
+    const shipping_home_price = this.state.home_shipping_price || 0;
+    const shipping_price = (hub_shipping) ? 0 : shipping_home_price;
 
     let total = nb_products * price + shipping_price;
     if (!total || isNaN(total) || (total < 0)) total = 0;
@@ -529,65 +325,24 @@ class OrderForm extends Component {
 
           <form onSubmit={ handleSubmit(this.props.createOrder) } autoComplete="off">
 
-            <CompanyAutoComplete onCompanyChange={ this.onCompanyChange.bind(this) }/>
+            <CompanyAutoComplete onSelectCompany={ this.onSelectCompany.bind(this) } onChangeCompany={ this.onChangeCompany.bind(this) }/>
 
-            <div className="form-group">
-              <label>Vous êtes?</label>
-              <div className="checkbox">
-                <label>
-                  <Field name="is_ccas" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/> 
-                  une mairie ou un CCAS
-                </label>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="checkbox">
-                <label>
-                  <Field name="is_ngo" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/> 
-                  une association à but non lucratif
-                </label>
-              </div>
-            </div>
-
-            { is_ngo_ccas && 
-              <div>
-                <div className="form-group">
-                  <div className="checkbox">
-                    <label>
-                      <Field name="has_hub" component="input" type="checkbox"/> 
-                      partenaire d&#39;une Banque Alimentaire (livraison gratuite)
-                    </label>
-                  </div>
-                </div>
-
-                { has_hub && 
-                  <div className="form-group">
-                    <label htmlFor="hub">Quelle est votre Banque Alimentaire?</label>
-                    <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() } />
-                  </div>
-                }
-              </div>
-            }
+            <CompanyTypeInput onChangeHub={ this.onChangeHub.bind(this) } onChange={ this.checkDeliveryOptions.bind(this) }/>
 
             <div className="gray-row">
 
-              <div className="form-group">
-                <label htmlFor="nb_products">Nombre d&#39;exemplaires du magazine</label>
-                <Field name="nb_products" price={price} component={FieldNbProducts} className="form-control"/>  
-                <small>À noter : Un paquet de 25 exemplaires du magazine pèse environ 3,5 kg.</small>
-              </div>
+              <OrderNbProducts price={price} onChangeShippingPrice={ this.onChangeShippingPrice.bind(this) }/>
 
               { is_ngo_ccas && 
                 <OrderShippingOptions
-                  hub={ this.getHubOption(hub) }
-                  shipping_price={shipping_home_price} />
+                  hub={ this.state.hub }
+                  shipping_price={ shipping_home_price } />
               }
 
               <OrderFormTable 
                 price={price} 
                 nb_products={nb_products || 0} 
-                shipping_price={shipping_price} 
+                shipping_price={ shipping_price } 
                 total={total} />
 
             </div>
@@ -596,20 +351,20 @@ class OrderForm extends Component {
 
               <div>
 
-                <Section name="order" title="Responsable de la commande">
-                  <Contact needPhone section="order" onChange={(e)=>{
+                <FormSectionPanel name="order" title="Responsable de la commande">
+                  <FormContact needPhone section="order" onChange={(e)=>{
                     const { name, value } = e.target;
                     this.props.change(name.replace('order','invoice').replace('contact','contact_disabled'), value);
                     this.props.change(name.replace('order','shipping').replace('contact','contact_disabled'), value);
                   }}/>
-                </Section>
+                </FormSectionPanel>
 
                 { !hub_shipping &&
-                  <Section name="shipping" title="Détail de la livraison">
+                  <FormSectionPanel name="shipping" title="Détail de la livraison">
 
                   <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
 
-                   <Address title="Adresse de livraison" onChange={(e)=>{
+                   <FormAddress title="Adresse de livraison" onChange={(e)=>{
                       const { name, value } = e.target;
                       this.props.change(name.replace('shipping','invoice').replace('address','address_disabled'), value);
                     }} />
@@ -624,32 +379,32 @@ class OrderForm extends Component {
                       </div>
                     </div>
 
-                    <ContactDisable needPhone section="shipping" disabled={use_contact_for_shipping} />
+                    <FormContactDisable needPhone section="shipping" disabled={ use_contact_for_shipping } />
  
-                  </Section>
+                  </FormSectionPanel>
                 }
 
-                <Section name="invoice" title="Informations de facturation">
+                <FormSectionPanel name="invoice" title="Informations de facturation">
 
                   <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
 
                   { !hub_shipping &&
-                    <div>
-                      <div className="form-group">
-                        <label>Adresse de facturation</label>
-                        <div className="checkbox">
-                          <label>
-                            <Field name="use_shipping_address" component="input" type="checkbox" /> 
-                            Utiliser l&#39;adresse de livraison pour la facturation
-                          </label>
-                        </div>
+                  <div>
+                    <div className="form-group">
+                      <label>Adresse de facturation</label>
+                      <div className="checkbox">
+                        <label>
+                          <Field name="use_shipping_address" component="input" type="checkbox" /> 
+                          Utiliser l&#39;adresse de livraison pour la facturation
+                        </label>
                       </div>
-                      <AddressDisable disabled={ use_shipping_address && !hub_shipping } />
                     </div>
+                    <FormAddressDisable disabled={ use_shipping_address } />
+                  </div>
                   }
 
-                  { !hub_shipping &&
-                    <Address title="Adresse de facturation" />
+                  { hub_shipping &&
+                    <FormAddressDisable title="Adresse de facturation"/>
                   }
 
                   <div className="form-group">
@@ -662,9 +417,9 @@ class OrderForm extends Component {
                     </div>
                   </div>
 
-                  <ContactDisable section="invoice" disabled={use_contact_for_invoice} />
+                  <FormContactDisable section="invoice" disabled={ use_contact_for_invoice } />
 
-                </Section>
+                </FormSectionPanel>
 
                 <div className="form-group">
                   <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre à votre commande</label>
@@ -687,12 +442,12 @@ class OrderForm extends Component {
                     <small>
                       &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
                       &nbsp;Je m’engage
-                      { (parseInt(shipping_option,10) === 1) &&
+                      { (shipping_option === 1) &&
                         <span>
                           &nbsp;à régler la totalité de ma commande ({toMoney(total)}) à réception de la facture.
                         </span>
                       }
-                      { (parseInt(shipping_option,10) === 2) &&
+                      { (shipping_option === 2) &&
                         <span>
                           &nbsp;à régler les frais de traitement de ma commande ({toMoney(total)}) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
                           <em>{ hub === 'BEEOTOP' ? "BEEOTOP Paris" : hub }</em>.
@@ -710,23 +465,7 @@ class OrderForm extends Component {
                         <h3 className="panel-title title">Il manque des informations pour valider votre commande</h3>
                       </div>
                       <div className="panel-body">
-                        <Field name="company" component={renderInputError} />
-                        <Field name="nb_products" component={renderInputError} />
-                        <Field name="order.contact.name" component={renderInputError} />
-                        <Field name="order.contact.email" component={renderInputError} />
-                        <Field name="order.contact.mobile" component={renderInputError} />
-                        <Field name="invoice.address.address1" component={renderInputError} />
-                        <Field name="invoice.address.zip" component={renderInputError} />
-                        <Field name="invoice.address.city" component={renderInputError} />
-                        <Field name="invoice.contact.name" component={renderInputError} />
-                        <Field name="invoice.contact.email" component={renderInputError} />
-                        <Field name="shipping.address.address1" component={renderInputError} />
-                        <Field name="shipping.address.zip" component={renderInputError} />
-                        <Field name="shipping.address.city" component={renderInputError} />
-                        <Field name="shipping.contact.name" component={renderInputError} />
-                        <Field name="shipping.contact.email" component={renderInputError} />
-                        <Field name="shipping.contact.mobile" component={renderInputError} />
-                        <Field name="order_signed" component={renderInputError} />
+                        <OrderFormErrors />
                       </div>
                     </div>
                   </div>
@@ -749,7 +488,6 @@ class OrderForm extends Component {
 
 OrderForm = reduxForm({
   form: 'order',
-  fields: [ 'company', 'order_comment' ],
   initialValues: {
     shipping_option: "1",
     order_signed: false,
@@ -768,25 +506,15 @@ OrderForm = reduxForm({
 OrderForm.propTypes = {
   hubs: React.PropTypes.array.isRequired,
   fetchHubs: React.PropTypes.func.isRequired,
-  createOrder: React.PropTypes.func.isRequired
+  createOrder: React.PropTypes.func.isRequired,
+  order: React.PropTypes.object.isRequired,
 }
 
-const selector = formValueSelector('order');
 function mapStateToProps(state) {
   return {
     companies: state.companies || [],
     hubs: state.hubs || [],
-    company: selector(state, 'company'),
-    is_ngo: selector(state, 'is_ngo'),
-    is_ccas: selector(state, 'is_ccas'),
-    has_hub: selector(state, 'has_hub'),
-    hub: selector(state, 'hub'),
-    nb_products: selector(state, 'nb_products'),
-    shipping_option: selector(state, 'shipping_option'),
-    use_contact_for_shipping: selector(state, 'shipping.use_contact_for_shipping'),
-    use_shipping_address: selector(state, 'invoice.use_shipping_address'),
-    use_contact_for_invoice: selector(state, 'invoice.use_contact_for_invoice'),
-    order: state.form.order || {}
+    order: state.form.order || {},
   }
 }
 

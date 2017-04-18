@@ -14,7 +14,6 @@ const default_props = {
     { "Raison sociale": "ACSANTE 93", "N°9": "25", "N°10": "25", "N°11": "25", "Type": "Association", "Asso d'une BA ?": "non", "Livraison via hub": "non", "Facturation magazine": "0", "Facturation transport": "oui", "(livraison)\nCivilité": "Mme", "(livraison)\nNom": "BRIEUX", "(livraison)\nPrénom": "Cecile", "(livraison)\nMail": "cecile.brieux@acsante93.com", "(livraison)\nportable": "", "(livraison)\nfixe ": "01 41 50 50 10", "(livraison)\nAdresse 1": "2  rue de Lorraine", "(livraison)\nAdresse 2": "", "(livraison)\nCP": "93000", "(livraison)\nVille": "BOBIGNY", "(facture)\nCivilité": "Mme", "(facture)\nNom": "BRIEUX", "re": "Cecile", "(facture)\nMail": "cecile.brieux@acsante93.com", "(facture)\nportable": "", "(facture)\nfixe ": "01 41 50 50 10", "(facture)\nRaison Sociale": "ACSANTE 93", "(facture)\nAdresse": "2  rue de Lorraine", "(facture)\nCP": "93000", "(facture)\nVille": "BOBIGNY", "Commentaires": "", "Bon engagement? 1er num": "", "Bon engagement? dernier num": "", "line": 6 }
   ],
   fetchCompanies: sinon.spy(),
-  onCompanyChange: sinon.spy()
 }
 
 const isRendered = (wrapper) => (expect(wrapper.find('.dropdown').length).toBe(1));
@@ -48,14 +47,21 @@ it('should open dropdown with 2 results', () => {
 
 it('should open dropdown and select first option', () => {
   let props = default_props;
-  props.onCompanyChange = sinon.spy();
+  props.onSelectCompany = sinon.spy();
+  props.onChangeCompany = sinon.spy();
   let wrapper = shallow( <CompanyAutoComplete { ...props } /> );
-  isRendered(wrapper);
-  expect(default_props.onCompanyChange.callCount).toBe(0);
-  let input = wrapper.instance().changeCompany(null,"acc","");
+
+  expect(props.onSelectCompany.callCount).toBe(0);
+  expect(props.onChangeCompany.callCount).toBe(0);
+
+  let input = wrapper.instance().changeCompany(null,"TRES","");
+  input = wrapper.instance().changeCompany(null,"acc","");
+  expect(props.onChangeCompany.callCount).toBe(2);
+
   expect(nbDropdownOptions(wrapper)).toBe(2);
   clickOnFirstDropdownOption(wrapper);
-  expect(props.onCompanyChange.callCount).toBe(1);
+  expect(props.onSelectCompany.callCount).toBe(1);
+
   isDropdownClose(wrapper);
 });
 

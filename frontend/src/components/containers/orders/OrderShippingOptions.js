@@ -4,7 +4,9 @@ import { Field } from 'redux-form';
 class OrderShippingOptions extends Component {
 
   render() {
-    const { hub, shipping_price } = this.props;
+    let { hub, shipping_price } = this.props;
+
+    hub = hub || { name: "BEEOTOP" };
 
     const hub_beeotop = (hub.name === "BEEOTOP");
     const hub_ba = !hub_beeotop;
@@ -44,7 +46,7 @@ class OrderShippingOptions extends Component {
 }
 
 OrderShippingOptions.propTypes = {
-  hub: React.PropTypes.object.isRequired,
+  hub: React.PropTypes.object,
   shipping_price: React.PropTypes.number.isRequired,
 }
 
