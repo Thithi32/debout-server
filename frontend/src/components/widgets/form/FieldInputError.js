@@ -1,8 +1,8 @@
 import React from 'react';
 
-const FieldInputError = ({input, meta, ...props}) => (
+const FieldInputError = ({input, meta, touched, ...props}) => (
   <div>
-  { meta.error &&
+  { meta.error && (!touched || meta.touched) &&
     <div {...props} className="error">
       <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
       <span className="sr-only">Erreur:</span>

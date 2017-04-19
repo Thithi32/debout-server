@@ -7,6 +7,8 @@ import removeDiacritics from "./../../../helpers";
 
 import { FormGroupInput } from './../../widgets';
 
+const upper = value => value && value.toUpperCase();
+
 export class CompanyAutoComplete extends Component {
 
   constructor () {
@@ -26,8 +28,8 @@ export class CompanyAutoComplete extends Component {
     let tolower = (str) => { return removeDiacritics(str.toLowerCase()); }
     if (str && str.length >= 3) 
       choices = this.props.companies.filter( (company) => ( tolower(company['Raison sociale']).indexOf(tolower(str)) > -1 ) ? company['Raison sociale'] : false );
-
     this.setState( { 'company_autocomplete': choices} );
+
     this.props.onChangeCompany && this.props.onChangeCompany(e, str, old_str);
   }
 
@@ -41,7 +43,8 @@ export class CompanyAutoComplete extends Component {
       <div className="dropdown open">
         <Field name="company" label="Nom de la structure" 
           component={FormGroupInput} type="text" className="form-control"
-          onChange={this.changeCompany.bind(this)}/>  
+          onChange={this.changeCompany.bind(this)}
+          normalize={upper}/>  
 
         { this.state.company_autocomplete && this.state.company_autocomplete.length > 0 &&
           <ul className="dropdown-menu">
