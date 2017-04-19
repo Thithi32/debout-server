@@ -143,7 +143,6 @@ const validate = (values) => {
         if (field.isRequired && (!values[field.name] || !values[field.name].trim().length)) {
           errors[field.name] = field.isRequired;
         }
-        if (field.isEmail) console.log(field,re_email.test(values[field.name]));
         if (field.isEmail && !re_email.test(values[field.name])) {
           errors[field.name] = field.isEmail;
         }

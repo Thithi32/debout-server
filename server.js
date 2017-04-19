@@ -96,7 +96,6 @@ const validOrder = (order) => {
 
   if (order['shipping_option'] === 2) {
     let hub = findHub(order['hub']);
-    console.log(hub);
     if (hub) {
       let full = [ hub["NOM 1"] + " " + hub["NOM 2"] ];
       if (hub["ADRESSE 1"].length) full.push(hub["ADRESSE 1"]);
