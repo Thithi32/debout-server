@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { fetchHubs, createOrder } from "./../../../actions";
+import { createOrder } from "./../../../actions";
 import { Field, reduxForm } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
 import OrderShippingOptions from "./OrderShippingOptions";
@@ -14,7 +14,7 @@ import { ContactUs, FormGroupInput, FormSectionPanel , FormContact, FormContactD
 const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
 const upper = value => value && value.toUpperCase();
 
-class OrderForm extends Component {
+export class OrderForm extends Component {
 
   constructor () {
     super();
@@ -336,18 +336,14 @@ OrderForm = reduxForm({
 }, null, { createOrder })(OrderForm);
 
 OrderForm.propTypes = {
-  hubs: React.PropTypes.array.isRequired,
-  fetchHubs: React.PropTypes.func.isRequired,
   createOrder: React.PropTypes.func.isRequired,
   order: React.PropTypes.object.isRequired,
 }
 
 function mapStateToProps(state) {
   return {
-    companies: state.companies || [],
-    hubs: state.hubs || [],
-    order: state.form.order || {},
+    order: (state && state.form && state.form.order) || {},
   }
 }
 
-export default connect(mapStateToProps, { fetchHubs, createOrder })(OrderForm);
+export default connect(mapStateToProps, { createOrder })(OrderForm);
