@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import "./OrderFormTable.css";
 
-const toMoney = (num) => ( (num && num.toFixed(2).replace('.',',') + "€") || "NaN" );
+const toMoney = (num) => ( (num && num.toFixed(2).replace('.',',') + "€") || "" );
 
 class OrderFormTable extends Component {
   render() {
@@ -18,7 +18,7 @@ class OrderFormTable extends Component {
           </thead>
           <tbody>
             <tr>
-              <td>Debout n°12</td>
+              <td><span className="hidden-xs">Debout n°12</span><span className="visible-xs-block">N°12</span></td>
               <td className="text-center">{toMoney(this.props.price)}</td>
               <td className="text-center">{this.props.nb_products}</td>
               <td className="text-right">{toMoney(this.props.price * this.props.nb_products)}</td>

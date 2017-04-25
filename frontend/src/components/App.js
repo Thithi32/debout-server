@@ -3,7 +3,7 @@ import { Router, Route, browserHistory } from 'react-router';
 
 import { FormOnly } from './layout';
 import { Loader } from './widgets';
-import { OrderForm, OrderConfirm } from './containers';
+import { OrderForm, OrderConfirm, SubscribeForm } from './containers';
 import './App.css';
 
 class App extends Component {
@@ -13,6 +13,8 @@ class App extends Component {
         <FormOnly>
           <Router history={browserHistory}>
             <Route path="/" component={OrderForm}/>
+            <Route path="/order" component={OrderForm}/>
+            <Route path="/subscribe" component={SubscribeForm}/>
             <Route path="/order/confirm/:id" component={OrderConfirm}/>
           </Router>
         </FormOnly>

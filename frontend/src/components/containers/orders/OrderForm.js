@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { createOrder } from "./../../../actions";
 import { Field, reduxForm } from 'redux-form';
+import { FormOnlyHeader, FormOnlyContent } from "./../../layout";
 import OrderFormTable from "./OrderFormTable";
 import OrderShippingOptions from "./OrderShippingOptions";
 import OrderNbProducts from "./OrderNbProducts";
@@ -137,18 +138,12 @@ export class OrderForm extends Component {
 
       <div className="widget">
 
-        <div className="widget-header">
-          <div className="logo">
-            <img className="pull-left" src="img/logo_mini.jpg" alt="Logo Debout" />
-          </div>
+        <FormOnlyHeader>
+          <h2>BON DE COMMANDE</h2>
+          <h3><strong>debout n°12</strong><br /> <span className="small">juin - juillet - août 2017</span> </h3>
+        </FormOnlyHeader>
 
-          <div className="row">
-            <h2>BON DE COMMANDE</h2>
-            <h3><strong>debout n°12</strong><br /> <span className="small">juin - juillet - août 2017</span> </h3>
-          </div>
-        </div>
-
-        <div className="widget-body">
+        <FormOnlyContent>
 
           <p>
             Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
@@ -312,7 +307,7 @@ export class OrderForm extends Component {
             }
           </form>
 
-        </div>
+        </FormOnlyContent>
       </div>
     )
   }

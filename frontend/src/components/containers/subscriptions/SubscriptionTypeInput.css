@@ -1,0 +1,36 @@
+.subscription-type-input .subscription-image {
+  width: 100%;
+}
+
+.subscription-type-input input[type='radio'] {
+  margin-right: 10px;
+}
+
+.subscription-type-input label {
+  color: #E6006C;
+  font-size: 16px;
+}
+
+.subscription-type-input input[name='solidarity_price'], .subscription-type-input input[name='solidarity_nb'] {
+  width: 50px;
+}
+
+.subscription-type-input .donation_recept label {
+  color: black;
+  font-size: 11px;
+  font-weight: normal;
+}
+
+.subscription-type-input .donation_recept input[type='checkbox'] {
+  margin-right: 7px;
+}
+
+/* Override bootstrap blue glow */
+.subscription-type-input input {
+  outline: none;
+  border: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid #737373 !important;
+}
