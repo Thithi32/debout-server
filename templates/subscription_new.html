@@ -1,0 +1,52 @@
+<html>
+<head>
+  <style type="text/css">
+    .col.right { float: left; text-align: right; width:50%; }
+    .col.left { float: left; width:50%; }
+    .row { clear: both; }
+    .table { border: 2px solid; }
+    .table td { border-bottom: 1px solid lightgrey; padding: 5px 10px; }
+    .table > tbody > tr > .thick-line { border-top: 2px solid; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    label { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div>
+    <p>
+      Bonjour,
+    </p>
+    <p>
+      Ci-dessous le nouvel abonnement de <em>%contact.fullname%</em>.
+    </p>
+  </div>
+  <hr>
+  <div class="row">
+    <h3 class="panel-title"><strong>Résumé de l'abonnement</strong></h3>
+  </div>
+  <div class="row">
+    <p>
+      <label>Type d'abonnement:</label> %type%<br />
+      <label>Montant:</label> %price%<br />
+      <label>Nombre d'exmplaire:</label> %solidarity_nb%<br />
+      <label>Reçu de don:</label> %recept%
+    </p>
+    <p>
+      <strong>Destinaire de l'abonnement:</strong><br />
+      <label>Nom:</label> %contact.name%<br />
+      <label>Prénom:</label> %contact.firstname%<br />
+      <label>Email:</label> %contact.email%<br />
+      <label>Portable:</label> %contact.mobile%<br />
+      <label>Fixe:</label> %contact.phone%
+    </p>
+    <p>
+      <strong>Adresse de l'abonnement:</strong><br />
+      <label>Adresse 1:</label> %address.address1%<br />
+      <label>Adresse 2:</label> %address.address2%<br />
+      <label>Code Postal:</label> %address.zip%<br />
+      <label>Ville:</label> %address.city%
+    </p>
+  </div>
+</body>
+</html>

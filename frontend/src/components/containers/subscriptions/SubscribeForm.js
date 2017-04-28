@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { reduxForm } from 'redux-form';
 import { FormOnlyHeader, FormOnlyContent } from "./../../layout";
-import { FormSectionPanel, FormContact, FormAddress } from "./../../widgets";
+import { FormContact, FormAddress } from "./../../widgets";
+import { createSubscription } from "./../../../actions";
 import SubscribeFormErrors from "./SubscribeFormErrors";
 import SubscriptionTypeInput from "./SubscriptionTypeInput";
 import SubscribeFormSignature from "./SubscribeFormSignature";
@@ -26,20 +27,25 @@ export class SubscribeForm extends Component {
 
         <FormOnlyContent>
 
-          <form autoComplete="off">
+          <form onSubmit={ this.props.handleSubmit(this.props.createSubscription) } autoComplete="off">
 
             <div className="gray-row row">
               <SubscriptionTypeInput />
             </div>
 
-            <FormSectionPanel name="subscriber" title="MERCI DE FAIRE PARVENIR MON ABONNEMENT PERSONNEL À">
+            <div className="panel panel-default">
+              <div className="panel-heading">
+                <h3 className="panel-title title">MERCI DE FAIRE PARVENIR MON ABONNEMENT PERSONNEL À</h3>
+              </div>
+              <div className="panel-body">
+                <FormContact needPhone />
+                <br/>
+                <br/>
+                <FormAddress title="Adresse de livraison" />
+              </div>
+            </div>
 
-              <FormContact needPhone />
-              <br/>
-              <br/>
-              <FormAddress title="Adresse de livraison" />
-
-            </FormSectionPanel>
+            <SubscribeFormSignature total={50}/>
 
             <div>
               <p>
@@ -51,8 +57,6 @@ export class SubscribeForm extends Component {
                 </small>
               </p>
             </div>
-
-            <SubscribeFormSignature total={50}/>
 
             { !this.props.valid &&
               <div className="gray-row">
@@ -69,7 +73,7 @@ export class SubscribeForm extends Component {
 
             <div className="form-group">
               <button type="submit" disabled={!this.props.valid}>
-                Commander
+                S&#39;abonner
               </button>
             </div>
 
@@ -84,10 +88,63 @@ export class SubscribeForm extends Component {
   }
 }
 
+/**** FOR TESTS ****/
+const simpleValues = {
+  type: 'simple',
+  contact: {
+    name: 'DELBART',
+    firstname: 'Thierry',
+    email: 'delbart@mailinator.com',
+    mobile: '06 12 34 56 78',
+    phone: '01 12 34 56 78',
+  },
+  address: {
+    address1: '12 rue de la paix',
+    address2: 'Forum de Innovation',
+    zip: '12000',
+    city: 'MONTPELLIER'
+  },
+  subscription_signed: true
+}
+
+const solidarityValues = {
+  type: 'solidaire',
+  solidarity_price: "20",
+  solidarity_nb: "5",
+  contact: {
+    name: 'DELBART',
+    firstname: 'Thierry',
+    email: 'delbart@mailinator.com',
+    mobile: '06 12 34 56 78',
+    phone: '01 12 34 56 78',
+  },
+  address: {
+    address1: '12 rue de la paix',
+    address2: 'Forum de Innovation',
+    zip: '12000',
+    city: 'MONTPELLIER'
+  },
+  subscription_signed: true
+}
+/******/
+
+const initialValues = {
+  type: 'solidaire',
+  solidarity_price: "20",
+  solidarity_nb: "5",
+}
+
 SubscribeForm = reduxForm({
   form: 'subscription',
-  validate
-}, null, null)(SubscribeForm);
+//  initialValues: simpleValues,
+  initialValues: solidarityValues,
+//  initialValues,
+  validate,
+}, null, { createSubscription })(SubscribeForm);
+
+SubscribeForm.propTypes = {
+  createSubscription: React.PropTypes.func.isRequired,
+}
 
 function mapStateToProps(state) {
   return {
@@ -95,4 +152,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { })(SubscribeForm);
+export default connect(mapStateToProps, { createSubscription })(SubscribeForm);

@@ -1,3 +1,5 @@
+import {reset} from 'redux-form';
+
 export const SET_COMPANIES = "SET_COMPANIES";
 export const SET_HUBS = "SET_HUBS";
 export const CREATE_ORDER = "ORDER_CREATED";
@@ -119,31 +121,69 @@ export function confirmOrder(id) {
       body: JSON.stringify( { order_id: id }),
       headers: { 'Content-Type': 'application/json' } 
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "OK") {
-          dispatch({
-            type: ORDER_CONFIRMED,
-            order: data.order
-          });
-        } else {
-          dispatch({
-            type: ORDER_NOT_CONFIRMED,
-            error: data.error
-          });
-        }
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "OK") {
         dispatch({
-          type: STOP_LOADING
+          type: ORDER_CONFIRMED,
+          order: data.order
         });
-      })
-      .catch(error => {
+      } else {
         dispatch({
           type: ORDER_NOT_CONFIRMED,
-          error: error
+          error: data.error
         });
-        dispatch({
-          type: STOP_LOADING
-        });
+      }
+      dispatch({
+        type: STOP_LOADING
       });
+    })
+    .catch(error => {
+      dispatch({
+        type: ORDER_NOT_CONFIRMED,
+        error: error
+      });
+      dispatch({
+        type: STOP_LOADING
+      });
+    });
   }
+}
+
+export function createSubscription( subscription ) {
+
+  return dispatch => {
+    console.log('start');
+    dispatch({
+      type: START_LOADING
+    });
+
+    console.log("Subscription sent",subscription);
+
+    fetch("/api/subscription/new", { 
+      method: "POST", 
+      body: JSON.stringify( { subscription }),
+      headers: { 'Content-Type': 'application/json' } 
+    })
+    .then(res => res.json())
+    .then(data => {
+      dispatch({
+        type: STOP_LOADING
+      });
+      if (data.status === "OK") {
+        alert("Merci pour votre abonnement.");
+        dispatch(reset('subscription'));
+//          window.location = 'http://debout.fr';
+      } else {
+        alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email abonnement@debout.fr");
+      }
+    })
+    .catch(error => {
+      dispatch({
+        type: STOP_LOADING
+      });
+      alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email abonnement@debout.fr");
+    });
+  }
+
 }

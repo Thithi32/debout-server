@@ -65,6 +65,41 @@ class SendMail {
     });
   }
 
+  subscription_new(subscription) {
+    const self = this;
+    console.log("Sending subscription_new");
+    return new Promise(function(resolve, reject) {
+      self.readFile('templates/subscription_new.html', reject, function (template) {
+        const helper = require('sendgrid').mail;
+        var mail = new helper.Mail(
+          new helper.Email(MAIL_APP), 
+          "Abonnement en ligne: " + subscription.contact.fullname,
+          new helper.Email(MAIL_APP), 
+          new helper.Content('text/html', template_replace(template,subscription)));
+
+        self.sendMail(mail.toJSON(),resolve,reject);
+      });
+    });
+  }
+
+  subscription_confirmation(subscription) {
+    const self = this;
+    console.log("Sending subscription_confirmation");
+    return new Promise(function(resolve, reject) {
+      self.readFile('./templates/subscription_confirmation.html', reject, function(template) {
+        const helper = require('sendgrid').mail;
+        var to_email = new helper.Email(subscription.contact.email);
+        var mail = new helper.Mail(
+          new helper.Email(MAIL_APP), 
+          "Votre abonnement Debout a bien été enregistré", 
+          to_email, 
+          new helper.Content('text/html', template_replace(template,subscription)));
+     
+        self.sendMail(mail.toJSON(),resolve,reject);
+      });
+    });
+  }
+
   readFile(file,reject,callback) {
     fs.readFile(file, 'utf8', function (err,template) {
       if (err) {
