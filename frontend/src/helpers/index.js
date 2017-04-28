@@ -101,3 +101,39 @@ export default function removeDiacritics(str) {
     }
     return str;
 }
+
+export function formValidateFields(fields,values,conditions) {
+    const re_email = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/; //';
+
+    let errors = {};
+    fields.map((field) => {
+      if (field.fields) {
+
+        let checkError = true;
+        if (field.condition) {
+          for (var i in field.condition) {
+            checkError = checkError && conditions[field.condition[i]];
+          }
+        }
+
+        if (checkError) {
+          errors[field.name] = formValidateFields(field.fields,values[field.name] || {});
+        }
+      } else {
+        if (field.greater_than ) {
+          if (values[field.name] <= field.greater_than.value) {
+            errors[field.name] = field.greater_than.message;
+          }
+        }
+        if (field.isRequired && (!values[field.name] || !values[field.name].trim().length)) {
+          errors[field.name] = field.isRequired;
+        }
+        if (field.isEmail && !re_email.test(values[field.name])) {
+          errors[field.name] = field.isEmail;
+        }
+
+      } 
+      return true;
+    });
+    return errors;
+}

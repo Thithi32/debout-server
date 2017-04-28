@@ -34,3 +34,7 @@
   box-shadow: none !important;
   border-bottom: 1px solid #737373 !important;
 }
+
+.subscription-type-input div[disabled] {
+  opacity: .6;
+}

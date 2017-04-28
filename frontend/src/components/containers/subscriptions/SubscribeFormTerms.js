@@ -1,8 +1,8 @@
 import React from 'react';
 
-import "./SubscriptionTerms.css";
+import "./SubscribeFormTerms.css";
 
-const SubscriptionTerms = () => (
+const SubscribeFormTerms = () => (
   <div className="subscription-terms">
     <p>
       (1) Offre valable en France métropolitaine jusqu&#39;au 31/12/2017 dans la limite des stocks disponibles. 
@@ -32,4 +32,4 @@ const SubscriptionTerms = () => (
   </div>
 )
 
-export default SubscriptionTerms;
+export default SubscribeFormTerms;

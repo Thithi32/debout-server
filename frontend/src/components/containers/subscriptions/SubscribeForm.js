@@ -3,9 +3,11 @@ import { connect } from "react-redux";
 import { reduxForm } from 'redux-form';
 import { FormOnlyHeader, FormOnlyContent } from "./../../layout";
 import { FormSectionPanel, FormContact, FormAddress } from "./../../widgets";
+import SubscribeFormErrors from "./SubscribeFormErrors";
 import SubscriptionTypeInput from "./SubscriptionTypeInput";
-import SubscriptionSignature from "./SubscriptionSignature";
-import SubscriptionTerms from "./SubscriptionTerms";
+import SubscribeFormSignature from "./SubscribeFormSignature";
+import SubscribeFormTerms from "./SubscribeFormTerms";
+import validate from './SubscribeForm.validate'
 
 import "./SubscribeForm.css";
 
@@ -34,11 +36,36 @@ export class SubscribeForm extends Component {
 
               <FormContact needPhone />
               <br/>
+              <br/>
               <FormAddress title="Adresse de livraison" />
 
             </FormSectionPanel>
 
-            <SubscriptionSignature total={50}/>
+            <div>
+              <p>
+                <small>
+                * : information obligatoire
+                </small><br />
+                <small>
+                &sup1; : veuillez renseigner au moins un numéro de téléphone
+                </small>
+              </p>
+            </div>
+
+            <SubscribeFormSignature total={50}/>
+
+            { !this.props.valid &&
+              <div className="gray-row">
+                <div className="panel panel-default">
+                  <div className="panel-heading">
+                    <h3 className="panel-title title">Il manque des informations pour valider votre abonnement</h3>
+                  </div>
+                  <div className="panel-body">
+                    <SubscribeFormErrors />
+                  </div>
+                </div>
+              </div>
+            }
 
             <div className="form-group">
               <button type="submit" disabled={!this.props.valid}>
@@ -48,7 +75,7 @@ export class SubscribeForm extends Component {
 
           </form>
 
-          <SubscriptionTerms />
+          <SubscribeFormTerms />
 
         </FormOnlyContent>
 
@@ -59,6 +86,7 @@ export class SubscribeForm extends Component {
 
 SubscribeForm = reduxForm({
   form: 'subscription',
+  validate
 }, null, null)(SubscribeForm);
 
 function mapStateToProps(state) {
