@@ -143,7 +143,7 @@ const validSubscription = (subscription) => {
   const toMoney = (num) => ( parseInt(num,10).toFixed(2).replace('.',',') + "€" );
   ['price'].map((f) => ( subscription[f] = toMoney(subscription[f])));
 
-  subscription.recept = (subscription.type === 'solidaire') ? (subscription.donation_recept === "TRUE" ? "oui" : "non") : '';
+  subscription.recept = (subscription.type === 'solidaire') ? ((subscription.donation_recept === true) ? "oui" : "non") : '';
 
   subscription['date'] = moment().tz('Europe/Paris').format('DD/MM/YY, HH:mm:ss');
   subscription['id'] = uid().toUpperCase();
