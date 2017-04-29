@@ -15,7 +15,7 @@ class SubscriptionTypeInput extends Component {
   }
 
   render() {
-    const disabled = ( this.state.subscription_type !== "solidaire") ? { "disabled": "disabled" } : {};
+    const disabled = ( this.state.subscription_type !== "simple") ? {} : { "disabled": "disabled" };
     return (
       <div className="subscription-type-input">
         <img src="img/subscription.png" alt="Subscription" className="subscription-image hidden-xs" />

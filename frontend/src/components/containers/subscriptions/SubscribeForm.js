@@ -88,7 +88,7 @@ export class SubscribeForm extends Component {
   }
 }
 
-/**** FOR TESTS ****/
+/**** FOR TESTS ***
 const simpleValues = {
   type: 'simple',
   contact: {
@@ -137,8 +137,8 @@ const initialValues = {
 SubscribeForm = reduxForm({
   form: 'subscription',
 //  initialValues: simpleValues,
-  initialValues: solidarityValues,
-//  initialValues,
+//  initialValues: solidarityValues,
+  initialValues,
   validate,
 }, null, { createSubscription })(SubscribeForm);
 
