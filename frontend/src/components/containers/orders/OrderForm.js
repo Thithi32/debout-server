@@ -1,108 +1,108 @@
-import React, { Component } from 'react';
-import { connect } from "react-redux";
-import { createOrder } from "./../../../actions";
-import { Field, reduxForm } from 'redux-form';
-import { FormOnlyHeader, FormOnlyContent } from "./../../layout";
-import OrderFormTable from "./OrderFormTable";
-import OrderShippingOptions from "./OrderShippingOptions";
-import OrderNbProducts from "./OrderNbProducts";
-import OrderFormErrors from "./OrderFormErrors";
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { createOrder } from './../../../actions'
+import { Field, reduxForm } from 'redux-form'
+import { FormOnlyHeader, FormOnlyContent } from './../../layout'
+import OrderFormTable from './OrderFormTable'
+import OrderShippingOptions from './OrderShippingOptions'
+import OrderNbProducts from './OrderNbProducts'
+import OrderFormErrors from './OrderFormErrors'
 import validate from './OrderForm.validate'
-import { CompanyAutoComplete, CompanyTypeInput } from "./../companies";
-import { ContactUs, FormGroupInput, FormSectionPanel , FormContact, FormContactDisable, 
-          FormAddress, FormAddressDisable } from "./../../widgets";
+import { CompanyAutoComplete, CompanyTypeInput } from './../companies'
+import { ContactUs, FormGroupInput, FormSectionPanel, FormContact, FormContactDisable,
+          FormAddress, FormAddressDisable } from './../../widgets'
 
-const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
-const upper = value => value && value.toUpperCase();
+const toMoney = (num) => ( num.toFixed(2).replace('.',',') + '€' )
+const upper = value => value && value.toUpperCase()
 
 export class OrderForm extends Component {
 
   constructor () {
-    super();
-    this.state = {};
+    super()
+    this.state = {}
   }
 
   onChangeHub(hub) {
-    this.setState({ hub });
+    this.setState({ hub })
   }
 
   onChangeShippingPrice(home_shipping_price) {
-    this.setState({ home_shipping_price });
+    this.setState({ home_shipping_price })
   }
 
   checkDeliveryOptions(e, value) {
-    const form = this.props.order;
-    const target = e.target.name;
-    const is_ngo = (target === "is_ngo") ? value : form.values.is_ngo;
-    const is_ccas = (target === "is_ccas") ? value : form.values.is_ccas;
+    const form = this.props.order
+    const target = e.target.name
+    const is_ngo = (target === 'is_ngo') ? value : form.values.is_ngo
+    const is_ccas = (target === 'is_ccas') ? value : form.values.is_ccas
     if (!is_ngo && !is_ccas) {
-      this.props.change('shipping_option','1');
+      this.props.change('shipping_option','1')
     }
   }
 
   onChangeCompany(e, str, old_str) {
     // First sync other company_name fields
     if (this.props.order.values.shipping && this.props.order.values.shipping.company_name === old_str) {
-      this.props.change("shipping.company_name", str);
+      this.props.change('shipping.company_name', str)
     }
     if (this.props.order.values.invoice && this.props.order.values.invoice.company_name === old_str) {
-      this.props.change("invoice.company_name", str);
+      this.props.change('invoice.company_name', str)
     }
   }
 
   onSelectCompany(company) {
-    const company_name = company['Raison sociale'];
+    const company_name = company['Raison sociale']
 
     let invoice_address = {
-        address1: company["(facture)\nAdresse"],
-        zip: company["(facture)\nCP"],
-        city: company["(facture)\nVille"]
+      address1: company['(facture)\nAdresse'],
+      zip: company['(facture)\nCP'],
+      city: company['(facture)\nVille']
     }
-    const has_invoice_address = invoice_address.address1 && invoice_address.zip && invoice_address.city;
+    const has_invoice_address = invoice_address.address1 && invoice_address.zip && invoice_address.city
 
     let shipping_address = {
-      address1: company["(livraison)\nAdresse 1"],
-      address2: company["(livraison)\nAdresse 2"],
-      zip: company["(livraison)\nCP"],
-      city: company["(livraison)\nVille"]
+      address1: company['(livraison)\nAdresse 1'],
+      address2: company['(livraison)\nAdresse 2'],
+      zip: company['(livraison)\nCP'],
+      city: company['(livraison)\nVille']
     }
-    const has_shipping_address = shipping_address.address1 && shipping_address.zip && shipping_address.city;
+    const has_shipping_address = shipping_address.address1 && shipping_address.zip && shipping_address.city
 
-    const invoice_company_name = company["(facture)\nRaison Sociale"];
+    const invoice_company_name = company['(facture)\nRaison Sociale']
 
     let invoice_contact = {
-        honorific: company["(facture)\nCivilité"],
-        name: company["(facture)\nNom"],
-        email: company["(facture)\nMail"],
-        mobile: company["(facture)\nportable"],
-        phone: company["(facture)\nfixe"] || company["(facture)\nfixe "]
+      honorific: company['(facture)\nCivilité'],
+      name: company['(facture)\nNom'],
+      email: company['(facture)\nMail'],
+      mobile: company['(facture)\nportable'],
+      phone: company['(facture)\nfixe'] || company['(facture)\nfixe ']
     }
-    const has_invoice_contact = invoice_contact.name && invoice_contact.email;
+    const has_invoice_contact = invoice_contact.name && invoice_contact.email
 
     let shipping_contact = {
-        honorific: company["(livraison)\nCivilité"],
-        name: company["(livraison)\nNom"],
-        firstname: company["(livraison)\nPrénom"],
-        email: company["(livraison)\nMail"],
-        mobile: company["(livraison)\nportable"],
-        phone: company["(livraison)\nfixe"] || company["(livraison)\nfixe "]
+      honorific: company['(livraison)\nCivilité'],
+      name: company['(livraison)\nNom'],
+      firstname: company['(livraison)\nPrénom'],
+      email: company['(livraison)\nMail'],
+      mobile: company['(livraison)\nportable'],
+      phone: company['(livraison)\nfixe'] || company['(livraison)\nfixe ']
     }
-    const has_shipping_contact = shipping_contact.name && shipping_contact.email;
+    const has_shipping_contact = shipping_contact.name && shipping_contact.email
 
-    this.props.initialize({ 
-      company: company_name, 
-      is_ngo:  (company['Type'].toLowerCase() === "association"),
-      is_ccas:  (company['Type'].toLowerCase() === "ccas"),
+    this.props.initialize({
+      company: company_name,
+      is_ngo:  (company['Type'].toLowerCase() === 'association'),
+      is_ccas:  (company['Type'].toLowerCase() === 'ccas'),
       has_hub: false,
       order_signed: false,
-      hub: "BEEOTOP",
-      nb_products: this.props.nb_products,
-      shipping_option: "1",
+      hub: 'BEEOTOP',
+      nb_products: this.props.order.values.nb_products || 0,
+      shipping_option: '1',
       shipping: {
         company_name: company_name,
         address: shipping_address,
         contact: shipping_contact,
-        use_contact_for_shipping: !has_shipping_contact  
+        use_contact_for_shipping: !has_shipping_contact
       },
       invoice: {
         company_name: invoice_company_name || company_name,
@@ -116,23 +116,23 @@ export class OrderForm extends Component {
   }
 
   render() {
-    const { handleSubmit, valid, order } = this.props;
-    const values = (order && order.values) || {};
-    const { is_ngo, is_ccas, hub, nb_products, shipping, invoice } = values;
-    const { use_shipping_address, use_contact_for_invoice } = invoice || {};
-    const { use_contact_for_shipping } = shipping || {};
-    const shipping_option = parseInt(values.shipping_option,10);
+    const { handleSubmit, valid, order } = this.props
+    const values = (order && order.values) || {}
+    const { is_ngo, is_ccas, hub, nb_products, shipping, invoice } = values
+    const { use_shipping_address, use_contact_for_invoice } = invoice || {}
+    const { use_contact_for_shipping } = shipping || {}
+    const shipping_option = parseInt(values.shipping_option,10)
 
-    const is_ngo_ccas = is_ngo || is_ccas;
-    const price = is_ngo_ccas ? 0.5 : 1.5;
+    const is_ngo_ccas = is_ngo || is_ccas
+    const price = is_ngo_ccas ? 0.5 : 1.5
 
-    const hub_shipping = (shipping_option === 2);
+    const hub_shipping = (shipping_option === 2)
 
-    const shipping_home_price = this.state.home_shipping_price || 0;
-    const shipping_price = (hub_shipping) ? 0 : shipping_home_price;
+    const shipping_home_price = this.state.home_shipping_price || 0
+    const shipping_price = (hub_shipping) ? 0 : shipping_home_price
 
-    let total = nb_products * price + shipping_price;
-    if (!total || isNaN(total) || (total < 0)) total = 0;
+    let total = nb_products * price + shipping_price
+    if (!total || isNaN(total) || (total < 0)) total = 0
 
     return (
 
@@ -150,27 +150,41 @@ export class OrderForm extends Component {
             Pour toute information, contactez-nous <ContactUs />.<br/>
           </p>
 
-          <form onSubmit={ handleSubmit(this.props.createOrder) } autoComplete="off">
+          <form
+            autoComplete="off"
+            onSubmit={handleSubmit(this.props.createOrder)}
+          >
 
-            <CompanyAutoComplete onSelectCompany={ this.onSelectCompany.bind(this) } onChangeCompany={ this.onChangeCompany.bind(this) }/>
+            <CompanyAutoComplete
+              onChangeCompany={this.onChangeCompany.bind(this)}
+              onSelectCompany={this.onSelectCompany.bind(this)}
+            />
 
-            <CompanyTypeInput onChangeHub={ this.onChangeHub.bind(this) } onChange={ this.checkDeliveryOptions.bind(this) }/>
+            <CompanyTypeInput
+              onChange={this.checkDeliveryOptions.bind(this)}
+              onChangeHub={this.onChangeHub.bind(this)}
+            />
 
             <div className="gray-row">
 
-              <OrderNbProducts price={price} onChangeShippingPrice={ this.onChangeShippingPrice.bind(this) }/>
+              <OrderNbProducts
+                onChangeShippingPrice={this.onChangeShippingPrice.bind(this)}
+                price={price}
+              />
 
-              { is_ngo_ccas && 
+              { is_ngo_ccas &&
                 <OrderShippingOptions
-                  hub={ this.state.hub }
-                  shipping_price={ shipping_home_price } />
+                  hub={this.state.hub}
+                  shipping_price={shipping_home_price}
+                />
               }
 
-              <OrderFormTable 
-                price={price} 
-                nb_products={nb_products || 0} 
-                shipping_price={ shipping_price } 
-                total={total} />
+              <OrderFormTable
+                nb_products={nb_products || 0}
+                price={price}
+                shipping_price={shipping_price}
+                total={total}
+              />
 
             </div>
 
@@ -178,42 +192,78 @@ export class OrderForm extends Component {
 
               <div>
 
-                <FormSectionPanel name="order" title="Responsable de la commande">
-                  <FormContact needPhone onChange={(e)=>{
-                    const { name, value } = e.target;
-                    this.props.change(name.replace('order','invoice').replace('contact','contact_disabled'), value);
-                    this.props.change(name.replace('order','shipping').replace('contact','contact_disabled'), value);
-                  }}/>
+                <FormSectionPanel
+                  name="order"
+                  title="Responsable de la commande"
+                >
+                  <FormContact
+                    needPhone
+                    onChange={(e)=>{
+                      const { name, value } = e.target
+                      this.props.change(name.replace('order','invoice').replace('contact','contact_disabled'), value)
+                      this.props.change(name.replace('order','shipping').replace('contact','contact_disabled'), value)
+                    }}
+                  />
                 </FormSectionPanel>
 
                 { !hub_shipping &&
-                  <FormSectionPanel name="shipping" title="Détail de la livraison">
+                  <FormSectionPanel
+                    name="shipping"
+                    title="Détail de la livraison"
+                  >
 
-                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} normalize={upper} type="text" className="form-control" />
+                    <Field
+                      className="form-control"
+                      component={FormGroupInput}
+                      label="Raison sociale"
+                      name="company_name"
+                      normalize={upper}
+                      type="text"
+                    />
 
-                   <FormAddress title="Adresse de livraison" onChange={(e)=>{
-                      const { name, value } = e.target;
-                      this.props.change(name.replace('shipping','invoice').replace('address','address_disabled'), value);
-                    }} />
+                    <FormAddress
+                      onChange={(e)=>{
+                        const { name, value } = e.target
+                        this.props.change(name.replace('shipping','invoice').replace('address','address_disabled'), value)
+                      }}
+                      title="Adresse de livraison"
+                    />
 
                     <div className="form-group">
                       <label>Contact pour la livraison</label>
                       <div className="checkbox">
                         <label>
-                          <Field name="use_contact_for_shipping" component="input" type="checkbox" /> 
+                          <Field
+                            component="input"
+                            name="use_contact_for_shipping"
+                            type="checkbox"
+                          />
                           Utiliser le nom du responsable de la commande pour la livraison
                         </label>
                       </div>
                     </div>
 
-                    <FormContactDisable needPhone disabled={ use_contact_for_shipping } />
- 
+                    <FormContactDisable
+                      disabled={use_contact_for_shipping}
+                      needPhone
+                    />
+
                   </FormSectionPanel>
                 }
 
-                <FormSectionPanel name="invoice" title="Informations de facturation">
+                <FormSectionPanel
+                  name="invoice"
+                  title="Informations de facturation"
+                >
 
-                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} normalize={upper} type="text" className="form-control" />
+                  <Field
+                    className="form-control"
+                    component={FormGroupInput}
+                    label="Raison sociale"
+                    name="company_name"
+                    normalize={upper}
+                    type="text"
+                  />
 
                   { !hub_shipping &&
                   <div>
@@ -221,12 +271,16 @@ export class OrderForm extends Component {
                       <label>Adresse de facturation</label>
                       <div className="checkbox">
                         <label>
-                          <Field name="use_shipping_address" component="input" type="checkbox" /> 
+                          <Field
+                            component="input"
+                            name="use_shipping_address"
+                            type="checkbox"
+                          />
                           Utiliser l&#39;adresse de livraison pour la facturation
                         </label>
                       </div>
                     </div>
-                    <FormAddressDisable disabled={ use_shipping_address } />
+                    <FormAddressDisable disabled={use_shipping_address} />
                   </div>
                   }
 
@@ -238,19 +292,33 @@ export class OrderForm extends Component {
                     <label>Responsable de la facture</label>
                     <div className="checkbox">
                       <label>
-                        <Field name="use_contact_for_invoice" component="input" type="checkbox" /> 
+                        <Field
+                          component="input"
+                          name="use_contact_for_invoice"
+                          type="checkbox"
+                        />
                         Utiliser le nom du responsable de la commande pour la facturation
                       </label>
                     </div>
                   </div>
 
-                  <FormContactDisable disabled={ use_contact_for_invoice } />
+                  <FormContactDisable disabled={use_contact_for_invoice} />
 
                 </FormSectionPanel>
 
                 <div className="form-group">
-                  <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre à votre commande</label>
-                  <Field name="order_comment" component="textarea" className="form-control" rows="3"/>  
+                  <label
+                    className="title"
+                    htmlFor="order_comment"
+                  >
+                    Laissez ici un commentaire à joindre à votre commande
+                  </label>
+                  <Field
+                    className="form-control"
+                    component="textarea"
+                    name="order_comment"
+                    rows="3"
+                  />
                 </div>
 
                 <div>
@@ -264,7 +332,11 @@ export class OrderForm extends Component {
                   </p>
                   <p>
 
-                    <Field name="order_signed" component="input" type="checkbox" /> 
+                    <Field
+                      component="input"
+                      name="order_signed"
+                      type="checkbox"
+                    />
 
                     <small>
                       &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
@@ -277,7 +349,7 @@ export class OrderForm extends Component {
                       { (shipping_option === 2) &&
                         <span>
                           &nbsp;à régler les frais de traitement de ma commande ({toMoney(total)}) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
-                          <em>{ hub === 'BEEOTOP' ? "BEEOTOP Paris" : hub }</em>.
+                          <em>{ hub === 'BEEOTOP' ? 'BEEOTOP Paris' : hub }</em>.
                         </span>
                       }
                       <br />
@@ -299,7 +371,10 @@ export class OrderForm extends Component {
                 }
 
                 <div className="form-group">
-                  <button type="submit" disabled={!valid}>
+                  <button
+                    disabled={!valid}
+                    type="submit"
+                  >
                     Commander
                   </button>
                 </div>
@@ -316,9 +391,9 @@ export class OrderForm extends Component {
 OrderForm = reduxForm({
   form: 'order',
   initialValues: {
-    shipping_option: "1",
+    shipping_option: '1',
     order_signed: false,
-    hub: "BEEOTOP",
+    hub: 'BEEOTOP',
     shipping: {
       use_contact_for_shipping: true
     },
@@ -328,7 +403,7 @@ OrderForm = reduxForm({
     }
   },
   validate
-}, null, { createOrder })(OrderForm);
+}, null, { createOrder })(OrderForm)
 
 OrderForm.propTypes = {
   createOrder: React.PropTypes.func.isRequired,
@@ -341,4 +416,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { createOrder })(OrderForm);
+export default connect(mapStateToProps, { createOrder })(OrderForm)

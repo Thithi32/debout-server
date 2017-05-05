@@ -1,6 +1,6 @@
-import React from 'react';
-import { Field } from 'redux-form';
-import { FieldInputError } from '../../widgets';
+import React from 'react'
+import { Field } from 'redux-form'
+import { FieldInputError } from '../../widgets'
 
 const SubscribeFormErrors = () => (
   <div>
@@ -15,4 +15,4 @@ const SubscribeFormErrors = () => (
   </div>
 )
 
-export default SubscribeFormErrors;
+export default SubscribeFormErrors

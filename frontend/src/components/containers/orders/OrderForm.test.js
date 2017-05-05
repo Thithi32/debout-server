@@ -1,14 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { mount } from 'enzyme';
-import sinon from 'sinon';
-import { Provider } from 'react-redux';
+import React from 'react'
+import { mount } from 'enzyme'
+import sinon from 'sinon'
+import { Provider } from 'react-redux'
 
-import OrderForm from './OrderForm';
+import OrderForm from './OrderForm'
 
-import { store } from './../../../store';
+import { store } from './../../../store'
 
-const default_props = {
+const defaultProps = {
   createOrder: sinon.spy(),
   order: {},
   store: {
@@ -18,10 +17,10 @@ const default_props = {
   },
 }
 
-const isRendered = (wrapper) => (expect(wrapper.find('div').length).toBeGreaterThan(0));
+const isRendered = (wrapper) => (expect(wrapper.find('div').length).toBeGreaterThan(0))
 
 it('renders without crashing', () => {
-  let wrapper = mount( <Provider store={store}><OrderForm { ...default_props }/></Provider> );
-  isRendered(wrapper);
-});
+  const wrapper = mount(<Provider store={store}><OrderForm {...defaultProps} /></Provider>)
+  isRendered(wrapper)
+})
 

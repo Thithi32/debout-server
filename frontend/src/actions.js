@@ -87,10 +87,10 @@ export function createOrder( order ) {
 
     console.log("Order sent",forder);
 
-    fetch("/api/order/new", { 
-      method: "POST", 
+    fetch("/api/order/new", {
+      method: "POST",
       body: JSON.stringify( { order: forder }),
-      headers: { 'Content-Type': 'application/json' } 
+      headers: { 'Content-Type': 'application/json' }
     })
       .then(res => res.json())
       .then(data => {
@@ -116,10 +116,10 @@ export function createOrder( order ) {
 export function confirmOrder(id) {
   return dispatch => {
 
-    fetch("/api/order/confirm", { 
-      method: "POST", 
+    fetch("/api/order/confirm", {
+      method: "POST",
       body: JSON.stringify( { order_id: id }),
-      headers: { 'Content-Type': 'application/json' } 
+      headers: { 'Content-Type': 'application/json' }
     })
     .then(res => res.json())
     .then(data => {
@@ -160,10 +160,10 @@ export function createSubscription( subscription ) {
 
     console.log("Subscription sent",subscription);
 
-    fetch("/api/subscription/new", { 
-      method: "POST", 
+    fetch("/api/subscription/new", {
+      method: "POST",
       body: JSON.stringify( { subscription }),
-      headers: { 'Content-Type': 'application/json' } 
+      headers: { 'Content-Type': 'application/json' }
     })
     .then(res => res.json())
     .then(data => {

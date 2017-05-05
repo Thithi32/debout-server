@@ -1,36 +1,44 @@
-import React, { Component } from 'react';
-import { connect } from "react-redux";
-import { reduxForm } from 'redux-form';
-import { FormOnlyHeader, FormOnlyContent } from "./../../layout";
-import { FormContact, FormAddress } from "./../../widgets";
-import { createSubscription } from "./../../../actions";
-import SubscribeFormErrors from "./SubscribeFormErrors";
-import SubscriptionTypeInput from "./SubscriptionTypeInput";
-import SubscribeFormSignature from "./SubscribeFormSignature";
-import SubscribeFormTerms from "./SubscribeFormTerms";
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { reduxForm } from 'redux-form'
+import { FormOnlyHeader, FormOnlyContent } from './../../layout'
+import { FormContact, FormAddress } from './../../widgets'
+import { createSubscription } from './../../../actions'
+import SubscribeFormErrors from './SubscribeFormErrors'
+import SubscriptionTypeInput from './SubscriptionTypeInput'
+import SubscribeFormSignature from './SubscribeFormSignature'
+import SubscribeFormTerms from './SubscribeFormTerms'
 import validate from './SubscribeForm.validate'
 
-import "./SubscribeForm.css";
+import './SubscribeForm.css'
 
-export class SubscribeForm extends Component {
+export class SubscribeForm extends Component { // eslint-disable-line
   render() {
+    const values = this.props.subscription.values || {};
+    const [magPrice, simpleSubscriptionPrice] = [2, 10]
+    const total = (values.type === 'simple') ? simpleSubscriptionPrice : (parseInt(values.solidarity_price,10) || 0)
+
     return (
       <div className="widget subscription-form">
 
         <FormOnlyHeader>
           <h2>Abonnez-vous solidaire!</h2>
           <p>
-            En vous abonnant à debout, vous pouvez offrir des magazines à ceux qui en ont besoin pour se (re)mettre debout.<br />
+            En vous abonnant à <a href="http://www.debout.fr">debout</a>, vous pouvez offrir des magazines à ceux qui en ont besoin pour se (re)mettre debout.<br />
             A partir de 40 €, vous bénéficiez d&#39;une réduction de votre impôt sur le revenu.
           </p>
+          <p><small><a href="/subscribe#term_1" className="pull-right">Voir les conditions</a></small></p>
         </FormOnlyHeader>
 
         <FormOnlyContent>
 
-          <form onSubmit={ this.props.handleSubmit(this.props.createSubscription) } autoComplete="off">
+          <form
+            autoComplete="off"
+            onSubmit={this.props.handleSubmit(this.props.createSubscription)}
+          >
 
             <div className="gray-row row">
-              <SubscriptionTypeInput />
+              <SubscriptionTypeInput mag_price={magPrice} simple_subscription_price={simpleSubscriptionPrice} />
             </div>
 
             <div className="panel panel-default">
@@ -39,13 +47,13 @@ export class SubscribeForm extends Component {
               </div>
               <div className="panel-body">
                 <FormContact needPhone />
-                <br/>
-                <br/>
+                <br />
+                <br />
                 <FormAddress title="Adresse de livraison" />
               </div>
             </div>
 
-            <SubscribeFormSignature total={50}/>
+            <SubscribeFormSignature total={total} />
 
             <div>
               <p>
@@ -72,7 +80,10 @@ export class SubscribeForm extends Component {
             }
 
             <div className="form-group">
-              <button type="submit" disabled={!this.props.valid}>
+              <button
+                disabled={!this.props.valid}
+                type="submit"
+              >
                 S&#39;abonner
               </button>
             </div>
@@ -88,7 +99,7 @@ export class SubscribeForm extends Component {
   }
 }
 
-/**** FOR TESTS ***
+/** ** FOR TESTS ***
 const simpleValues = {
   type: 'simple',
   contact: {
@@ -130,8 +141,7 @@ const solidarityValues = {
 
 const initialValues = {
   type: 'solidaire',
-  solidarity_price: "20",
-  solidarity_nb: "5",
+  solidarity_price: '20',
 }
 
 SubscribeForm = reduxForm({
@@ -140,7 +150,7 @@ SubscribeForm = reduxForm({
 //  initialValues: solidarityValues,
   initialValues,
   validate,
-}, null, { createSubscription })(SubscribeForm);
+}, null, { createSubscription })(SubscribeForm)
 
 SubscribeForm.propTypes = {
   createSubscription: React.PropTypes.func.isRequired,
@@ -148,8 +158,8 @@ SubscribeForm.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    subscription: (state && state.form && state.form.subscription) || {},
+    subscription: (state && state.form && state.form.subscription) || { value: {}},
   }
 }
 
-export default connect(mapStateToProps, { createSubscription })(SubscribeForm);
+export default connect(mapStateToProps, { createSubscription })(SubscribeForm)
