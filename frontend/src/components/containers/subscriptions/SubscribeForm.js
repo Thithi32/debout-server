@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { reduxForm } from 'redux-form'
+import { Field, reduxForm } from 'redux-form'
 import { FormOnlyHeader, FormOnlyContent } from './../../layout'
-import { FormContact, FormAddress } from './../../widgets'
+import { FormContact, FormAddress, FormGroupInput } from './../../widgets'
 import { createSubscription } from './../../../actions'
 import SubscribeFormErrors from './SubscribeFormErrors'
 import SubscriptionTypeInput from './SubscriptionTypeInput'
@@ -11,6 +11,8 @@ import SubscribeFormTerms from './SubscribeFormTerms'
 import validate from './SubscribeForm.validate'
 
 import './SubscribeForm.css'
+
+const upper = value => value && value.toUpperCase()
 
 export class SubscribeForm extends Component { // eslint-disable-line
   render() {
@@ -35,6 +37,7 @@ export class SubscribeForm extends Component { // eslint-disable-line
           <form
             autoComplete="off"
             onSubmit={this.props.handleSubmit(this.props.createSubscription)}
+            className="form-horizontal"
           >
 
             <div className="gray-row row">
@@ -47,8 +50,14 @@ export class SubscribeForm extends Component { // eslint-disable-line
               </div>
               <div className="panel-body">
                 <FormContact needPhone />
-                <br />
-                <br />
+                <Field
+                  className="form-control"
+                  component={FormGroupInput}
+                  label="Raison sociale"
+                  name="company_name"
+                  normalize={upper}
+                  type="text"
+                />
                 <FormAddress title="Adresse de livraison" />
               </div>
             </div>
@@ -80,10 +89,7 @@ export class SubscribeForm extends Component { // eslint-disable-line
             }
 
             <div className="form-group">
-              <button
-                disabled={!this.props.valid}
-                type="submit"
-              >
+              <button disabled={!this.props.valid} type="submit">
                 S&#39;abonner
               </button>
             </div>

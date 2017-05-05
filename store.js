@@ -29,7 +29,7 @@ class Store {
   getFirstEmptyRow(sheet) {
     return new Promise(function(resolve, reject) {
       let offset = 0;
-      for (i = 0; i < 20; i++) { 
+      for (i = 0; i < 20; i++) {
         offset = i * 100 + 1;
         sheet.getRows({
           offset: offset,
@@ -149,7 +149,7 @@ class Store {
         if (!ordersSheet || !companiesSheet) {
           reject("No 'Commandes' and 'Fournisseurs' sheets in spreadsheet");
         } else {
-          ordersSheet.addRow({ 
+          ordersSheet.addRow({
             commande: order.id,
             raisonsociale: order.company,
             date:order.date,
@@ -250,6 +250,7 @@ class Store {
             email: subscription.contact.email || '',
             portable: subscription.contact.mobile || '',
             fixe: subscription.contact.phone || '',
+            raisonsociale: subscription.company_name || '',
             adresse1: subscription.address.address1 || '',
             adresse2: subscription.address.address2 || '',
             cp: subscription.address.zip || '',
