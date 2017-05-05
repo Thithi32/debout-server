@@ -1,15 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { shallow } from 'enzyme';
-import SubscriptionTypeInput from './SubscriptionTypeInput';
+import React from 'react'
+import { shallow } from 'enzyme'
+import sinon from 'sinon'
 
-const default_props = {
+import { SubscriptionTypeInput } from './SubscriptionTypeInput'
+
+const defaultProps = {
+  simple_subscription_price: 10,
+  mag_price: 2,
+  solidarity_price: 20,
 }
 
-const isRendered = (wrapper) => (expect(wrapper.find('div').length).toBeGreaterThan(0));
+const isRendered = (wrapper) => (expect(wrapper.find('.subscription-type-input').length).toBeGreaterThan(0))
 
 it('renders without crashing', () => {
-  let wrapper = shallow( <SubscriptionTypeInput { ...default_props }/> );
-  isRendered(wrapper);
+  const wrapper = shallow(<SubscriptionTypeInput { ...defaultProps }/>)
+  isRendered(wrapper)
 });
 

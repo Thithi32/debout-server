@@ -6,7 +6,7 @@ import './SubscriptionTypeInput.css'
 
 const toMoney = (num) => ( (num && num.toFixed(2).replace('.',',') + "€") || "" );
 
-class SubscriptionTypeInput extends Component {
+export class SubscriptionTypeInput extends Component {
 
   constructor() {
     super()
