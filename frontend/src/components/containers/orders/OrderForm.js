@@ -350,18 +350,16 @@ const validate = (values) => {
     errors.order_signed = "Vous devez accepter les termes d'engagement de la commande";
   }
 
-  if (values.shipping.use_contact_for_shipping && (!values.order || !values.order.contact || (!values.order.contact.mobile && !values.order.contact.phone))) {
+  if (!values.order || !values.order.contact || (!values.order.contact.mobile && !values.order.contact.phone)) {
     if (!errors.order) errors.order = {};
     if (!errors.order.contact) errors.order.contact = {};
-    errors.order.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone";
-    errors.order.contact.phone = errors.order.contact.mobile;
+    errors.order.contact.mobile = "Veuillez renseigner au moins un numéro de téléphone au responsable de la commande";
   }
 
-  if (!values.shipping.use_contact_for_shipping && (!values.shipping.contact || (!values.shipping.contact.mobile && !values.shipping.contact.phone))) {
+  if (need_shipping && !values.shipping.use_contact_for_shipping && (!values.shipping.contact || (!values.shipping.contact.mobile && !values.shipping.contact.phone))) {
     if (!errors.shipping) errors.shipping = {};
     if (!errors.shipping.contact) errors.shipping.contact = {};
     errors.shipping.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone au contact de livraison";
-    errors.shipping.contact.phone = errors.shipping.contact.mobile;
   }
 
   return errors;
