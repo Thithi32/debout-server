@@ -8,7 +8,7 @@ import OrderNbProducts from "./OrderNbProducts";
 import OrderFormErrors from "./OrderFormErrors";
 import validate from './OrderForm.validate'
 import { CompanyAutoComplete, CompanyTypeInput } from "./../companies";
-import { ContactUs, FormGroupInput, FormSectionPanel , FormContact, FormContactDisable, 
+import { ContactUs, FormGroupInput, FormSectionPanel , FormContact, FormContactDisable,
           FormAddress, FormAddressDisable } from "./../../widgets";
 
 const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
@@ -55,7 +55,7 @@ export class OrderForm extends Component {
     let invoice_address = {
         address1: company["(facture)\nAdresse"],
         zip: company["(facture)\nCP"],
-        city: company["(facture)\nVille"]
+        city: company["(facture)\nVille"].toUpperCase()
     }
     const has_invoice_address = invoice_address.address1 && invoice_address.zip && invoice_address.city;
 
@@ -63,7 +63,7 @@ export class OrderForm extends Component {
       address1: company["(livraison)\nAdresse 1"],
       address2: company["(livraison)\nAdresse 2"],
       zip: company["(livraison)\nCP"],
-      city: company["(livraison)\nVille"]
+      city: company["(livraison)\nVille"].toUpperCase()
     }
     const has_shipping_address = shipping_address.address1 && shipping_address.zip && shipping_address.city;
 
@@ -71,7 +71,7 @@ export class OrderForm extends Component {
 
     let invoice_contact = {
         honorific: company["(facture)\nCivilité"],
-        name: company["(facture)\nNom"],
+        name: company["(facture)\nNom"].toUpperCase(),
         email: company["(facture)\nMail"],
         mobile: company["(facture)\nportable"],
         phone: company["(facture)\nfixe"] || company["(facture)\nfixe "]
@@ -80,7 +80,7 @@ export class OrderForm extends Component {
 
     let shipping_contact = {
         honorific: company["(livraison)\nCivilité"],
-        name: company["(livraison)\nNom"],
+        name: company["(livraison)\nNom"].toUpperCase(),
         firstname: company["(livraison)\nPrénom"],
         email: company["(livraison)\nMail"],
         mobile: company["(livraison)\nportable"],
@@ -88,8 +88,8 @@ export class OrderForm extends Component {
     }
     const has_shipping_contact = shipping_contact.name && shipping_contact.email;
 
-    this.props.initialize({ 
-      company: company_name, 
+    this.props.initialize({
+      company: company_name.toUpperCase(),
       is_ngo:  (company['Type'].toLowerCase() === "association"),
       is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: false,
@@ -98,13 +98,13 @@ export class OrderForm extends Component {
       nb_products: this.props.nb_products,
       shipping_option: "1",
       shipping: {
-        company_name: company_name,
+        company_name: company_name.toUpperCase(),
         address: shipping_address,
         contact: shipping_contact,
-        use_contact_for_shipping: !has_shipping_contact  
+        use_contact_for_shipping: !has_shipping_contact
       },
       invoice: {
-        company_name: invoice_company_name || company_name,
+        company_name: (invoice_company_name || company_name).toUpperCase(),
         address: invoice_address,
         address_disabled: shipping_address,
         use_shipping_address: has_shipping_address && !has_invoice_address,
@@ -165,16 +165,16 @@ export class OrderForm extends Component {
 
               <OrderNbProducts price={price} onChangeShippingPrice={ this.onChangeShippingPrice.bind(this) }/>
 
-              { is_ngo_ccas && 
+              { is_ngo_ccas &&
                 <OrderShippingOptions
                   hub={ this.state.hub }
                   shipping_price={ shipping_home_price } />
               }
 
-              <OrderFormTable 
-                price={price} 
-                nb_products={nb_products || 0} 
-                shipping_price={ shipping_price } 
+              <OrderFormTable
+                price={price}
+                nb_products={parseInt(nb_products,10) || 0}
+                shipping_price={ shipping_price }
                 total={total} />
 
             </div>
@@ -205,14 +205,14 @@ export class OrderForm extends Component {
                       <label>Contact pour la livraison</label>
                       <div className="checkbox">
                         <label>
-                          <Field name="use_contact_for_shipping" component="input" type="checkbox" /> 
+                          <Field name="use_contact_for_shipping" component="input" type="checkbox" />
                           Utiliser le nom du responsable de la commande pour la livraison
                         </label>
                       </div>
                     </div>
 
                     <FormContactDisable needPhone disabled={ use_contact_for_shipping } />
- 
+
                   </FormSectionPanel>
                 }
 
@@ -226,7 +226,7 @@ export class OrderForm extends Component {
                       <label>Adresse de facturation</label>
                       <div className="checkbox">
                         <label>
-                          <Field name="use_shipping_address" component="input" type="checkbox" /> 
+                          <Field name="use_shipping_address" component="input" type="checkbox" />
                           Utiliser l&#39;adresse de livraison pour la facturation
                         </label>
                       </div>
@@ -243,7 +243,7 @@ export class OrderForm extends Component {
                     <label>Responsable de la facture</label>
                     <div className="checkbox">
                       <label>
-                        <Field name="use_contact_for_invoice" component="input" type="checkbox" /> 
+                        <Field name="use_contact_for_invoice" component="input" type="checkbox" />
                         Utiliser le nom du responsable de la commande pour la facturation
                       </label>
                     </div>
@@ -255,7 +255,7 @@ export class OrderForm extends Component {
 
                 <div className="form-group">
                   <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre à votre commande</label>
-                  <Field name="order_comment" component="textarea" className="form-control" rows="3"/>  
+                  <Field name="order_comment" component="textarea" className="form-control" rows="3"/>
                 </div>
 
                 <div>
@@ -269,7 +269,7 @@ export class OrderForm extends Component {
                   </p>
                   <p>
 
-                    <Field name="order_signed" component="input" type="checkbox" /> 
+                    <Field name="order_signed" component="input" type="checkbox" />
 
                     <small>
                       &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
