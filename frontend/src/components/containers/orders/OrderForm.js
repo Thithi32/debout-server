@@ -49,8 +49,8 @@ const FormGroupInput = ({ input, label, ...props}) => (
 
 const FormInput = ({ input, type, meta: { touched, error }, ...props}) => (
   <div className={ touched && error && ' error' }>
-    <input type={type} {...input} {...props} />  
-    { touched && error && <div className="form-message"><small>{error}</small></div> }        
+    <input type={type} {...input} {...props} />
+    { touched && error && <div className="form-message"><small>{error}</small></div> }
   </div>
 )
 
@@ -77,9 +77,9 @@ const Section = (props) => (
 const FieldNbProducts = ({ input, price, meta: { touched, error }, ...props}) => (
   <div className={ touched && error && ' error' }>
     <select {...input} {...props}>
-        <option key={ 0 } value="0">Choisir le nombre d&#39;exemplaires</option>  
+        <option key={ 0 } value="0">Choisir le nombre d&#39;exemplaires</option>
       { packs.map((pack,i) =>
-        <option key={ i } value={ pack.nb }>{ pack.nb } exemplaires = { toMoney(pack.nb * price) }</option>  
+        <option key={ i } value={ pack.nb }>{ pack.nb } exemplaires = { toMoney(pack.nb * price) }</option>
       )}
     </select>
     { touched && error && <div className="form-message"><small>{error}</small></div> }
@@ -145,25 +145,25 @@ class Contact extends Component {
           }
           <Field name="honorific" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Civilité" component={FormHonorific} disabled={this.props.disabled} className="honorific form-control"/>
           <div className="name-group">
-            <Field name="name" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Nom *" disabled={this.props.disabled} component="input" type="text" className="form-control"/>  
-            <Field name="firstname" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Prénom" disabled={this.props.disabled} component="input" type="text" className="form-control"/>  
+            <Field name="name" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Nom *" disabled={this.props.disabled} component="input" type="text" className="form-control"/>
+            <Field name="firstname" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Prénom" disabled={this.props.disabled} component="input" type="text" className="form-control"/>
           </div>
           <Field name={`${section}.${name}.name`} component={renderInputError} />
           <div className="input-group email-group">
             <span className="input-group-addon" id="email_label"><i className="glyphicon glyphicon-envelope"></i></span>
             <Field name="email" placeholder="Email *" disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="email_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
+               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>
           </div>
           <Field name={`${section}.${name}.email`} component={renderInputError} />
           <div className="input-group mobile-group">
             <span className="input-group-addon" id="mobile_label"><i className="glyphicon glyphicon-phone"></i></span>
             <Field name="mobile" placeholder={mobile_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="mobile_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
+               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>
           </div>
           <div className="input-group phone-group">
             <span className="input-group-addon" id="phone_label"><i className="glyphicon glyphicon-phone-alt"></i></span>
             <Field name="phone" placeholder={phone_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="phone_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>  
+               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>
           </div>
           <Field name={`${section}.${name}.mobile`} component={renderInputError} />
         </div>
@@ -199,15 +199,15 @@ class ContactDisable extends Component {
 }
 
 const fields_validation = [
-  { 
+  {
     name: "company",
-    isRequired: "Le nom de votre structure est obligatoire" 
+    isRequired: "Le nom de votre structure est obligatoire"
   },
-  { 
+  {
     name: "nb_products",
     greater_than: {
       value: "0",
-      message: "Veuillez sélectionnez le nombre d'exemplaires désirés" 
+      message: "Veuillez sélectionnez le nombre d'exemplaires désirés"
     }
   },
   {
@@ -216,13 +216,13 @@ const fields_validation = [
       {
         name: 'contact',
         fields: [
-          { 
+          {
             name: 'name',
-            isRequired: "Le nom du responsable de la commande est obligatoire" 
+            isRequired: "Le nom du responsable de la commande est obligatoire"
           },
-          { 
+          {
             name: 'email',
-            isRequired: "L'email du responsable de la commande est obligatoire" 
+            isRequired: "L'email du responsable de la commande est obligatoire"
           }
         ]
       }
@@ -235,17 +235,17 @@ const fields_validation = [
         name: 'address',
         condition: ['invoice_address'],
         fields: [
-          { 
+          {
             name: 'address1',
-            isRequired: "L'adresse de facturation doit contenir au moins une ligne" 
+            isRequired: "L'adresse de facturation doit contenir au moins une ligne"
           },
-          { 
+          {
             name: 'zip',
-            isRequired: "Le code postal de l'adresse de facturation est obligatoire" 
+            isRequired: "Le code postal de l'adresse de facturation est obligatoire"
           },
-          { 
+          {
             name: 'city',
-            isRequired: "La ville de l'adresse de facturation est obligatoire" 
+            isRequired: "La ville de l'adresse de facturation est obligatoire"
           }
         ]
       },
@@ -253,13 +253,13 @@ const fields_validation = [
         name: 'contact',
         condition: ['invoice_contact'],
         fields: [
-          { 
+          {
             name: 'name',
-            isRequired: "Le nom du responsable de la facturation est obligatoire" 
+            isRequired: "Le nom du responsable de la facturation est obligatoire"
           },
-          { 
+          {
             name: 'email',
-            isRequired: "L'email du responsable de la facturation est obligatoire" 
+            isRequired: "L'email du responsable de la facturation est obligatoire"
           }
         ]
       }
@@ -273,17 +273,17 @@ const fields_validation = [
         name: 'address',
         condition: ['shipping'],
         fields: [
-          { 
+          {
             name: 'address1',
-            isRequired: "L'adresse de livraison doit contenir au moins une ligne" 
+            isRequired: "L'adresse de livraison doit contenir au moins une ligne"
           },
-          { 
+          {
             name: 'zip',
-            isRequired: "Le code postal de l'adresse de livraison est obligatoire" 
+            isRequired: "Le code postal de l'adresse de livraison est obligatoire"
           },
-          { 
+          {
             name: 'city',
-            isRequired: "La ville de l'adresse de livraison est obligatoire" 
+            isRequired: "La ville de l'adresse de livraison est obligatoire"
           }
         ]
       },
@@ -291,13 +291,13 @@ const fields_validation = [
         name: 'contact',
         condition: ['shipping','shipping_contact'],
         fields: [
-          { 
+          {
             name: 'name',
-            isRequired: "Le nom du contact pour la livraison est obligatoire" 
+            isRequired: "Le nom du contact pour la livraison est obligatoire"
           },
-          { 
+          {
             name: 'email',
-            isRequired: "L'email du contact pour la livraison est obligatoire" 
+            isRequired: "L'email du contact pour la livraison est obligatoire"
           }
         ]
       }
@@ -338,7 +338,7 @@ const validate = (values) => {
         if (field.isRequired && (!values[field.name] || !values[field.name].trim().length)) {
           errors[field.name] = field.isRequired;
         }
-      } 
+      }
       return true;
     });
     return errors;
@@ -358,6 +358,7 @@ const validate = (values) => {
   }
 
   if (!values.shipping.use_contact_for_shipping && (!values.shipping.contact || (!values.shipping.contact.mobile && !values.shipping.contact.phone))) {
+    if (!errors.shipping) errors.shipping = {};
     if (!errors.shipping.contact) errors.shipping.contact = {};
     errors.shipping.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone au contact de livraison";
     errors.shipping.contact.phone = errors.shipping.contact.mobile;
@@ -379,8 +380,8 @@ class OrderForm extends Component {
   }
 
   getHubOptions() {
-    return this.props.hubs.map((hub, idx) => { 
-      let name = hub['NOM 1'] + " " + hub['NOM 2']; 
+    return this.props.hubs.map((hub, idx) => {
+      let name = hub['NOM 1'] + " " + hub['NOM 2'];
       return { key: idx, value: name, text: name}; //hub['BA']
     });
   }
@@ -389,9 +390,9 @@ class OrderForm extends Component {
     let { options, ...other } = fieldProps;
     return (
       <Field {...other} component="select">
-          <option key={ "BEEOTOP" } value={ "BEEOTOP" }>Choisir votre Banque Alimentaire</option>  
+          <option key={ "BEEOTOP" } value={ "BEEOTOP" }>Choisir votre Banque Alimentaire</option>
         { options.map((option) =>
-          <option key={ option.key } value={ option.value }>{ option.text }</option>  
+          <option key={ option.key } value={ option.value }>{ option.text }</option>
         )}
       </Field>
     )
@@ -418,7 +419,7 @@ class OrderForm extends Component {
 
     let choices = [];
     let tolower = (str) => { return removeDiacritics(str.toLowerCase()); }
-    if (str.length >= 3) 
+    if (str.length >= 3)
       choices = this.props.companies.filter( (company) => ( tolower(company['Raison sociale']).indexOf(tolower(str)) > -1 ) ? company['Raison sociale'] : false );
 
     this.setState( { 'company_autocomplete': choices} );
@@ -465,8 +466,8 @@ class OrderForm extends Component {
 
     const hub = (this.props.hubs.find((hub) => { return (hub['NOM 1'].trim() + ' ' + hub['NOM 2'].trim()).toLowerCase() === company['Livraison via hub'].toLowerCase()})) ? company['Livraison via hub'] : 'BEEOTOP';
 
-    this.props.initialize({ 
-      company: company_name, 
+    this.props.initialize({
+      company: company_name,
       is_ngo:  (company['Type'].toLowerCase() === "association"),
       is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: false,
@@ -478,7 +479,7 @@ class OrderForm extends Component {
         company_name: company_name,
         address: shipping_address,
         contact: shipping_contact,
-        use_contact_for_shipping: !has_shipping_contact  
+        use_contact_for_shipping: !has_shipping_contact
       },
       invoice: {
         company_name: invoice_company_name || company_name,
@@ -494,8 +495,8 @@ class OrderForm extends Component {
   }
 
   render() {
-    const { 
-      handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address, 
+    const {
+      handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address,
       use_contact_for_shipping, use_contact_for_invoice, valid } = this.props;
 
     const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
@@ -546,13 +547,13 @@ class OrderForm extends Component {
           <form onSubmit={ handleSubmit(this.props.createOrder) } autoComplete="off">
 
             <div className="dropdown open">
-              <Field name="company" label="Nom de la structure" 
+              <Field name="company" label="Nom de la structure"
                 component={FormGroupInput} type="text" className="form-control"
-                onChange={this.changeCompany.bind(this)}/>  
+                onChange={this.changeCompany.bind(this)}/>
 
               { this.state.company_autocomplete && this.state.company_autocomplete.length > 0 &&
                 <ul className="dropdown-menu">
-                  { this.state.company_autocomplete.map((company, key) => 
+                  { this.state.company_autocomplete.map((company, key) =>
                       <li key={key}><a href="#" onClick={() => this.selectCompany(company)}>{ company['Raison sociale'] }</a></li>
                   )}
                 </ul>
@@ -563,7 +564,7 @@ class OrderForm extends Component {
               <label>Vous êtes?</label>
               <div className="checkbox">
                 <label>
-                  <Field name="is_ccas" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/> 
+                  <Field name="is_ccas" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/>
                   une mairie ou un CCAS
                 </label>
               </div>
@@ -572,24 +573,24 @@ class OrderForm extends Component {
             <div className="form-group">
               <div className="checkbox">
                 <label>
-                  <Field name="is_ngo" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/> 
+                  <Field name="is_ngo" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/>
                   une association à but non lucratif
                 </label>
               </div>
             </div>
 
-            { (is_ngo || is_ccas) && 
+            { (is_ngo || is_ccas) &&
               <div>
                 <div className="form-group">
                   <div className="checkbox">
                     <label>
-                      <Field name="has_hub" component="input" type="checkbox"/> 
+                      <Field name="has_hub" component="input" type="checkbox"/>
                       partenaire d&#39;une Banque Alimentaire (livraison gratuite)
                     </label>
                   </div>
                 </div>
 
-                { has_hub && 
+                { has_hub &&
                   <div className="form-group">
                     <label htmlFor="hub">Quelle est votre Banque Alimentaire?</label>
                     <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() } />
@@ -602,11 +603,11 @@ class OrderForm extends Component {
 
               <div className="form-group">
                 <label htmlFor="nb_products">Nombre d&#39;exemplaires du magazine</label>
-                <Field name="nb_products" price={price} component={FieldNbProducts} className="form-control"/>  
+                <Field name="nb_products" price={price} component={FieldNbProducts} className="form-control"/>
                 <small>À noter : Un paquet de 25 exemplaires du magazine pèse environ 3,5 kg.</small>
               </div>
 
-              { (is_ngo || is_ccas) && 
+              { (is_ngo || is_ccas) &&
                 <div className="form-group">
                   <label htmlFor="nb_products">Choisir votre mode de livraison</label>
                   <div className="radio">
@@ -622,7 +623,7 @@ class OrderForm extends Component {
                   <div className="radio">
                     <label>
                       <Field component="input" type="radio" name="shipping_option" value="2"/>
-                       
+
                       { ba_shipping_available &&
                         <span>Option 2: Livraison dans votre Banque Alimentaire (gratuite)</span>
                       }
@@ -636,10 +637,10 @@ class OrderForm extends Component {
                 </div>
               }
 
-              <OrderFormTable 
-                price={price} 
-                nb_products={nb_products || 0} 
-                shipping_price={shipping_price} 
+              <OrderFormTable
+                price={price}
+                nb_products={nb_products || 0}
+                shipping_price={shipping_price}
                 total={total} />
 
             </div>
@@ -670,14 +671,14 @@ class OrderForm extends Component {
                       <label>Contact pour la livraison</label>
                       <div className="checkbox">
                         <label>
-                          <Field name="use_contact_for_shipping" component="input" type="checkbox" /> 
+                          <Field name="use_contact_for_shipping" component="input" type="checkbox" />
                           Utiliser le nom du responsable de la commande pour la livraison
                         </label>
                       </div>
                     </div>
 
                     <ContactDisable needPhone section="shipping" disabled={use_contact_for_shipping} />
- 
+
                   </Section>
                 }
 
@@ -691,7 +692,7 @@ class OrderForm extends Component {
                         <label>Adresse de facturation</label>
                         <div className="checkbox">
                           <label>
-                            <Field name="use_shipping_address" component="input" type="checkbox" /> 
+                            <Field name="use_shipping_address" component="input" type="checkbox" />
                             Utiliser l&#39;adresse de livraison pour la facturation
                           </label>
                         </div>
@@ -708,7 +709,7 @@ class OrderForm extends Component {
                     <label>Responsable de la facture</label>
                     <div className="checkbox">
                       <label>
-                        <Field name="use_contact_for_invoice" component="input" type="checkbox" /> 
+                        <Field name="use_contact_for_invoice" component="input" type="checkbox" />
                         Utiliser le nom du responsable de la commande pour la facturation
                       </label>
                     </div>
@@ -720,7 +721,7 @@ class OrderForm extends Component {
 
                 <div className="form-group">
                   <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre à votre commande</label>
-                  <Field name="order_comment" component="textarea" className="form-control" rows="3"/>  
+                  <Field name="order_comment" component="textarea" className="form-control" rows="3"/>
                 </div>
 
                 <div>
@@ -734,7 +735,7 @@ class OrderForm extends Component {
                   </p>
                   <p>
 
-                    <Field name="order_signed" component="input" type="checkbox" /> 
+                    <Field name="order_signed" component="input" type="checkbox" />
 
                     <small>
                       &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
