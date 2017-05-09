@@ -1,6 +1,8 @@
 import moment from "moment"
 import tz from "moment-timezone";
 
+import Invoice from "./invoice";
+
 import config from './../config';
 const { GOOGLE_ORDER_DOC_KEY, GOOGLE_SUBSCRIPTION_DOC_KEY, GOOGLE_CREDS_CLIENT_EMAIL, GOOGLE_CREDS_PRIVATE_KEY } = config;
 
@@ -264,7 +266,13 @@ class Store {
             if (err) {
               reject("Unable to write new row in subscriptionsSheet");
             } else {
-              resolve("OK");
+              const invoice = new Invoice();
+              invoice.subscription_new(subscription).then((message) => {
+                resolve("OK");
+              })
+              .catch((error) => {
+                reject(error);
+              }) // End invoice.subscription_new
             }
           }); // End subscriptionSheet addRow
         }
