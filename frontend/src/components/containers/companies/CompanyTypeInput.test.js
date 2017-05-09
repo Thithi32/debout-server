@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
-import ReactTestUtils from 'react-test-utils';
 
 import { CompanyTypeInput } from './CompanyTypeInput';
 
