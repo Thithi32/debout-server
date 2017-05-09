@@ -5,8 +5,8 @@ import moment from "moment";
 import tz from "moment-timezone";
 import uid from "uid";
 
-import SendMail from "./sendmail";
-import Store from "./store";
+import SendMail from "./libs/sendmail";
+import Store from "./libs/store";
 
 const app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -168,7 +168,7 @@ let hubs = [];
 let line = 2
 const csv=require('csvtojson');
 csv()
-.fromFile('./companies.csv')
+.fromFile('./bases/companies.csv')
 .on('json',(jsonObj)=>{
   jsonObj.line = line++;
   companies.push(jsonObj);
@@ -181,7 +181,7 @@ csv()
 
     line = 2;
     csv()
-    .fromFile('./hubs.csv')
+    .fromFile('./bases/hubs.csv')
     .on('json',(jsonObj)=>{
       jsonObj.line = line++;
       hubs.push(jsonObj);
@@ -228,10 +228,10 @@ csv()
             store.order_new(order)
               .then((message2) => {
                 mail.order_confirmation(order)
-                  .then((message3) => res.json({ 
-                    status: "OK", 
+                  .then((message3) => res.json({
+                    status: "OK",
                     response: {
-                      'order_new': message, 
+                      'order_new': message,
                       'store_order': message2,
                       'order_confirmation': message3
                     }
@@ -261,10 +261,10 @@ csv()
             store.subscription_new(subscription)
               .then((message2) => {
                 mail.subscription_confirmation(subscription)
-                  .then((message3) => res.json({ 
-                    status: "OK", 
+                  .then((message3) => res.json({
+                    status: "OK",
                     response: {
-                      'subscription_new': message, 
+                      'subscription_new': message,
                       'store_subscription': message2,
                       'subscription_confirmation': message3
                     }

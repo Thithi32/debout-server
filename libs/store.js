@@ -1,11 +1,8 @@
-import config from './config'
 import moment from "moment"
 import tz from "moment-timezone";
 
-const GOOGLE_ORDER_DOC_KEY = process.env.GOOGLE_ORDER_DOC_KEY || config.GOOGLE_ORDER_DOC_KEY;
-const GOOGLE_SUBSCRIPTION_DOC_KEY = process.env.GOOGLE_SUBSCRIPTION_DOC_KEY || config.GOOGLE_SUBSCRIPTION_DOC_KEY;
-const GOOGLE_CREDS_CLIENT_EMAIL = process.env.GOOGLE_CREDS_CLIENT_EMAIL || config.GOOGLE_CREDS_CLIENT_EMAIL;
-const GOOGLE_CREDS_PRIVATE_KEY = process.env.GOOGLE_CREDS_PRIVATE_KEY || config.GOOGLE_CREDS_PRIVATE_KEY;
+import config from './../config';
+const { GOOGLE_ORDER_DOC_KEY, GOOGLE_SUBSCRIPTION_DOC_KEY, GOOGLE_CREDS_CLIENT_EMAIL, GOOGLE_CREDS_PRIVATE_KEY } = config;
 
 if (!GOOGLE_ORDER_DOC_KEY) {
   console.log('!!!! Missing GOOGLE_ORDER_DOC_KEY configuration !!!!!');
