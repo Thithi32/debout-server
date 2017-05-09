@@ -28,9 +28,9 @@ class OrderShippingOptions extends Component {
           <div className="radio">
             <label>
               <Field component="input" type="radio" name="shipping_option" value="2"/>
-               
+
               { hub_ba &&
-                <span>Option 2: Livraison gratuite dans votre Banque Alimentaire ({ hub.OUVERTURE }): { hub.name }, <em>{ hub.address_inline }</em></span>
+                <span>Option 2: Livraison gratuite dans votre Banque Alimentaire ({ hub.OUVERTURE }): { hub.name }<br /><em>{ hub.address_inline }</em></span>
               }
               { hub_beeotop &&
                 <div>

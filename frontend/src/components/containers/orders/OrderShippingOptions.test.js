@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 
 import OrderShippingOptions from './OrderShippingOptions';
 
-const default_props = {
+const defaultProps = {
   hub: {
     "BA": "BA11",
     "NOM 1": "BANQUE ALIMENTAIRE",
@@ -27,23 +27,30 @@ const default_props = {
 
 const isRendered = (wrapper) => (expect(wrapper.find('.radio').length).toBe(2));
 const secondOptionLabel = (wrapper) => (wrapper.find('.radio').at(1).find('span').text());
+const firstOptionLabel = (wrapper) => (wrapper.find('.radio').at(0).find('span').text());
 
 it('renders without crashing', () => {
-  let wrapper = shallow( <OrderShippingOptions { ...default_props } /> );
+  let wrapper = shallow( <OrderShippingOptions { ...defaultProps } /> );
   isRendered(wrapper);
 });
 
-it('should show ba shipping', () => {
-  let wrapper = shallow( <OrderShippingOptions { ...default_props } /> );
-  let label = (secondOptionLabel(wrapper));
-  expect(label).toContain('Banque Alimentaire');
-  expect(label).toContain(default_props.hub.name);
-  expect(label).toContain(default_props.hub.address_inline);
-  expect(label).toContain(default_props.hub.OUVERTURE);
+it('should show shipping price', () => {
+  let wrapper = shallow( <OrderShippingOptions { ...defaultProps } /> );
+  let label = firstOptionLabel(wrapper);
+  expect(label).toContain(defaultProps.shipping_price);
 });
 
 it('should show ba shipping', () => {
-  let props = default_props;
+  let wrapper = shallow( <OrderShippingOptions { ...defaultProps } /> );
+  let label = secondOptionLabel(wrapper);
+  expect(label).toContain('Banque Alimentaire');
+  expect(label).toContain(defaultProps.hub.name);
+  expect(label).toContain(defaultProps.hub.address_inline);
+  expect(label).toContain(defaultProps.hub.OUVERTURE);
+});
+
+it('should show Beeotop shipping', () => {
+  let props = defaultProps;
   props.hub = { name: "BEEOTOP" };
   let wrapper = shallow( <OrderShippingOptions { ...props } /> );
   let label = (secondOptionLabel(wrapper));

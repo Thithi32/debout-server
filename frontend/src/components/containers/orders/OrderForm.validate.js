@@ -1,13 +1,13 @@
 const fields_validation = [
-  { 
+  {
     name: "company",
-    isRequired: "Le nom de votre structure est obligatoire" 
+    isRequired: "Le nom de votre structure est obligatoire"
   },
-  { 
+  {
     name: "nb_products",
     greater_than: {
       value: "0",
-      message: "Veuillez sélectionnez le nombre d'exemplaires désirés" 
+      message: "Veuillez sélectionnez le nombre d'exemplaires désirés"
     }
   },
   {
@@ -16,14 +16,14 @@ const fields_validation = [
       {
         name: 'contact',
         fields: [
-          { 
+          {
             name: 'name',
-            isRequired: "Le nom du responsable de la commande est obligatoire" 
+            isRequired: "Le nom du responsable de la commande est obligatoire"
           },
-          { 
+          {
             name: 'email',
             isRequired: "L'email du responsable de la commande est obligatoire",
-            isEmail: "L'email du responsable de la commande ne semble pas correct" 
+            isEmail: "L'email du responsable de la commande ne semble pas correct"
           }
         ]
       }
@@ -36,17 +36,17 @@ const fields_validation = [
         name: 'address',
         condition: ['invoice_address'],
         fields: [
-          { 
+          {
             name: 'address1',
-            isRequired: "L'adresse de facturation doit contenir au moins une ligne" 
+            isRequired: "L'adresse de facturation doit contenir au moins une ligne"
           },
-          { 
+          {
             name: 'zip',
-            isRequired: "Le code postal de l'adresse de facturation est obligatoire" 
+            isRequired: "Le code postal de l'adresse de facturation est obligatoire"
           },
-          { 
+          {
             name: 'city',
-            isRequired: "La ville de l'adresse de facturation est obligatoire" 
+            isRequired: "La ville de l'adresse de facturation est obligatoire"
           }
         ]
       },
@@ -54,14 +54,14 @@ const fields_validation = [
         name: 'contact',
         condition: ['invoice_contact'],
         fields: [
-          { 
+          {
             name: 'name',
-            isRequired: "Le nom du responsable de la facturation est obligatoire" 
+            isRequired: "Le nom du responsable de la facturation est obligatoire"
           },
-          { 
+          {
             name: 'email',
             isRequired: "L'email du responsable de la facturation est obligatoire",
-            isEmail: "L'email du responsable de la facturation ne semble pas correct"  
+            isEmail: "L'email du responsable de la facturation ne semble pas correct"
           }
         ]
       }
@@ -75,17 +75,17 @@ const fields_validation = [
         name: 'address',
         condition: ['shipping'],
         fields: [
-          { 
+          {
             name: 'address1',
-            isRequired: "L'adresse de livraison doit contenir au moins une ligne" 
+            isRequired: "L'adresse de livraison doit contenir au moins une ligne"
           },
-          { 
+          {
             name: 'zip',
-            isRequired: "Le code postal de l'adresse de livraison est obligatoire" 
+            isRequired: "Le code postal de l'adresse de livraison est obligatoire"
           },
-          { 
+          {
             name: 'city',
-            isRequired: "La ville de l'adresse de livraison est obligatoire" 
+            isRequired: "La ville de l'adresse de livraison est obligatoire"
           }
         ]
       },
@@ -93,14 +93,14 @@ const fields_validation = [
         name: 'contact',
         condition: ['shipping','shipping_contact'],
         fields: [
-          { 
+          {
             name: 'name',
-            isRequired: "Le nom du contact pour la livraison est obligatoire" 
+            isRequired: "Le nom du contact pour la livraison est obligatoire"
           },
-          { 
+          {
             name: 'email',
             isRequired: "L'email du contact pour la livraison est obligatoire",
-            isEmail: "L'email du contact pour la livraison ne semble pas correct"  
+            isEmail: "L'email du contact pour la livraison ne semble pas correct"
           }
         ]
       }
@@ -147,7 +147,7 @@ const validate = (values) => {
           errors[field.name] = field.isEmail;
         }
 
-      } 
+      }
       return true;
     });
     return errors;
@@ -159,13 +159,14 @@ const validate = (values) => {
     errors.order_signed = "Vous devez accepter les termes d'engagement de la commande";
   }
 
-  if (values.shipping.use_contact_for_shipping && (!values.order || !values.order.contact || (!values.order.contact.mobile && !values.order.contact.phone))) {
+  if (!values.order || !values.order.contact || (!values.order.contact.mobile && !values.order.contact.phone)) {
     if (!errors.order) errors.order = {};
     if (!errors.order.contact) errors.order.contact = {};
-    errors.order.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone";
+    errors.order.contact.mobile = "Veuillez renseigner au moins un numéro de téléphone au responsable de la commande";
   }
 
-  if (!values.shipping.use_contact_for_shipping && (!values.shipping.contact || (!values.shipping.contact.mobile && !values.shipping.contact.phone))) {
+  if (need_shipping && !values.shipping.use_contact_for_shipping && (!values.shipping.contact || (!values.shipping.contact.mobile && !values.shipping.contact.phone))) {
+    if (!errors.shipping) errors.shipping = {};
     if (!errors.shipping.contact) errors.shipping.contact = {};
     errors.shipping.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone au contact de livraison";
   }

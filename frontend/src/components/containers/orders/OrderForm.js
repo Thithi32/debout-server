@@ -56,56 +56,56 @@ export class OrderForm extends Component {
     let invoice_address = {
       address1: company['(facture)\nAdresse'],
       zip: company['(facture)\nCP'],
-      city: company['(facture)\nVille']
+      city: company['(facture)\nVille'].toUpperCase()
     }
     const has_invoice_address = invoice_address.address1 && invoice_address.zip && invoice_address.city
 
     let shipping_address = {
-      address1: company['(livraison)\nAdresse 1'],
-      address2: company['(livraison)\nAdresse 2'],
-      zip: company['(livraison)\nCP'],
-      city: company['(livraison)\nVille']
+      address1: company["(livraison)\nAdresse 1"],
+      address2: company["(livraison)\nAdresse 2"],
+      zip: company["(livraison)\nCP"],
+      city: company["(livraison)\nVille"].toUpperCase()
     }
     const has_shipping_address = shipping_address.address1 && shipping_address.zip && shipping_address.city
 
     const invoice_company_name = company['(facture)\nRaison Sociale']
 
     let invoice_contact = {
-      honorific: company['(facture)\nCivilité'],
-      name: company['(facture)\nNom'],
-      email: company['(facture)\nMail'],
-      mobile: company['(facture)\nportable'],
-      phone: company['(facture)\nfixe'] || company['(facture)\nfixe ']
+      honorific: company["(facture)\nCivilité"],
+      name: company["(facture)\nNom"].toUpperCase(),
+      email: company["(facture)\nMail"],
+      mobile: company["(facture)\nportable"],
+      phone: company["(facture)\nfixe"] || company["(facture)\nfixe "]
     }
     const has_invoice_contact = invoice_contact.name && invoice_contact.email
 
     let shipping_contact = {
-      honorific: company['(livraison)\nCivilité'],
-      name: company['(livraison)\nNom'],
-      firstname: company['(livraison)\nPrénom'],
-      email: company['(livraison)\nMail'],
-      mobile: company['(livraison)\nportable'],
-      phone: company['(livraison)\nfixe'] || company['(livraison)\nfixe ']
+      honorific: company["(livraison)\nCivilité"],
+      name: company["(livraison)\nNom"].toUpperCase(),
+      firstname: company["(livraison)\nPrénom"],
+      email: company["(livraison)\nMail"],
+      mobile: company["(livraison)\nportable"],
+      phone: company["(livraison)\nfixe"] || company["(livraison)\nfixe "]
     }
     const has_shipping_contact = shipping_contact.name && shipping_contact.email
 
     this.props.initialize({
-      company: company_name,
-      is_ngo:  (company['Type'].toLowerCase() === 'association'),
-      is_ccas:  (company['Type'].toLowerCase() === 'ccas'),
+      company: company_name.toUpperCase(),
+      is_ngo:  (company['Type'].toLowerCase() === "association"),
+      is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: false,
       order_signed: false,
       hub: 'BEEOTOP',
       nb_products: this.props.order.values.nb_products || 0,
       shipping_option: '1',
       shipping: {
-        company_name: company_name,
+        company_name: company_name.toUpperCase(),
         address: shipping_address,
         contact: shipping_contact,
         use_contact_for_shipping: !has_shipping_contact
       },
       invoice: {
-        company_name: invoice_company_name || company_name,
+        company_name: (invoice_company_name || company_name).toUpperCase(),
         address: invoice_address,
         address_disabled: shipping_address,
         use_shipping_address: has_shipping_address && !has_invoice_address,
@@ -180,9 +180,9 @@ export class OrderForm extends Component {
               }
 
               <OrderFormTable
-                nb_products={nb_products || 0}
                 price={price}
-                shipping_price={shipping_price}
+                nb_products={parseInt(nb_products,10) || 0}
+                shipping_price={ shipping_price }
                 total={total}
               />
 
@@ -233,20 +233,13 @@ export class OrderForm extends Component {
                       <label>Contact pour la livraison</label>
                       <div className="checkbox">
                         <label>
-                          <Field
-                            component="input"
-                            name="use_contact_for_shipping"
-                            type="checkbox"
-                          />
+                          <Field name="use_contact_for_shipping" component="input" type="checkbox" />
                           Utiliser le nom du responsable de la commande pour la livraison
                         </label>
                       </div>
                     </div>
 
-                    <FormContactDisable
-                      disabled={use_contact_for_shipping}
-                      needPhone
-                    />
+                    <FormContactDisable needPhone disabled={ use_contact_for_shipping } />
 
                   </FormSectionPanel>
                 }
@@ -271,11 +264,7 @@ export class OrderForm extends Component {
                       <label>Adresse de facturation</label>
                       <div className="checkbox">
                         <label>
-                          <Field
-                            component="input"
-                            name="use_shipping_address"
-                            type="checkbox"
-                          />
+                          <Field name="use_shipping_address" component="input" type="checkbox" />
                           Utiliser l&#39;adresse de livraison pour la facturation
                         </label>
                       </div>
@@ -292,11 +281,7 @@ export class OrderForm extends Component {
                     <label>Responsable de la facture</label>
                     <div className="checkbox">
                       <label>
-                        <Field
-                          component="input"
-                          name="use_contact_for_invoice"
-                          type="checkbox"
-                        />
+                        <Field name="use_contact_for_invoice" component="input" type="checkbox" />
                         Utiliser le nom du responsable de la commande pour la facturation
                       </label>
                     </div>
@@ -332,11 +317,7 @@ export class OrderForm extends Component {
                   </p>
                   <p>
 
-                    <Field
-                      component="input"
-                      name="order_signed"
-                      type="checkbox"
-                    />
+                    <Field name="order_signed" component="input" type="checkbox" />
 
                     <small>
                       &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
