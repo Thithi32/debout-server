@@ -17,8 +17,14 @@ const configKeys = [
   - use env variables	(this option will be used first)
 ***************************************/
 
-let config = require('./config.json');
-if (!config) config = {};
+let config;
+try {
+  config = require('./config.json');
+} catch (ex) {
+	config = {};
+}
+
+console.log(config);
 
 let result = {};
 configKeys.map((key) => ( result[key] = process.env[key] || config[key]));
