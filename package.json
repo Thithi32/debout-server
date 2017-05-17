@@ -20,6 +20,7 @@
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.11",
     "nodemon": "^1.11.0",
+    "request-promise": "^4.2.1",
     "sendgrid": "^4.8.4",
     "uid": "0.0.2"
   },
