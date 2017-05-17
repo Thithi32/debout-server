@@ -4,15 +4,23 @@ import config from './../config';
 class Invoice {
 
 	constructor() {
-		const { ZOHO_AUTH_TOKEN, ZOHO_ORGANIZATION_ID } = config;
+		const { ZOHO_AUTH_TOKEN, ZOHO_ORGANIZATION_ID, ZOHO_SUBSCRIPTION_ITEM_ID, ZOHO_DONATION_ITEM_ID } = config;
 		if (!ZOHO_AUTH_TOKEN) {
 		  console.log('!!!! Missing ZOHO_AUTH_TOKEN configuration !!!!!');
 		}
 		if (!ZOHO_ORGANIZATION_ID) {
 		  console.log('!!!! Missing ZOHO_ORGANIZATION_ID configuration !!!!!');
 		}
+		if (!ZOHO_SUBSCRIPTION_ITEM_ID) {
+		  console.log('!!!! Missing ZOHO_SUBSCRIPTION_ITEM_ID configuration !!!!!');
+		}
+		if (!ZOHO_DONATION_ITEM_ID) {
+		  console.log('!!!! Missing ZOHO_DONATION_ITEM_ID configuration !!!!!');
+		}
 
 		if (ZOHO_AUTH_TOKEN && ZOHO_ORGANIZATION_ID) this.service = new Zoho(ZOHO_AUTH_TOKEN,ZOHO_ORGANIZATION_ID);
+		this.ZOHO_SUBSCRIPTION_ITEM_ID = ZOHO_SUBSCRIPTION_ITEM_ID;
+		this.ZOHO_DONATION_ITEM_ID = ZOHO_DONATION_ITEM_ID;
 	}
 
   subscription_new(subscription) {
@@ -62,7 +70,7 @@ class Invoice {
     			customer_id: contact.contact_id,
     			line_items: [
         		{
-        			item_id: "643421000000060019"
+        			item_id: self.ZOHO_SUBSCRIPTION_ITEM_ID,
         		}
         	],
     		}
