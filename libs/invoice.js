@@ -21,6 +21,8 @@ class Invoice {
 		if (ZOHO_AUTH_TOKEN && ZOHO_ORGANIZATION_ID) this.service = new Zoho(ZOHO_AUTH_TOKEN,ZOHO_ORGANIZATION_ID);
 		this.ZOHO_SUBSCRIPTION_ITEM_ID = ZOHO_SUBSCRIPTION_ITEM_ID;
 		this.ZOHO_DONATION_ITEM_ID = ZOHO_DONATION_ITEM_ID;
+
+		this.subscription_price = 10;
 	}
 
   subscription_new(subscription) {
@@ -66,13 +68,18 @@ class Invoice {
 	    self.service.getOrCreateContact(zohoContact)
     	.then((contact) => {
     		console.log(contact);
+
+    		let line_items = [ { item_id: self.ZOHO_SUBSCRIPTION_ITEM_ID } ];
+    		if (subscription.type === 'solidaire') {
+    			line_items.push( {
+    				item_id: self.ZOHO_DONATION_ITEM_ID,
+    				rate: subscription.solidarity_price - self.subscription_price,
+    			})
+
+    		}
     		let zohoInvoice = {
     			customer_id: contact.contact_id,
-    			line_items: [
-        		{
-        			item_id: self.ZOHO_SUBSCRIPTION_ITEM_ID,
-        		}
-        	],
+    			line_items
     		}
 
     		return self.service.createInvoice(zohoInvoice);
