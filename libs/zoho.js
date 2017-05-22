@@ -1,5 +1,6 @@
 import request from 'request-promise';
 import querystring from 'querystring';
+import utf8 from 'utf8';
 
 class Zoho {
 	constructor(authtoken, organization_id) {
@@ -23,7 +24,7 @@ class Zoho {
   		console.log(method,uri);
 			request({
 		    method: method,
-		    uri: uri,
+		    uri: utf8.encode(uri),
 			})
       .then((res) => JSON.parse(res))
       .then((res) => resolve(res))

@@ -22,7 +22,8 @@
     "nodemon": "^1.11.0",
     "request-promise": "^4.2.1",
     "sendgrid": "^4.8.4",
-    "uid": "0.0.2"
+    "uid": "0.0.2",
+    "utf8": "^2.1.2"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
