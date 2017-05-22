@@ -1,399 +1,33 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { fetchCompanies, fetchHubs, createOrder } from "./../../../actions";
-import { Field, reduxForm, formValueSelector, FormSection, change as changeFieldValue } from 'redux-form';
+import { createOrder } from "./../../../actions";
+import { Field, reduxForm } from 'redux-form';
 import OrderFormTable from "./OrderFormTable";
-import { ContactUs } from "./../../widgets";
-import removeDiacritics from "./../../../helpers";
+import OrderShippingOptions from "./OrderShippingOptions";
+import OrderNbProducts from "./OrderNbProducts";
+import OrderFormErrors from "./OrderFormErrors";
+import validate from './OrderForm.validate'
+import { CompanyAutoComplete, CompanyTypeInput } from "./../companies";
+import { ContactUs, FormGroupInput, FormSectionPanel , FormContact, FormContactDisable,
+          FormAddress, FormAddressDisable } from "./../../widgets";
 
 const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
+const upper = value => value && value.toUpperCase();
 
-const packs = [
-  { nb: 10, shipping: 10 },
-  { nb: 25, shipping: 22 },
-  { nb: 50, shipping: 30 },
-  { nb: 100, shipping: 38 },
-  { nb: 150, shipping: 42 },
-  { nb: 200, shipping: 50 },
-  { nb: 250, shipping: 53 },
-  { nb: 300, shipping: 58 },
-  { nb: 350, shipping: 65 },
-  { nb: 400, shipping: 70 },
-  { nb: 450, shipping: 80 },
-  { nb: 500, shipping: 90 },
-  { nb: 600, shipping: 102 },
-  { nb: 700, shipping: 120 },
-  { nb: 800, shipping: 135 },
-  { nb: 900, shipping: 150 },
-  { nb: 1000, shipping: 170 }
-];
 
-const renderInputError = ({input, meta, ...props}) => (
-  <div>
-  { meta.error &&
-    <div {...props} className="error">
-      <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      <span className="sr-only">Erreur:</span>
-      &nbsp;{meta.error}
-    </div>
-  }
-  </div>
-)
-
-const FormGroupInput = ({ input, label, ...props}) => (
-  <div className="form-group">
-    <label htmlFor={input.name}>{label}</label>
-    <FormInput input={input} {...props} />
-  </div>
-)
-
-const FormInput = ({ input, type, meta: { touched, error }, ...props}) => (
-  <div className={ touched && error && ' error' }>
-    <input type={type} {...input} {...props} />
-    { touched && error && <div className="form-message"><small>{error}</small></div> }
-  </div>
-)
-
-const FormHonorific = ({ input, label, meta, ...props}) => (
-  <select {...input} {...props}>
-    <option value="M">M</option>
-    <option value="Mme">Mme</option>
-  </select>
-)
-
-const Section = (props) => (
-  <FormSection name={props.name}>
-    <div className="panel panel-default">
-      <div className="panel-heading">
-        <h3 className="panel-title title">{ props.title }</h3>
-      </div>
-      <div className="panel-body">
-        {props.children}
-      </div>
-    </div>
-  </FormSection>
-)
-
-const FieldNbProducts = ({ input, price, meta: { touched, error }, ...props}) => (
-  <div className={ touched && error && ' error' }>
-    <select {...input} {...props}>
-        <option key={ 0 } value="0">Choisir le nombre d&#39;exemplaires</option>
-      { packs.map((pack,i) =>
-        <option key={ i } value={ pack.nb }>{ pack.nb } exemplaires = { toMoney(pack.nb * price) }</option>
-      )}
-    </select>
-    { touched && error && <div className="form-message"><small>{error}</small></div> }
-  </div>
-)
-
-class Address extends Component {
-  render() {
-    const name = this.props.name || 'address';
-    return (
-      <FormSection name={name}>
-        <div className="form-group">
-          { this.props.title &&
-            <label htmlFor="address1">{ this.props.title }</label>
-          }
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address1" placeholder="Ligne 1 *" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="address2" placeholder="Ligne 2" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="zip" placeholder="Code postal *" disabled={this.props.disabled} />
-          <Field component={FormInput} onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} className="form-control" type="text" name="city" placeholder="Commune *" disabled={this.props.disabled} />
-        </div>
-      </FormSection>
-    )
-  }
-}
-
-class AddressDisable extends Component {
-  render() {
-    const { disabled, ...props } = this.props;
-    return (
-      <div>
-        { !disabled &&
-          <div>
-            <Address { ...props } />
-            <div className="hide">
-              <Address name="address_disabled" disabled { ...props } />
-            </div>
-          </div>
-        }
-        { disabled &&
-          <div>
-            <div className="hide">
-              <Address { ...props } />
-            </div>
-            <Address name="address_disabled" disabled { ...props } />
-          </div>
-        }
-      </div>
-    )
-  }
-}
-
-class Contact extends Component {
-  render() {
-    const name = this.props.name || 'contact';
-    const section = this.props.section || '';
-    const mobile_label = "Téléphone mobile" + ((this.props.needPhone) ? " ¹" : "");
-    const phone_label = "Téléphone fixe" + ((this.props.needPhone) ? " ¹" : "");
-    return (
-      <FormSection name={name}>
-        <div className="form-group contact-form">
-          { this.props.title &&
-            <label>{ this.props.title }</label>
-          }
-          <Field name="honorific" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} label="Civilité" component={FormHonorific} disabled={this.props.disabled} className="honorific form-control"/>
-          <div className="name-group">
-            <Field name="name" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Nom *" disabled={this.props.disabled} component="input" type="text" className="form-control"/>
-            <Field name="firstname" onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }} placeholder="Prénom" disabled={this.props.disabled} component="input" type="text" className="form-control"/>
-          </div>
-          <Field name={`${section}.${name}.name`} component={renderInputError} />
-          <div className="input-group email-group">
-            <span className="input-group-addon" id="email_label"><i className="glyphicon glyphicon-envelope"></i></span>
-            <Field name="email" placeholder="Email *" disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="email_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>
-          </div>
-          <Field name={`${section}.${name}.email`} component={renderInputError} />
-          <div className="input-group mobile-group">
-            <span className="input-group-addon" id="mobile_label"><i className="glyphicon glyphicon-phone"></i></span>
-            <Field name="mobile" placeholder={mobile_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="mobile_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>
-          </div>
-          <div className="input-group phone-group">
-            <span className="input-group-addon" id="phone_label"><i className="glyphicon glyphicon-phone-alt"></i></span>
-            <Field name="phone" placeholder={phone_label} disabled={this.props.disabled} component="input" type="text" className="form-control" aria-describedby="phone_label"
-               onChange={(e)=>{ this.props.onChange && this.props.onChange(e); }}/>
-          </div>
-          <Field name={`${section}.${name}.mobile`} component={renderInputError} />
-        </div>
-      </FormSection>
-    )
-  }
-}
-
-class ContactDisable extends Component {
-  render() {
-    const { disabled, ...props } = this.props;
-    return (
-      <div>
-        { !disabled &&
-          <div>
-            <Contact { ...props } />
-            <div className="hide">
-              <Contact name="contact_disabled" disabled { ...props } />
-            </div>
-          </div>
-        }
-        { disabled &&
-          <div>
-            <div className="hide">
-              <Contact { ...props } />
-            </div>
-            <Contact name="contact_disabled" disabled { ...props } />
-          </div>
-        }
-      </div>
-    )
-  }
-}
-
-const fields_validation = [
-  {
-    name: "company",
-    isRequired: "Le nom de votre structure est obligatoire"
-  },
-  {
-    name: "nb_products",
-    greater_than: {
-      value: "0",
-      message: "Veuillez sélectionnez le nombre d'exemplaires désirés"
-    }
-  },
-  {
-    name: 'order',
-    fields:  [
-      {
-        name: 'contact',
-        fields: [
-          {
-            name: 'name',
-            isRequired: "Le nom du responsable de la commande est obligatoire"
-          },
-          {
-            name: 'email',
-            isRequired: "L'email du responsable de la commande est obligatoire"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    name: 'invoice',
-    fields: [
-      {
-        name: 'address',
-        condition: ['invoice_address'],
-        fields: [
-          {
-            name: 'address1',
-            isRequired: "L'adresse de facturation doit contenir au moins une ligne"
-          },
-          {
-            name: 'zip',
-            isRequired: "Le code postal de l'adresse de facturation est obligatoire"
-          },
-          {
-            name: 'city',
-            isRequired: "La ville de l'adresse de facturation est obligatoire"
-          }
-        ]
-      },
-      {
-        name: 'contact',
-        condition: ['invoice_contact'],
-        fields: [
-          {
-            name: 'name',
-            isRequired: "Le nom du responsable de la facturation est obligatoire"
-          },
-          {
-            name: 'email',
-            isRequired: "L'email du responsable de la facturation est obligatoire"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    name: 'shipping',
-    condition: ['shipping'],
-    fields: [
-      {
-        name: 'address',
-        condition: ['shipping'],
-        fields: [
-          {
-            name: 'address1',
-            isRequired: "L'adresse de livraison doit contenir au moins une ligne"
-          },
-          {
-            name: 'zip',
-            isRequired: "Le code postal de l'adresse de livraison est obligatoire"
-          },
-          {
-            name: 'city',
-            isRequired: "La ville de l'adresse de livraison est obligatoire"
-          }
-        ]
-      },
-      {
-        name: 'contact',
-        condition: ['shipping','shipping_contact'],
-        fields: [
-          {
-            name: 'name',
-            isRequired: "Le nom du contact pour la livraison est obligatoire"
-          },
-          {
-            name: 'email',
-            isRequired: "L'email du contact pour la livraison est obligatoire"
-          }
-        ]
-      }
-    ]
-  }
-];
-
-const validate = (values) => {
-  const need_shipping = parseInt(values.shipping_option,10) !== 2;
-  const conditions = {
-    shipping: need_shipping,
-    shipping_contact: !(values.shipping && values.shipping.use_contact_for_shipping),
-    invoice_address: !need_shipping || !(values.invoice && values.invoice.use_shipping_address),
-    invoice_contact: !(values.invoice && values.invoice.use_contact_for_invoice)
-  }
-
-  const checkIsRequired = (fields,values) => {
-    let errors = {};
-    fields.map((field) => {
-      if (field.fields) {
-
-        let checkError = true;
-        if (field.condition) {
-          for (var i in field.condition) {
-            checkError = checkError && conditions[field.condition[i]];
-          }
-        }
-
-        if (checkError) {
-          errors[field.name] = checkIsRequired(field.fields,values[field.name] || {});
-        }
-      } else {
-        if (field.greater_than ) {
-          if (values[field.name] <= field.greater_than.value) {
-            errors[field.name] = field.greater_than.message;
-          }
-        }
-        if (field.isRequired && (!values[field.name] || !values[field.name].trim().length)) {
-          errors[field.name] = field.isRequired;
-        }
-      }
-      return true;
-    });
-    return errors;
-  }
-
-  let errors = checkIsRequired(fields_validation,values);
-
-  if (!values.order_signed) {
-    errors.order_signed = "Vous devez accepter les termes d'engagement de la commande";
-  }
-
-  if (!values.order || !values.order.contact || (!values.order.contact.mobile && !values.order.contact.phone)) {
-    if (!errors.order) errors.order = {};
-    if (!errors.order.contact) errors.order.contact = {};
-    errors.order.contact.mobile = "Veuillez renseigner au moins un numéro de téléphone au responsable de la commande";
-  }
-
-  if (need_shipping && !values.shipping.use_contact_for_shipping && (!values.shipping.contact || (!values.shipping.contact.mobile && !values.shipping.contact.phone))) {
-    if (!errors.shipping) errors.shipping = {};
-    if (!errors.shipping.contact) errors.shipping.contact = {};
-    errors.shipping.contact.mobile = "Pour la livraison, veuillez renseigner au moins un numéro de téléphone au contact de livraison";
-  }
-
-  return errors;
-}
-
-class OrderForm extends Component {
+export class OrderForm extends Component {
 
   constructor () {
     super();
     this.state = {};
   }
 
-  componentDidMount() {
-    this.props.fetchCompanies();
-    this.props.fetchHubs();
+  onChangeHub(hub) {
+    this.setState({ hub });
   }
 
-  getHubOptions() {
-    return this.props.hubs.map((hub, idx) => {
-      let name = hub['NOM 1'] + " " + hub['NOM 2'];
-      return { key: idx, value: name, text: name}; //hub['BA']
-    });
-  }
-
-  FieldHub(fieldProps) {
-    let { options, ...other } = fieldProps;
-    return (
-      <Field {...other} component="select">
-          <option key={ "BEEOTOP" } value={ "BEEOTOP" }>Choisir votre Banque Alimentaire</option>
-        { options.map((option) =>
-          <option key={ option.key } value={ option.value }>{ option.text }</option>
-        )}
-      </Field>
-    )
+  onChangeShippingPrice(home_shipping_price) {
+    this.setState({ home_shipping_price });
   }
 
   checkDeliveryOptions(e, value) {
@@ -406,7 +40,7 @@ class OrderForm extends Component {
     }
   }
 
-  changeCompany(e, str, old_str) {
+  onChangeCompany(e, str, old_str) {
     // First sync other company_name fields
     if (this.props.order.values.shipping && this.props.order.values.shipping.company_name === old_str) {
       this.props.change("shipping.company_name", str);
@@ -414,22 +48,15 @@ class OrderForm extends Component {
     if (this.props.order.values.invoice && this.props.order.values.invoice.company_name === old_str) {
       this.props.change("invoice.company_name", str);
     }
-
-    let choices = [];
-    let tolower = (str) => { return removeDiacritics(str.toLowerCase()); }
-    if (str.length >= 3)
-      choices = this.props.companies.filter( (company) => ( tolower(company['Raison sociale']).indexOf(tolower(str)) > -1 ) ? company['Raison sociale'] : false );
-
-    this.setState( { 'company_autocomplete': choices} );
   }
 
-  selectCompany(company) {
+  onSelectCompany(company) {
     const company_name = company['Raison sociale'];
 
     let invoice_address = {
         address1: company["(facture)\nAdresse"],
         zip: company["(facture)\nCP"],
-        city: company["(facture)\nVille"]
+        city: company["(facture)\nVille"].toUpperCase()
     }
     const has_invoice_address = invoice_address.address1 && invoice_address.zip && invoice_address.city;
 
@@ -437,7 +64,7 @@ class OrderForm extends Component {
       address1: company["(livraison)\nAdresse 1"],
       address2: company["(livraison)\nAdresse 2"],
       zip: company["(livraison)\nCP"],
-      city: company["(livraison)\nVille"]
+      city: company["(livraison)\nVille"].toUpperCase()
     }
     const has_shipping_address = shipping_address.address1 && shipping_address.zip && shipping_address.city;
 
@@ -445,7 +72,7 @@ class OrderForm extends Component {
 
     let invoice_contact = {
         honorific: company["(facture)\nCivilité"],
-        name: company["(facture)\nNom"],
+        name: company["(facture)\nNom"].toUpperCase(),
         email: company["(facture)\nMail"],
         mobile: company["(facture)\nportable"],
         phone: company["(facture)\nfixe"] || company["(facture)\nfixe "]
@@ -454,7 +81,7 @@ class OrderForm extends Component {
 
     let shipping_contact = {
         honorific: company["(livraison)\nCivilité"],
-        name: company["(livraison)\nNom"],
+        name: company["(livraison)\nNom"].toUpperCase(),
         firstname: company["(livraison)\nPrénom"],
         email: company["(livraison)\nMail"],
         mobile: company["(livraison)\nportable"],
@@ -462,25 +89,23 @@ class OrderForm extends Component {
     }
     const has_shipping_contact = shipping_contact.name && shipping_contact.email;
 
-    const hub = (this.props.hubs.find((hub) => { return (hub['NOM 1'].trim() + ' ' + hub['NOM 2'].trim()).toLowerCase() === company['Livraison via hub'].toLowerCase()})) ? company['Livraison via hub'] : 'BEEOTOP';
-
     this.props.initialize({
-      company: company_name,
+      company: company_name.toUpperCase(),
       is_ngo:  (company['Type'].toLowerCase() === "association"),
       is_ccas:  (company['Type'].toLowerCase() === "ccas"),
       has_hub: false,
       order_signed: false,
-      hub,
+      hub: "BEEOTOP",
       nb_products: this.props.nb_products,
       shipping_option: "1",
       shipping: {
-        company_name: company_name,
+        company_name: company_name.toUpperCase(),
         address: shipping_address,
         contact: shipping_contact,
         use_contact_for_shipping: !has_shipping_contact
       },
       invoice: {
-        company_name: invoice_company_name || company_name,
+        company_name: (invoice_company_name || company_name).toUpperCase(),
         address: invoice_address,
         address_disabled: shipping_address,
         use_shipping_address: has_shipping_address && !has_invoice_address,
@@ -488,34 +113,23 @@ class OrderForm extends Component {
         use_contact_for_invoice: !has_invoice_contact
       }
     },false)
-
-    this.setState({company_autocomplete: {}});
   }
 
   render() {
-    const {
-      handleSubmit, is_ngo, is_ccas, has_hub, hub, nb_products, shipping_option, use_shipping_address,
-      use_contact_for_shipping, use_contact_for_invoice, valid } = this.props;
+    const { handleSubmit, valid, order } = this.props;
+    const values = (order && order.values) || {};
+    const { is_ngo, is_ccas, hub, nb_products, shipping, invoice } = values;
+    const { use_shipping_address, use_contact_for_invoice } = invoice || {};
+    const { use_contact_for_shipping } = shipping || {};
+    const shipping_option = parseInt(values.shipping_option,10);
 
-    const price = (is_ngo || is_ccas) ? 0.5 : 1.5;
+    const is_ngo_ccas = is_ngo || is_ccas;
+    const price = is_ngo_ccas ? 0.5 : 1.5;
 
-    const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub !== undefined && hub !== "BEEOTOP";
+    const hub_shipping = (shipping_option === 2);
 
-    const home_delivery = (parseInt(shipping_option,10) === 1);
-
-    let shipping_price = 0;
-    let shipping_home_price = 0;
-    if (parseInt(nb_products, 10) > 0) {
-      for (var i = 0; i < packs.length; i++) {
-        if (packs[i].nb === parseInt(nb_products, 10)) {
-          shipping_home_price = packs[i].shipping;
-        }
-      }
-
-    }
-    if (home_delivery) {
-      shipping_price = shipping_home_price;
-    }
+    const shipping_home_price = this.state.home_shipping_price || 0;
+    const shipping_price = (hub_shipping) ? 0 : shipping_home_price;
 
     let total = nb_products * price + shipping_price;
     if (!total || isNaN(total) || (total < 0)) total = 0;
@@ -538,107 +152,34 @@ class OrderForm extends Component {
         <div className="widget-body">
 
           <p>
-            Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
+            { false &&
+              <span>
+                Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
+              </span>
+            }
             Pour toute information, contactez-nous <ContactUs />.<br/>
           </p>
 
           <form onSubmit={ handleSubmit(this.props.createOrder) } autoComplete="off">
 
-            <div className="dropdown open">
-              <Field name="company" label="Nom de la structure"
-                component={FormGroupInput} type="text" className="form-control"
-                onChange={this.changeCompany.bind(this)}/>
+            <CompanyAutoComplete onSelectCompany={ this.onSelectCompany.bind(this) } onChangeCompany={ this.onChangeCompany.bind(this) }/>
 
-              { this.state.company_autocomplete && this.state.company_autocomplete.length > 0 &&
-                <ul className="dropdown-menu">
-                  { this.state.company_autocomplete.map((company, key) =>
-                      <li key={key}><a href="#" onClick={() => this.selectCompany(company)}>{ company['Raison sociale'] }</a></li>
-                  )}
-                </ul>
-              }
-            </div>
-
-            <div className="form-group">
-              <label>Vous êtes?</label>
-              <div className="checkbox">
-                <label>
-                  <Field name="is_ccas" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/>
-                  une mairie ou un CCAS
-                </label>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="checkbox">
-                <label>
-                  <Field name="is_ngo" component="input" type="checkbox" onChange={this.checkDeliveryOptions.bind(this)}/>
-                  une association à but non lucratif
-                </label>
-              </div>
-            </div>
-
-            { (is_ngo || is_ccas) &&
-              <div>
-                <div className="form-group">
-                  <div className="checkbox">
-                    <label>
-                      <Field name="has_hub" component="input" type="checkbox"/>
-                      partenaire d&#39;une Banque Alimentaire (livraison gratuite)
-                    </label>
-                  </div>
-                </div>
-
-                { has_hub &&
-                  <div className="form-group">
-                    <label htmlFor="hub">Quelle est votre Banque Alimentaire?</label>
-                    <this.FieldHub name="hub" className="form-control" options={ this.getHubOptions() } />
-                  </div>
-                }
-              </div>
-            }
+            <CompanyTypeInput ba_select={ false } onChangeHub={ this.onChangeHub.bind(this) } onChange={ this.checkDeliveryOptions.bind(this) }/>
 
             <div className="gray-row">
 
-              <div className="form-group">
-                <label htmlFor="nb_products">Nombre d&#39;exemplaires du magazine</label>
-                <Field name="nb_products" price={price} component={FieldNbProducts} className="form-control"/>
-                <small>À noter : Un paquet de 25 exemplaires du magazine pèse environ 3,5 kg.</small>
-              </div>
+              <OrderNbProducts price={price} onChangeShippingPrice={ this.onChangeShippingPrice.bind(this) }/>
 
-              { (is_ngo || is_ccas) &&
-                <div className="form-group">
-                  <label htmlFor="nb_products">Choisir votre mode de livraison</label>
-                  <div className="radio">
-                    <label>
-                      <Field component="input" type="radio" name="shipping_option" value="1"/>
-                       Option 1: Livraison dans votre structure{ shipping_home_price > 0 &&
-                        <span>
-                          &nbsp;= { shipping_home_price }€
-                        </span>
-                       }
-                    </label>
-                  </div>
-                  <div className="radio">
-                    <label>
-                      <Field component="input" type="radio" name="shipping_option" value="2"/>
-
-                      { ba_shipping_available &&
-                        <span>Option 2: Livraison dans votre Banque Alimentaire (gratuite)</span>
-                      }
-                      { !ba_shipping_available &&
-                        <div>
-                          <span>Option 2: Livraison gratuite au BEEOTOP de Paris, <em>14 boulevard de Douaumont – 75017 Paris</em></span>
-                        </div>
-                      }
-                    </label>
-                  </div>
-                </div>
+              { is_ngo_ccas &&
+                <OrderShippingOptions
+                  hub={ this.state.hub }
+                  shipping_price={ shipping_home_price } />
               }
 
               <OrderFormTable
                 price={price}
-                nb_products={nb_products || 0}
-                shipping_price={shipping_price}
+                nb_products={parseInt(nb_products,10) || 0}
+                shipping_price={ shipping_price }
                 total={total} />
 
             </div>
@@ -647,20 +188,20 @@ class OrderForm extends Component {
 
               <div>
 
-                <Section name="order" title="Responsable de la commande">
-                  <Contact needPhone section="order" onChange={(e)=>{
+                <FormSectionPanel name="order" title="Responsable de la commande">
+                  <FormContact needPhone onChange={(e)=>{
                     const { name, value } = e.target;
                     this.props.change(name.replace('order','invoice').replace('contact','contact_disabled'), value);
                     this.props.change(name.replace('order','shipping').replace('contact','contact_disabled'), value);
                   }}/>
-                </Section>
+                </FormSectionPanel>
 
-                { home_delivery &&
-                  <Section name="shipping" title="Détail de la livraison">
+                { !hub_shipping &&
+                  <FormSectionPanel name="shipping" title="Détail de la livraison">
 
-                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
+                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} normalize={upper} type="text" className="form-control" />
 
-                   <Address title="Adresse de livraison" onChange={(e)=>{
+                   <FormAddress title="Adresse de livraison" onChange={(e)=>{
                       const { name, value } = e.target;
                       this.props.change(name.replace('shipping','invoice').replace('address','address_disabled'), value);
                     }} />
@@ -675,32 +216,32 @@ class OrderForm extends Component {
                       </div>
                     </div>
 
-                    <ContactDisable needPhone section="shipping" disabled={use_contact_for_shipping} />
+                    <FormContactDisable needPhone disabled={ use_contact_for_shipping } />
 
-                  </Section>
+                  </FormSectionPanel>
                 }
 
-                <Section name="invoice" title="Informations de facturation">
+                <FormSectionPanel name="invoice" title="Informations de facturation">
 
-                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} type="text" className="form-control" />
+                  <Field name="company_name" label="Raison sociale" component={FormGroupInput} normalize={upper} type="text" className="form-control" />
 
-                  { home_delivery &&
-                    <div>
-                      <div className="form-group">
-                        <label>Adresse de facturation</label>
-                        <div className="checkbox">
-                          <label>
-                            <Field name="use_shipping_address" component="input" type="checkbox" />
-                            Utiliser l&#39;adresse de livraison pour la facturation
-                          </label>
-                        </div>
+                  { !hub_shipping &&
+                  <div>
+                    <div className="form-group">
+                      <label>Adresse de facturation</label>
+                      <div className="checkbox">
+                        <label>
+                          <Field name="use_shipping_address" component="input" type="checkbox" />
+                          Utiliser l&#39;adresse de livraison pour la facturation
+                        </label>
                       </div>
-                      <AddressDisable disabled={ use_shipping_address && home_delivery } />
                     </div>
+                    <FormAddressDisable disabled={ use_shipping_address } />
+                  </div>
                   }
 
-                  { !home_delivery &&
-                    <Address title="Adresse de facturation" />
+                  { hub_shipping &&
+                    <FormAddressDisable title="Adresse de facturation"/>
                   }
 
                   <div className="form-group">
@@ -713,9 +254,9 @@ class OrderForm extends Component {
                     </div>
                   </div>
 
-                  <ContactDisable section="invoice" disabled={use_contact_for_invoice} />
+                  <FormContactDisable disabled={ use_contact_for_invoice } />
 
-                </Section>
+                </FormSectionPanel>
 
                 <div className="form-group">
                   <label htmlFor="order_comment" className="title">Laissez ici un commentaire à joindre à votre commande</label>
@@ -738,15 +279,15 @@ class OrderForm extends Component {
                     <small>
                       &nbsp;&nbsp;<strong>Ce bon de commande vaut commande définitive.</strong>
                       &nbsp;Je m’engage
-                      { (parseInt(shipping_option,10) === 1) &&
+                      { (shipping_option === 1) &&
                         <span>
                           &nbsp;à régler la totalité de ma commande ({toMoney(total)}) à réception de la facture.
                         </span>
                       }
-                      { (parseInt(shipping_option,10) === 2) &&
+                      { (shipping_option === 2) &&
                         <span>
                           &nbsp;à régler les frais de traitement de ma commande ({toMoney(total)}) à réception de la facture et à respecter les dates de récupération de ma commande sur la plateforme relais de distribution&nbsp;
-                          <em>{(hub && ba_shipping_available) ? hub : "BEEOTOP Paris"}</em>.
+                          <em>{ hub === 'BEEOTOP' ? "BEEOTOP Paris" : hub }</em>.
                         </span>
                       }
                       <br />
@@ -761,23 +302,7 @@ class OrderForm extends Component {
                         <h3 className="panel-title title">Il manque des informations pour valider votre commande</h3>
                       </div>
                       <div className="panel-body">
-                        <Field name="company" component={renderInputError} />
-                        <Field name="nb_products" component={renderInputError} />
-                        <Field name="order.contact.name" component={renderInputError} />
-                        <Field name="order.contact.email" component={renderInputError} />
-                        <Field name="order.contact.mobile" component={renderInputError} />
-                        <Field name="invoice.address.address1" component={renderInputError} />
-                        <Field name="invoice.address.zip" component={renderInputError} />
-                        <Field name="invoice.address.city" component={renderInputError} />
-                        <Field name="invoice.contact.name" component={renderInputError} />
-                        <Field name="invoice.contact.email" component={renderInputError} />
-                        <Field name="shipping.address.address1" component={renderInputError} />
-                        <Field name="shipping.address.zip" component={renderInputError} />
-                        <Field name="shipping.address.city" component={renderInputError} />
-                        <Field name="shipping.contact.name" component={renderInputError} />
-                        <Field name="shipping.contact.email" component={renderInputError} />
-                        <Field name="shipping.contact.mobile" component={renderInputError} />
-                        <Field name="order_signed" component={renderInputError} />
+                        <OrderFormErrors />
                       </div>
                     </div>
                   </div>
@@ -800,7 +325,6 @@ class OrderForm extends Component {
 
 OrderForm = reduxForm({
   form: 'order',
-  fields: [ 'company', 'order_comment' ],
   initialValues: {
     shipping_option: "1",
     order_signed: false,
@@ -817,30 +341,14 @@ OrderForm = reduxForm({
 }, null, { createOrder })(OrderForm);
 
 OrderForm.propTypes = {
-  companies: React.PropTypes.array.isRequired,
-  fetchCompanies: React.PropTypes.func.isRequired,
-  hubs: React.PropTypes.array.isRequired,
-  fetchHubs: React.PropTypes.func.isRequired,
-  createOrder: React.PropTypes.func.isRequired
+  createOrder: React.PropTypes.func.isRequired,
+  order: React.PropTypes.object.isRequired,
 }
 
-const selector = formValueSelector('order');
 function mapStateToProps(state) {
   return {
-    companies: state.companies,
-    hubs: state.hubs,
-    company: selector(state, 'company'),
-    is_ngo: selector(state, 'is_ngo'),
-    is_ccas: selector(state, 'is_ccas'),
-    has_hub: selector(state, 'has_hub'),
-    hub: selector(state, 'hub'),
-    nb_products: selector(state, 'nb_products'),
-    shipping_option: selector(state, 'shipping_option'),
-    use_contact_for_shipping: selector(state, 'shipping.use_contact_for_shipping'),
-    use_shipping_address: selector(state, 'invoice.use_shipping_address'),
-    use_contact_for_invoice: selector(state, 'invoice.use_contact_for_invoice'),
-    order: state.form.order
+    order: (state && state.form && state.form.order) || {},
   }
 }
 
-export default connect(mapStateToProps, { fetchCompanies, fetchHubs, createOrder, changeFieldValue })(OrderForm);
+export default connect(mapStateToProps, { createOrder })(OrderForm);

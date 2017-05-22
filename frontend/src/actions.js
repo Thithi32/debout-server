@@ -24,7 +24,8 @@ export function fetchCompanies() {
   return dispatch => {
     fetch("/api/companies")
       .then(res => res.json())
-      .then(data => dispatch(setCompanies(data.companies)));
+      .then(data => dispatch(setCompanies(data.companies)))
+      .catch(error => false);
   }
 }
 
@@ -32,7 +33,8 @@ export function fetchHubs() {
   return dispatch => {
     fetch("/api/hubs")
       .then(res => res.json())
-      .then(data => dispatch(setHubs(data.hubs)));
+      .then(data => dispatch(setHubs(data.hubs)))
+      .catch(error => false);
   }
 }
 

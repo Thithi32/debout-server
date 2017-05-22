@@ -95,9 +95,25 @@ const validOrder = (order) => {
   }
 
   if (order['shipping_option'] === 2) {
-    order.shipping = {
-      full: order['hub']
+    let hub = findHub(order['hub']);
+    if (hub) {
+      let full = [ hub["NOM 1"] + " " + hub["NOM 2"] ];
+      if (hub["ADRESSE 1"].length) full.push(hub["ADRESSE 1"]);
+      if (hub["ADRESSE 2"].length) full.push(hub["ADRESSE 2"]);
+      full.push(hub["CP"] + " " + hub["VILLE"]);
+      full.push("Tel: " + hub["TELEPHONE"]);
+      order.shipping = {
+        full: full.join('<br/>'),
+      }
+      if (hub["OUVERTURE"].length) {
+        order.shipping.opendays = "<p>Retrait possible: <strong>" + hub["OUVERTURE"] + "</strong></p>";
+      }
+    } else {
+      order.shipping = {
+        full: "BEEOTOP de Paris<br/>14 boulevard de Douaumont</br>75017 Paris"
+      }
     }
+
   } else {
     if (order.shipping) {
       let full = [
@@ -119,6 +135,11 @@ const validOrder = (order) => {
 const findCompany = (name) => {
   return companies.find(function(company) { return company['Raison sociale'].toLowerCase() === name.toLowerCase() })
 }
+
+const findHub = (name) => {
+  return hubs.find(function(hub) { return hub['NOM 1'].toLowerCase() + " " + hub['NOM 2'].toLowerCase() === name.toLowerCase() })
+}
+
 
 // PARSING COMPANIES FILE
 let companies = [];

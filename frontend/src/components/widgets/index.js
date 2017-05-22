@@ -1,9 +1,24 @@
 import Loader from './Loader'
 import ContactUs from './ContactUs'
+import { 
+  FormGroupInput, FormInput, FormSectionPanel, FormContact, FormContactDisable, FormAddress, FormAddressDisable,
+  FieldNbProducts, FieldHonorific, FieldInputError 
+} from './form'
 
-export {
+export  {
   
   ContactUs,
-  Loader
-  
+  Loader,
+
+  FormGroupInput,
+  FormInput,
+  FormSectionPanel,
+  FormContact,
+  FormContactDisable,
+  FormAddress,
+  FormAddressDisable,
+
+  FieldNbProducts,
+  FieldHonorific,
+  FieldInputError,  
 }

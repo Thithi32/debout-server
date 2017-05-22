@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import "./OrderFormTable.css";
 
-const toMoney = (num) => ( num.toFixed(2).replace('.',',') + "€" );
+const toMoney = (num) => ( (num && num.toFixed(2).replace('.',',') + "€") || "NaN" );
 
 class OrderFormTable extends Component {
   render() {
@@ -40,6 +40,13 @@ class OrderFormTable extends Component {
       </div>
     )
   }
+}
+
+OrderFormTable.propTypes = {
+  price: React.PropTypes.number.isRequired,
+  nb_products: React.PropTypes.number.isRequired,
+  shipping_price: React.PropTypes.number.isRequired,
+  total: React.PropTypes.number.isRequired,
 }
 
 export default OrderFormTable;
