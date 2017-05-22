@@ -17,10 +17,10 @@ export class CompanyTypeInput extends Component {
   render() {
 
     const order = this.props.order;
+    const ba_select = this.props.ba_select !== false;
 
     const is_ngo_ccas = order.values && (order.values.is_ngo || order.values.is_ccas);
     const has_hub = order.values && order.values.has_hub;
-
 
     return (
       <div className="company-type-input">
@@ -43,7 +43,7 @@ export class CompanyTypeInput extends Component {
           </div>
         </div>
 
-        { is_ngo_ccas &&
+        { is_ngo_ccas && ba_select &&
           <div>
             <div className="form-group">
               <div className="checkbox">
@@ -71,6 +71,7 @@ CompanyTypeInput.propTypes = {
   onChange: React.PropTypes.func,
   onChangeHub: React.PropTypes.func,
   order: React.PropTypes.object.isRequired,
+  ba_select: React.PropTypes.bool,
 }
 
 function mapStateToProps(state) {

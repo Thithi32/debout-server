@@ -151,7 +151,11 @@ export class OrderForm extends Component {
         <div className="widget-body">
 
           <p>
-            Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
+            { false &&
+              <span>
+                Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
+              </span>
+            }
             Pour toute information, contactez-nous <ContactUs />.<br/>
           </p>
 
@@ -159,7 +163,7 @@ export class OrderForm extends Component {
 
             <CompanyAutoComplete onSelectCompany={ this.onSelectCompany.bind(this) } onChangeCompany={ this.onChangeCompany.bind(this) }/>
 
-            <CompanyTypeInput onChangeHub={ this.onChangeHub.bind(this) } onChange={ this.checkDeliveryOptions.bind(this) }/>
+            <CompanyTypeInput ba_select={ false } onChangeHub={ this.onChangeHub.bind(this) } onChange={ this.checkDeliveryOptions.bind(this) }/>
 
             <div className="gray-row">
 
