@@ -1,7 +1,7 @@
 {
   "extends": "airbnb",
   "rules": {
-    "no-console": "error",
+    "no-console": "off",
     "consistent-return": "warn",
     "arrow-parens": "off",
     "import/no-dynamic-require": "warn",
@@ -30,10 +30,13 @@
     "no-class-assign": "off",
     "react/jsx-no-bind": "off",
     "react/forbid-prop-types": "off",
+    "no-alert": "off"
   },
   "globals": {
     "document": true,
     "window": true,
+    "fetch": true,
+    "alert": true,
     "describe": true,
     "it": true,
     "expect": true

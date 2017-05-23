@@ -25,7 +25,7 @@ export class SubscriptionTypeInput extends Component {
   render() {
     const solidarityType = this.state.subscription_type !== 'simple';
     const disabled = !solidarityType ? { disabled: 'disabled' } : {};
-    const receptAvailable = solidarityType && this.state.solidarity_price >= this.props.simple_subscription_price * 4;
+    const receptAvailable = solidarityType && this.props.solidarity_price >= this.props.simple_subscription_price * 4;
     const receptDisabled = !receptAvailable ? { disabled: 'disabled' } : {};
     const solidarityNbMag = (this.props.solidarity_price >= this.props.simple_subscription_price + this.props.mag_price) ? Math.floor((this.props.solidarity_price - this.props.simple_subscription_price) / this.props.mag_price) : 0;
 

@@ -163,10 +163,10 @@ class Zoho {
     });
 	}
 
-	sendInvoice(invoice_id, to_mail_ids) {
+	sendInvoice(invoice_id, to_mail_ids, template_email_id) {
     const self = this;
     return new Promise(function(resolve, reject) {
-			self.fetch(`/invoices/${invoice_id}/email`,'POST', { to_mail_ids })
+			self.fetch(`/invoices/${invoice_id}/email`,'POST', { to_mail_ids, template_email_id })
       .then((response) => {
       	resolve(response.message);
       })

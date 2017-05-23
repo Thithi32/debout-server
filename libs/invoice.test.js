@@ -28,7 +28,7 @@ describe('Invoice', function() {
   	this.timeout(10000);
   	const invoice = new Invoice();
   	return invoice.subscription_new(defaultSubscription)
-  	.then((message) => (assert.equal(message,'OK')))
+  	.then((result) => (assert.equal(result.message,'OK')))
   	.catch((error) => (assert(false,error)));
   });
 });
