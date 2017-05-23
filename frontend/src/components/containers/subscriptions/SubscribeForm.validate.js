@@ -53,7 +53,7 @@ const validate = (values) => {
     errors.contact.mobile = 'Veuillez renseigner au moins un numéro de téléphone';
   }
 
-  if (values.type === 'solidaire' && values.solidarity_price <= 10) {
+  if (values.type === 'solidaire' && values.solidarity_price < 10) {
     console.log(values.type, values.solidarity_price);
     errors.solidarity_price = "Le prix minimum de l'abonnement ne peut être inférieur à 10€.";
   }
