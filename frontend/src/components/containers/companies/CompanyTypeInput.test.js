@@ -50,3 +50,16 @@ it('should show ba checkbox and select', () => {
   expect(wrapper.find('Field[name="has_hub"]').length).toBe(1);
   expect(wrapper.find('label[htmlFor="hub"]').length).toBe(1);
 });
+
+it('should not show ba checkbox and select when ba_select is false', () => {
+  let props = defaultProps;
+  props.order.values = {
+    is_ccas: true,
+    is_ngo: false,
+  }
+  props.ba_select = false;
+  let wrapper = shallow( <CompanyTypeInput { ...props } /> );
+  isRendered(wrapper);
+  expect(wrapper.find('Field[name="has_hub"]').length).toBe(0);
+  expect(wrapper.find('label[htmlFor="hub"]').length).toBe(0);
+});

@@ -15,6 +15,7 @@ import { ContactUs, FormGroupInput, FormSectionPanel, FormContact, FormContactDi
 const toMoney = (num) => ( num.toFixed(2).replace('.',',') + '€' )
 const upper = value => value && value.toUpperCase()
 
+
 export class OrderForm extends Component {
 
   constructor () {
@@ -146,7 +147,11 @@ export class OrderForm extends Component {
         <FormOnlyContent>
 
           <p>
-            Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
+            { false &&
+              <span>
+                Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
+              </span>
+            }
             Pour toute information, contactez-nous <ContactUs />.<br/>
           </p>
 
@@ -161,8 +166,9 @@ export class OrderForm extends Component {
             />
 
             <CompanyTypeInput
-              onChange={this.checkDeliveryOptions.bind(this)}
-              onChangeHub={this.onChangeHub.bind(this)}
+              ba_select={ false }
+              onChangeHub={ this.onChangeHub.bind(this) }
+              onChange={ this.checkDeliveryOptions.bind(this) }
             />
 
             <div className="gray-row">
