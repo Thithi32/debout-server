@@ -1,12 +1,12 @@
-module.exports = {
+{
   "extends": "airbnb",
   "rules": {
     "no-console": "error",
     "consistent-return": "warn",
     "arrow-parens": "off",
     "import/no-dynamic-require": "warn",
-    "camelcase": ["warn", {properties: "never"},
-    "no-unused-vars": [2, {"args": "all", "argsIgnorePattern": "^_"}],
+    "camelcase": "off",
+    "no-unused-vars": [2, {"args": "after-used", "argsIgnorePattern": "^_"}],
     "comma-dangle": ["warn", "always-multiline"],
     "dot-notation": "warn",
     "arrow-body-style": "off",
@@ -24,16 +24,18 @@ module.exports = {
     "no-plusplus": "off",
     "no-constant-condition": ["error", { "checkLoops": false }],
     "no-script-url": "off",
-    "semi": ["error", "never"],
+    "semi": ["error", "always"],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "import/no-named-as-default": "off",
     "no-class-assign": "off",
+    "react/jsx-no-bind": "off",
+    "react/forbid-prop-types": "off",
   },
   "globals": {
     "document": true,
     "window": true,
     "describe": true,
     "it": true,
-    "expect": true,
-  },
+    "expect": true
+  }
 }

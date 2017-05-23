@@ -1,33 +1,33 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Field, formValueSelector } from 'redux-form'
-import { FieldInputError } from '../../widgets'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Field, formValueSelector } from 'redux-form';
+import { FieldInputError } from '../../widgets';
 
-import './SubscriptionTypeInput.css'
+import './SubscriptionTypeInput.css';
 
-const toMoney = (num) => ( (num && num.toFixed(2).replace('.',',') + "€") || "" );
+const toMoney = (num) => `${num && num.toFixed(2).replace('.', ',')}€` || '';
 
 export class SubscriptionTypeInput extends Component {
 
   constructor() {
-    super()
-    this.state = {}
+    super();
+    this.state = {};
   }
 
   onChangeSubscriptionType(...args) {
-    this.setState({ subscription_type: args[1] })
+    this.setState({ subscription_type: args[1] });
   }
 
   onChangeSolidarityPrice(...args) {
-    this.setState({ solidarity_price: args[1] })
+    this.setState({ solidarity_price: args[1] });
   }
 
   render() {
-    const solidarityType = this.state.subscription_type !== 'simple'
-    const disabled =  !solidarityType ? { disabled: 'disabled' } : {}
+    const solidarityType = this.state.subscription_type !== 'simple';
+    const disabled = !solidarityType ? { disabled: 'disabled' } : {};
     const receptAvailable = solidarityType && this.state.solidarity_price >= this.props.simple_subscription_price * 4;
-    const receptDisabled = !receptAvailable ? { disabled: 'disabled' } : {}
-    const solidarityNbMag = (this.props.solidarity_price >= this.props.simple_subscription_price + this.props.mag_price) ? Math.floor((this.props.solidarity_price - this.props.simple_subscription_price) / this.props.mag_price) : 0
+    const receptDisabled = !receptAvailable ? { disabled: 'disabled' } : {};
+    const solidarityNbMag = (this.props.solidarity_price >= this.props.simple_subscription_price + this.props.mag_price) ? Math.floor((this.props.solidarity_price - this.props.simple_subscription_price) / this.props.mag_price) : 0;
 
     return (
       <div className="subscription-type-input">
@@ -69,7 +69,7 @@ export class SubscriptionTypeInput extends Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -77,14 +77,13 @@ SubscriptionTypeInput.propTypes = {
   simple_subscription_price: React.PropTypes.number.isRequired,
   mag_price: React.PropTypes.number.isRequired,
   solidarity_price: React.PropTypes.number.isRequired,
-}
+};
 
-const selector = formValueSelector('subscription')
+const selector = formValueSelector('subscription');
 function mapStateToProps(state) {
   return {
     solidarity_price: parseInt(selector(state, 'solidarity_price'), 10) || 0,
-  }
+  };
 }
 
-export default connect(mapStateToProps)(SubscriptionTypeInput)
-
+export default connect(mapStateToProps)(SubscriptionTypeInput);

@@ -1,24 +1,24 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Field, reduxForm } from 'redux-form'
-import { FormOnlyHeader, FormOnlyContent } from './../../layout'
-import { FormContact, FormAddress, FormGroupInput } from './../../widgets'
-import { createSubscription } from './../../../actions'
-import SubscribeFormErrors from './SubscribeFormErrors'
-import SubscriptionTypeInput from './SubscriptionTypeInput'
-import SubscribeFormSignature from './SubscribeFormSignature'
-import SubscribeFormTerms from './SubscribeFormTerms'
-import validate from './SubscribeForm.validate'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Field, reduxForm } from 'redux-form';
+import { FormOnlyHeader, FormOnlyContent } from './../../layout';
+import { FormContact, FormAddress, FormGroupInput } from './../../widgets';
+import { createSubscription } from './../../../actions';
+import SubscribeFormErrors from './SubscribeFormErrors';
+import SubscriptionTypeInput from './SubscriptionTypeInput';
+import SubscribeFormSignature from './SubscribeFormSignature';
+import SubscribeFormTerms from './SubscribeFormTerms';
+import validate from './SubscribeForm.validate';
 
-import './SubscribeForm.css'
+import './SubscribeForm.css';
 
-const upper = value => value && value.toUpperCase()
+const upper = value => value && value.toUpperCase();
 
 export class SubscribeForm extends Component { // eslint-disable-line
   render() {
-    const values = this.props.subscription.values || {};
-    const [magPrice, simpleSubscriptionPrice] = [2, 10]
-    const total = (values.type === 'simple') ? simpleSubscriptionPrice : (parseInt(values.solidarity_price,10) || 0)
+    const values = this.props.subscription.values || {};
+    const [magPrice, simpleSubscriptionPrice] = [2, 10];
+    const total = (values.type === 'simple') ? simpleSubscriptionPrice : (parseInt(values.solidarity_price, 10) || 0);
 
     return (
       <div className="widget subscription-form">
@@ -101,7 +101,7 @@ export class SubscribeForm extends Component { // eslint-disable-line
         </FormOnlyContent>
 
       </div>
-    )
+    );
   }
 }
 
@@ -148,7 +148,7 @@ const solidarityValues = {
 const initialValues = {
   type: 'solidaire',
   solidarity_price: '40',
-}
+};
 
 SubscribeForm = reduxForm({
   form: 'subscription',
@@ -156,16 +156,16 @@ SubscribeForm = reduxForm({
 //  initialValues: solidarityValues,
   initialValues,
   validate,
-}, null, { createSubscription })(SubscribeForm)
+}, null, { createSubscription })(SubscribeForm);
 
 SubscribeForm.propTypes = {
   createSubscription: React.PropTypes.func.isRequired,
-}
+};
 
 function mapStateToProps(state) {
   return {
-    subscription: (state && state.form && state.form.subscription) || { value: {}},
-  }
+    subscription: (state && state.form && state.form.subscription) || { value: {} },
+  };
 }
 
-export default connect(mapStateToProps, { createSubscription })(SubscribeForm)
+export default connect(mapStateToProps, { createSubscription })(SubscribeForm);
