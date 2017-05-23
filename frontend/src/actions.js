@@ -170,7 +170,7 @@ export function createSubscription(subscription) {
       if (data.status === 'OK') {
         alert('Merci pour votre abonnement.');
         dispatch(reset('subscription'));
-//          window.location = 'http://debout.fr/donner';
+        window.location = 'http://debout.fr/donner';
       } else {
         alert('Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email abonnement@debout.fr');
       }

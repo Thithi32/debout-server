@@ -234,50 +234,53 @@ class Store {
         reject("Abonnement invalide pour manque d'informations");
       }
 
-      self.getSubscriptionSheets(function( { subscriptionsSheet }) {
-        if (!subscriptionsSheet) {
-          reject("No 'Abonnements' sheet in spreadsheet");
-        } else {
-          let row = {
-            abonnement: subscription.id || '',
-            date: subscription.date || '',
-            type: subscription.type || '',
-            montant: '10,00',
-            civilite: subscription.contact.honorific || 'Mr',
-            nom: subscription.contact.name || '',
-            prenom: subscription.contact.firstname || '',
-            email: subscription.contact.email || '',
-            portable: subscription.contact.mobile || '',
-            fixe: subscription.contact.phone || '',
-            raisonsociale: subscription.company_name || '',
-            adresse1: subscription.address.address1 || '',
-            adresse2: subscription.address.address2 || '',
-            cp: subscription.address.zip || '',
-            ville: subscription.address.city || '',
-          };
+      const invoice = new Invoice();
+      invoice.subscription_new(subscription).then(({ message, contact, invoice }) => {
+        self.getSubscriptionSheets(function( { subscriptionsSheet }) {
+          if (!subscriptionsSheet) {
+            reject("No 'Abonnements' sheet in spreadsheet");
+          } else {
+            console.log(contact,invoice);
+            let row = {
+              abonnement: subscription.id || '',
+              date: subscription.date || '',
+              type: subscription.type || '',
+              montant: '10,00',
+              civilite: subscription.contact.honorific || 'Mr',
+              nom: subscription.contact.name || '',
+              prenom: subscription.contact.firstname || '',
+              email: subscription.contact.email || '',
+              portable: subscription.contact.mobile || '',
+              fixe: subscription.contact.phone || '',
+              raisonsociale: subscription.company_name || '',
+              adresse1: subscription.address.address1 || '',
+              adresse2: subscription.address.address2 || '',
+              cp: subscription.address.zip || '',
+              ville: subscription.address.city || '',
+              zohoclient: contact.contact_name,
+              zohoinvoice: invoice.invoice_number,
+            };
 
-          if (subscription.type === "solidaire") {
-            row.montant = subscription.solidarity_price.toString().replace('.',',') || '';
-            row.nbexp = subscription.solidarity_nb || 0;
-            row["reçu"] = subscription.recept || '';
+            if (subscription.type === "solidaire") {
+              row.montant = subscription.solidarity_price.toString().replace('.',',') || '';
+              row.nbexp = subscription.solidarity_nb || 0;
+              row["reçu"] = subscription.recept || '';
+            }
+
+            subscriptionsSheet.addRow(row, (err) => {
+              if (err) {
+                reject("Unable to write new row in subscriptionsSheet");
+              } else {
+                resolve("OK");
+              }
+            }); // End subscriptionSheet addRow
           }
 
-          subscriptionsSheet.addRow(row, (err) => {
-            if (err) {
-              reject("Unable to write new row in subscriptionsSheet");
-            } else {
-              const invoice = new Invoice();
-              invoice.subscription_new(subscription).then((message) => {
-                resolve("OK");
-              })
-              .catch((error) => {
-                reject(error);
-              }) // End invoice.subscription_new
-            }
-          }); // End subscriptionSheet addRow
-        }
-
-      }); // End getSubscriptionSheets
+        }); // End getSubscriptionSheets
+      })
+      .catch((error) => {
+        reject(error);
+      }) // End invoice.subscription_new
 
     }); // End Promise
   }

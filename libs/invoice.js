@@ -4,7 +4,7 @@ import config from './../config';
 class Invoice {
 
 	constructor() {
-		const { ZOHO_AUTH_TOKEN, ZOHO_ORGANIZATION_ID, ZOHO_SUBSCRIPTION_ITEM_ID, ZOHO_DONATION_ITEM_ID } = config;
+		const { ZOHO_AUTH_TOKEN, ZOHO_ORGANIZATION_ID, ZOHO_SUBSCRIPTION_ITEM_ID, ZOHO_DONATION_ITEM_ID, ZOHO_SUBSCRIPTION_TEMPLATE, ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE } = config;
 		if (!ZOHO_AUTH_TOKEN) {
 		  console.log('!!!! Missing ZOHO_AUTH_TOKEN configuration !!!!!');
 		}
@@ -21,6 +21,8 @@ class Invoice {
 		if (ZOHO_AUTH_TOKEN && ZOHO_ORGANIZATION_ID) this.service = new Zoho(ZOHO_AUTH_TOKEN,ZOHO_ORGANIZATION_ID);
 		this.ZOHO_SUBSCRIPTION_ITEM_ID = ZOHO_SUBSCRIPTION_ITEM_ID;
 		this.ZOHO_DONATION_ITEM_ID = ZOHO_DONATION_ITEM_ID;
+		this.ZOHO_SUBSCRIPTION_TEMPLATE = ZOHO_SUBSCRIPTION_TEMPLATE;
+		this.ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE = ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE;
 
 		this.subscription_price = 10;
 	}
@@ -38,11 +40,12 @@ class Invoice {
 	  	if (!(contact.phone || contact.mobile)) reject(`Un téléphone pour l'abonné est obligatoire`);
 	  	if (!address) reject(`L'adresse de l'abonné est obligatoire`);
 
-	  	let zohoContact = {
-	  		contact_name: [contact.honorific, contact.name, contact.firstname].join(' '),
+	  	const honorific = contact.honorific || "M";
+	  	const zohoContact = {
+	  		contact_name: [honorific, contact.firstname, contact.name].join(' '),
 		    contact_persons: [
 		    	{
-		    		salutation: contact.honorific || "M",
+		    		salutation: honorific,
 		    		first_name: contact.firstname,
 		    		last_name: contact.name,
 		    		email: contact.email,
@@ -51,7 +54,6 @@ class Invoice {
 		    		is_primary_contact: true,
 		    	}
 		    ],
-
 	  	}
 
 	  	zohoContact.billing_address = {
@@ -65,9 +67,11 @@ class Invoice {
 
 	  	if (subscription.company_name) zohoContact.company_name = subscription.company_name;
 
+	  	let zoho_contact, zoho_invoice;
 	    self.service.getOrCreateContact(zohoContact)
     	.then((contact) => {
-    		console.log(contact);
+    		zoho_contact = contact;
+//    		console.log(zoho_contact);
 
     		let line_items = [ { item_id: self.ZOHO_SUBSCRIPTION_ITEM_ID } ];
     		if (subscription.type === 'solidaire') {
@@ -78,19 +82,23 @@ class Invoice {
 
     		}
     		let zohoInvoice = {
-    			customer_id: contact.contact_id,
+    			customer_id: zoho_contact.contact_id,
     			line_items
     		}
+    		console.log(self.ZOHO_SUBSCRIPTION_TEMPLATE);
+    		if (self.ZOHO_SUBSCRIPTION_TEMPLATE) zohoInvoice.template_id = self.ZOHO_SUBSCRIPTION_TEMPLATE;
 
     		return self.service.createInvoice(zohoInvoice);
     	})
   		.then((invoice) => {
-  			console.log(invoice);
-  			return self.service.sendInvoice(invoice.invoice_id, invoice.contact_persons_details.map((person) => (person.email)));
+  			zoho_invoice = invoice;
+//  			console.log(zoho_invoice);
+
+  			return self.service.sendInvoice(zoho_invoice.invoice_id, zoho_invoice.contact_persons_details.map((person) => (person.email)), self.ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE);
   		})
   		.then((message) => {
-  			console.log(message)
-	    	resolve('OK');
+//  			console.log(message)
+	    	resolve({ message: 'OK', contact: zoho_contact, invoice: zoho_invoice });
   		})
     	.catch((error) => {
     		reject(error);
