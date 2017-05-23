@@ -147,7 +147,7 @@ const solidarityValues = {
 
 const initialValues = {
   type: 'solidaire',
-  solidarity_price: '20',
+  solidarity_price: '40',
 }
 
 SubscribeForm = reduxForm({

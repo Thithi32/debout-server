@@ -12,6 +12,7 @@ const SubscribeFormErrors = () => (
     <Field name="contact.email" component={FieldInputError} />
     <Field name="contact.mobile" component={FieldInputError} />
     <Field name="subscription_signed" component={FieldInputError} />
+    <Field name="solidarity_price" component={FieldInputError} />
   </div>
 )
 

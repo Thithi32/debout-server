@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Field, formValueSelector } from 'redux-form'
+import { FieldInputError } from '../../widgets'
 
 import './SubscriptionTypeInput.css'
 
@@ -51,9 +52,12 @@ export class SubscriptionTypeInput extends Component {
               Je m&#39;abonne pour un montant total de <Field component="input" type="number" name="solidarity_price" {...disabled} onChange={this.onChangeSolidarityPrice.bind(this)} />€<br />
               et j&#39;offre <strong>{ solidarityNbMag }</strong> magazines debout.
             </p>
+            <Field name="solidarity_price" component={FieldInputError} />
             <p>
-              Ma dépense réelle après déduction fiscale <a href="/subscribe#term_2">(2)</a>:
-              {toMoney((this.props.solidarity_price < this.props.simple_subscription_price * 4) ? this.props.solidarity_price : this.props.solidarity_price * 0.34)}
+              Ma dépense réelle après déduction fiscale <a href="/subscribe#term_2">(2)</a>:&nbsp;
+              <strong>
+                {toMoney((this.props.solidarity_price < this.props.simple_subscription_price * 4) ? this.props.solidarity_price : this.props.solidarity_price * 0.34)}
+              </strong>
             </p>
             <div className="donation_recept" {...receptDisabled}>
               <label htmlFor="donation_recept">
