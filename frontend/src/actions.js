@@ -1,5 +1,3 @@
-import { reset } from 'redux-form';
-
 export const SET_COMPANIES = 'SET_COMPANIES';
 export const SET_HUBS = 'SET_HUBS';
 export const CREATE_ORDER = 'ORDER_CREATED';
@@ -84,7 +82,7 @@ export function createOrder(order) {
 
     forder.confirmation_url = `${document.location.origin}/order/confirm`;
 
-    console.log('Order sent', forder);
+//    console.log('Order sent', forder);
 
     fetch('/api/order/new', {
       method: 'POST',
@@ -150,12 +148,11 @@ export function confirmOrder(id) {
 
 export function createSubscription(subscription) {
   return dispatch => {
-    console.log('start');
     dispatch({
       type: START_LOADING,
     });
 
-    console.log('Subscription sent', subscription);
+//    console.log('Subscription sent', subscription);
 
     fetch('/api/subscription/new', {
       method: 'POST',
@@ -164,14 +161,12 @@ export function createSubscription(subscription) {
     })
     .then(res => res.json())
     .then(data => {
-      dispatch({
-        type: STOP_LOADING,
-      });
       if (data.status === 'OK') {
-        alert('Merci pour votre abonnement.');
-        dispatch(reset('subscription'));
-        window.location = 'http://debout.fr/donner';
+        window.location = (data.response && data.response.invoice_url) || 'http://debout.fr/donner';
       } else {
+        dispatch({
+          type: STOP_LOADING,
+        });
         alert('Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email abonnement@debout.fr');
       }
     })

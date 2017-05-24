@@ -240,7 +240,7 @@ class Store {
           if (!subscriptionsSheet) {
             reject("No 'Abonnements' sheet in spreadsheet");
           } else {
-            console.log(contact,invoice);
+//            console.log(contact,invoice);
             let row = {
               abonnement: subscription.id || '',
               date: subscription.date || '',
@@ -271,7 +271,7 @@ class Store {
               if (err) {
                 reject("Unable to write new row in subscriptionsSheet");
               } else {
-                resolve("OK");
+                resolve({ message: "OK", invoice_url: invoice.invoice_url });
               }
             }); // End subscriptionSheet addRow
           }

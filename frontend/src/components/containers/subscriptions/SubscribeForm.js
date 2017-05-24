@@ -123,11 +123,11 @@ const simpleValues = {
   },
   subscription_signed: true
 }
-
+*//*
 const solidarityValues = {
   type: 'solidaire',
-  solidarity_price: "20",
-  solidarity_nb: "5",
+  solidarity_price: '20',
+  solidarity_nb: '5',
   contact: {
     name: 'DELBART',
     firstname: 'Thierry',
@@ -139,11 +139,10 @@ const solidarityValues = {
     address1: '12 rue de la paix',
     address2: 'Forum de Innovation',
     zip: '12000',
-    city: 'MONTPELLIER'
+    city: 'MONTPELLIER',
   },
-  subscription_signed: true
-}
-/******/
+  subscription_signed: true,
+};*/
 
 const initialValues = {
   type: 'solidaire',

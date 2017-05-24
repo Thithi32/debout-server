@@ -259,21 +259,14 @@ csv()
           .then((message) => {
             const store = new Store();
             store.subscription_new(subscription)
-              .then((message2) => {
-                mail.subscription_confirmation(subscription)
-                  .then((message3) => res.json({
-                    status: "OK",
-                    response: {
-                      'subscription_new': message,
-                      'store_subscription': message2,
-                      'subscription_confirmation': message3
-                    }
-                  }))
-                  .catch((error) => {
-                    console.log("- SUBSCRIPTION ERROR -- " + error,subscription);
-                    res.json({ status: "ERROR", error });
-                  })
-              })
+              .then(({ message2, invoice_url }) => res.json({
+                status: "OK",
+                response: {
+                  'mail_subscription_new': message,
+                  'store_subscription_new': message2,
+                  invoice_url,
+                }
+              }))
               .catch((error) => {
                 console.log("- SUBSCRIPTION ERROR -- " + error,subscription);
                 res.json({ status: "ERROR", error });
