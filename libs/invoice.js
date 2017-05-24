@@ -4,7 +4,8 @@ import config from './../config';
 class Invoice {
 
 	constructor() {
-		const { ZOHO_AUTH_TOKEN, ZOHO_ORGANIZATION_ID, ZOHO_SUBSCRIPTION_ITEM_ID, ZOHO_DONATION_ITEM_ID, ZOHO_SUBSCRIPTION_TEMPLATE, ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE } = config;
+		const { ZOHO_AUTH_TOKEN, ZOHO_ORGANIZATION_ID, ZOHO_SUBSCRIPTION_ITEM_ID, ZOHO_DONATION_ITEM_ID,
+			ZOHO_SUBSCRIPTION_TEMPLATE, ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE, ZOHO_GATEWAY_NAME } = config;
 		if (!ZOHO_AUTH_TOKEN) {
 		  console.log('!!!! Missing ZOHO_AUTH_TOKEN configuration !!!!!');
 		}
@@ -23,6 +24,7 @@ class Invoice {
 		this.ZOHO_DONATION_ITEM_ID = ZOHO_DONATION_ITEM_ID;
 		this.ZOHO_SUBSCRIPTION_TEMPLATE = ZOHO_SUBSCRIPTION_TEMPLATE;
 		this.ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE = ZOHO_SUBSCRIPTION_EMAIL_TEMPLATE;
+		this.ZOHO_GATEWAY_NAME = ZOHO_GATEWAY_NAME;
 
 		this.subscription_price = 10;
 	}
@@ -83,11 +85,20 @@ class Invoice {
     		}
     		let zohoInvoice = {
     			customer_id: zoho_contact.contact_id,
-    			gateway_name: "stripe",
     			line_items
     		}
     		console.log(self.ZOHO_SUBSCRIPTION_TEMPLATE);
     		if (self.ZOHO_SUBSCRIPTION_TEMPLATE) zohoInvoice.template_id = self.ZOHO_SUBSCRIPTION_TEMPLATE;
+    		if (self.ZOHO_GATEWAY_NAME) {
+    			zohoInvoice.payment_options = {
+        		payment_gateways: [
+            	{
+                configured: true,
+                gateway_name: slef.ZOHO_GATEWAY_NAME,
+            	},
+	        	],
+    			};
+    		}
 
     		return self.service.createInvoice(zohoInvoice);
     	})
