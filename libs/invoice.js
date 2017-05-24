@@ -83,6 +83,7 @@ class Invoice {
     		}
     		let zohoInvoice = {
     			customer_id: zoho_contact.contact_id,
+    			gateway_name: "stripe",
     			line_items
     		}
     		console.log(self.ZOHO_SUBSCRIPTION_TEMPLATE);
