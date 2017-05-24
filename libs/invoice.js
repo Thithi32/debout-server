@@ -94,7 +94,7 @@ class Invoice {
         		payment_gateways: [
             	{
                 configured: true,
-                gateway_name: slef.ZOHO_GATEWAY_NAME,
+                gateway_name: self.ZOHO_GATEWAY_NAME,
             	},
 	        	],
     			};
