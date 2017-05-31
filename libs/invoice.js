@@ -73,7 +73,7 @@ class Invoice {
 	    self.service.getOrCreateContact(zohoContact)
     	.then((contact) => {
     		zoho_contact = contact;
-    		console.log(zoho_contact);
+    		//console.log(zoho_contact);
 
     		let line_items = [ { item_id: self.ZOHO_SUBSCRIPTION_ITEM_ID } ];
     		if (subscription.type === 'solidaire') {
@@ -90,7 +90,6 @@ class Invoice {
  			    ],
      			line_items
     		}
-    		console.log(self.ZOHO_SUBSCRIPTION_TEMPLATE);
     		if (self.ZOHO_SUBSCRIPTION_TEMPLATE) zohoInvoice.template_id = self.ZOHO_SUBSCRIPTION_TEMPLATE;
     		if (self.ZOHO_GATEWAY_NAME) {
     			zohoInvoice.payment_options = {
