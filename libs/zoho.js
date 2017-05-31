@@ -12,14 +12,14 @@ class Zoho {
 		}
   }
 
-  fetch(path,method,payload) {
+  fetch(path,method,jsonString,queryString) {
   	const self = this;
   	method = (method || 'GET').toUpperCase();
   	return new Promise(function(resolve,reject) {
-  		const payloadString = JSON.stringify(payload);
-  		//const query = querystring.stringify(payload);
-  		const query = (method === 'GET') ? querystring.stringify(payload) : `JSONString=${JSON.stringify(payload)}`;
-  		const uri = `https://invoice.zoho.com/api/v3${path}?authtoken=${self.authtoken}&organization_id=${self.organization_id}&${query}`;
+      if (!queryString) queryString = {};
+      queryString.authtoken = self.authtoken;
+      queryString.organization_id = self.organization_id;
+  		const uri = `https://invoice.zoho.com/api/v3${path}?${querystring.stringify(queryString)}${(jsonString)?'&JSONString='+JSON.stringify(jsonString):''}`;
 
   		console.log(method,uri);
 			request({
@@ -37,7 +37,7 @@ class Zoho {
   getContacts(filter) {
     const self = this;
     return new Promise(function(resolve, reject) {
-			self.fetch("/contacts","GET",filter)
+			self.fetch("/contacts", "GET", undefined, filter)
       .then((response) => {
       	resolve(response.contacts);
       })
@@ -52,7 +52,7 @@ class Zoho {
     return new Promise(function(resolve, reject) {
 	  	if (!contact.contact_name) reject(`Le nom du contact Zoho invoice est obligatoire`);
 
-			self.fetch("/contacts","POST",contact)
+			self.fetch("/contacts", "POST", contact)
       .then((response) => {
       	resolve(response.contact);
       })
@@ -163,10 +163,10 @@ class Zoho {
     });
 	}
 
-	sendInvoice(invoice_id, to_mail_ids, template_email_id) {
+	sendInvoice(invoice_id, to_mail_ids, email_template_id) {
     const self = this;
     return new Promise(function(resolve, reject) {
-			self.fetch(`/invoices/${invoice_id}/email`,'POST', { to_mail_ids, template_email_id })
+			self.fetch(`/invoices/${invoice_id}/email`,'POST', undefined, { email_template_id })
       .then((response) => {
       	resolve(response.message);
       })
