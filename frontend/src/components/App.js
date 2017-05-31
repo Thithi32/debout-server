@@ -13,6 +13,7 @@ class App extends Component {
         <FormOnly>
           <Router history={browserHistory}>
             <Route path="/" component={OrderForm}/>
+            <Route path="/commande" component={OrderForm}/>
             <Route path="/order/confirm/:id" component={OrderConfirm}/>
           </Router>
         </FormOnly>
