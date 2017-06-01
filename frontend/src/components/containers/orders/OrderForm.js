@@ -24,6 +24,10 @@ export class OrderForm extends Component {
     this.state = {};
   }
 
+  componentDidMount() {
+    document.title = 'Abonnement au magazine solidaire debout';
+  }
+
   onChangeHub(hub) {
     this.setState({ hub });
   }

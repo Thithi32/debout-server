@@ -38,7 +38,7 @@ export class SubscriptionTypeInput extends Component {
             ABONNEMENT SIMPLE
           </label>
           <p>
-           Je m&#39;abonne pour 1 an au prix de 10€
+           Je m&#39;abonne pour 1 an au prix de 10€ <br/> (4 numéros)
           </p>
         </div>
         <img src="img/subscription.png" alt="Subscription" className="subscription-image visible-xs-block" />
@@ -49,8 +49,8 @@ export class SubscriptionTypeInput extends Component {
           </label>
           <div {...disabled}>
             <p>
-              Je m&#39;abonne pour un montant total de <Field component="input" type="number" name="solidarity_price" {...disabled} onChange={this.onChangeSolidarityPrice.bind(this)} />€<br />
-              et j&#39;offre <strong>{ solidarityNbMag }</strong> magazines debout.
+              Je verse <Field component="input" type="number" name="solidarity_price" {...disabled} onChange={this.onChangeSolidarityPrice.bind(this)} />€
+              à l&apos;association: je suis abonné pour 1 an et j&apos;offre <strong>{ solidarityNbMag }</strong> magazines debout.
             </p>
             <Field name="solidarity_price" component={FieldInputError} />
             <p>

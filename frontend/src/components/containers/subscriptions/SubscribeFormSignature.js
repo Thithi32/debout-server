@@ -3,7 +3,7 @@ import { Field } from 'redux-form';
 
 import './SubscribeFormSignature.css';
 
-const toMoney = (num) => (`${num.toFixed(2).replace('.', ',')}€`);
+const toMoney = (num) => (`${num.toFixed(0)}€`);
 
 const SubscribeFormSignature = (props) => (
   <div className="subscription-signature">

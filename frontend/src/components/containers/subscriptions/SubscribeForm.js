@@ -15,6 +15,10 @@ import './SubscribeForm.css';
 const upper = value => value && value.toUpperCase();
 
 export class SubscribeForm extends Component { // eslint-disable-line
+  componentDidMount() {
+    document.title = 'Commande du magazine solidaire debout';
+  }
+
   render() {
     const values = this.props.subscription.values || {};
     const [magPrice, simpleSubscriptionPrice] = [2, 10];
