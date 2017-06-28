@@ -153,6 +153,7 @@ export function createSubscription(subscription) {
     });
 
 //    console.log('Subscription sent', subscription);
+    let error_msg = 'Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email abonnement@debout.fr';
 
     fetch('/api/subscription/new', {
       method: 'POST',
@@ -162,19 +163,39 @@ export function createSubscription(subscription) {
     .then(res => res.json())
     .then(data => {
       if (data.status === 'OK') {
+        alert(`Nous vous remercions pour votre abonnement au magazine debout. Nous espérons qu'il sera pour vous et vos proches une source de précieuses informations, de découvertes et de partage.
+
+IMPORTANT: Veuillez noter que votre abonnement ne sera actif qu'à réception de votre règlement.
+
+Vous pouvez effectuer ce règlement dès maintenant (conseillé) ou suivre les indications de paiement dans l'email que vous recevrez dans quelques minutes à ${subscription.contact.email}
+
+Merci !
+l'équipe du magazine debout`);
         window.location = (data.response && data.response.invoice_url) || 'http://debout.fr/donner';
       } else {
+        try {
+          if (data.error && data.error.error) {
+            const error = JSON.parse(data.error.error);
+            const errorCode = error.code;
+            if (errorCode === 3062) {
+              error_msg = `Un compte existe déjà pour ${subscription.contact.firstname} ${subscription.contact.name} avec un email different. Veuillez mettre le bon email ou choisir un autre nom de contact.`;
+            }
+          }
+        } catch (e) {
+          console.log(e);
+        }
+
         dispatch({
           type: STOP_LOADING,
         });
-        alert('Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email abonnement@debout.fr');
+        alert(error_msg);
       }
     })
     .catch(() => {
       dispatch({
         type: STOP_LOADING,
       });
-      alert('Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email abonnement@debout.fr');
+      alert(error_msg);
     });
   };
 }

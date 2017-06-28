@@ -246,7 +246,7 @@ class Store {
               date: subscription.date || '',
               type: subscription.type || '',
               montant: '10,00',
-              civilite: subscription.contact.honorific || 'Mr',
+              civilite: subscription.contact.honorific || 'M',
               nom: subscription.contact.name || '',
               prenom: subscription.contact.firstname || '',
               email: subscription.contact.email || '',

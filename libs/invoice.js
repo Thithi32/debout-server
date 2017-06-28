@@ -60,7 +60,7 @@ class Invoice {
 
 	  	zohoContact.billing_address = {
 	  		address: address.address1,
-	  		street2: address.address2,
+	  		street2: address.address2 || '',
         city: address.city,
         zip: address.zip,
         country: "France",
