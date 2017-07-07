@@ -1,69 +1,68 @@
-export const SET_COMPANIES = "SET_COMPANIES";
-export const SET_HUBS = "SET_HUBS";
-export const CREATE_ORDER = "ORDER_CREATED";
-export const START_LOADING = "START_LOADING";
-export const STOP_LOADING = "STOP_LOADING";
-export const ORDER_CONFIRMED = "ORDER_CONFIRMED";
-export const ORDER_NOT_CONFIRMED = "ORDER_NOT_CONFIRMED";
+export const SET_COMPANIES = 'SET_COMPANIES';
+export const SET_HUBS = 'SET_HUBS';
+export const CREATE_ORDER = 'ORDER_CREATED';
+export const START_LOADING = 'START_LOADING';
+export const STOP_LOADING = 'STOP_LOADING';
+export const ORDER_CONFIRMED = 'ORDER_CONFIRMED';
+export const ORDER_NOT_CONFIRMED = 'ORDER_NOT_CONFIRMED';
 
 export function setCompanies(companies) {
   return {
     type: SET_COMPANIES,
-    companies
-  }
+    companies,
+  };
 }
 
 export function setHubs(hubs) {
   return {
     type: SET_HUBS,
-    hubs
-  }
+    hubs,
+  };
 }
 
 export function fetchCompanies() {
   return dispatch => {
-    fetch("/api/companies")
+    fetch('/api/companies')
       .then(res => res.json())
       .then(data => dispatch(setCompanies(data.companies)))
-      .catch(error => false);
-  }
+      .catch(() => false);
+  };
 }
 
 export function fetchHubs() {
   return dispatch => {
-    fetch("/api/hubs")
+    fetch('/api/hubs')
       .then(res => res.json())
       .then(data => dispatch(setHubs(data.hubs)))
-      .catch(error => false);
-  }
+      .catch(() => false);
+  };
 }
 
 export function startLoading() {
   return dispatch => {
     dispatch({
-      type: START_LOADING
+      type: START_LOADING,
     });
-  }
+  };
 }
 
 export function stopLoading() {
   return dispatch => {
     dispatch({
-      type: STOP_LOADING
+      type: STOP_LOADING,
     });
-  }
+  };
 }
 
-export function createOrder( order ) {
-
+export function createOrder(order) {
   return dispatch => {
     dispatch({
-      type: START_LOADING
+      type: START_LOADING,
     });
 
-    let { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, order_comment, shipping, shipping_option, order : { contact } } = order;
-    let forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact, order_comment };
-    if (shipping_option === "1") {
+    const { company, is_ngo, is_ccas, has_hub, hub, nb_products, invoice, order_comment, shipping, shipping_option, order: { contact } } = order;
+    const forder = { company, is_ngo, is_ccas, has_hub, hub, nb_products, contact, order_comment };
+    if (shipping_option === '1') {
       if (shipping.contact_disabled) delete shipping.contact_disabled;
       if (shipping.address_disabled) delete shipping.address_disabled;
       if (shipping.use_contact_for_shipping) shipping.contact = contact;
@@ -71,8 +70,8 @@ export function createOrder( order ) {
       forder.shipping_option = 1;
       forder.shipping = shipping;
     } else {
-      const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== "BEEOTOP";
-      if (!ba_shipping_available) forder.hub = "BEEOTOP";
+      const ba_shipping_available = has_hub && (is_ngo || is_ccas) && hub && hub !== 'BEEOTOP';
+      if (!ba_shipping_available) forder.hub = 'BEEOTOP';
       forder.shipping_option = 2;
     }
 
@@ -81,69 +80,122 @@ export function createOrder( order ) {
     if (invoice.use_contact_for_invoice) invoice.contact = contact;
     forder.invoice = invoice;
 
-    forder.confirmation_url = document.location.origin + "/order/confirm";
+    forder.confirmation_url = `${document.location.origin}/order/confirm`;
 
-    console.log("Order sent",forder);
+//    console.log('Order sent', forder);
 
-    fetch("/api/order/new", { 
-      method: "POST", 
-      body: JSON.stringify( { order: forder }),
-      headers: { 'Content-Type': 'application/json' } 
+    fetch('/api/order/new', {
+      method: 'POST',
+      body: JSON.stringify({ order: forder }),
+      headers: { 'Content-Type': 'application/json' },
     })
       .then(res => res.json())
       .then(data => {
-        if (data.status === "OK") {
-          alert("Merci pour votre commande. Vous allez recevoir dans quelques minutes une confirmation de votre commande à " + forder.contact.email + ". Merci de valider formellement votre commande en cliquant dans le lien de cet email");
+        if (data.status === 'OK') {
+          alert(`Merci pour votre commande. Vous allez recevoir dans quelques minutes une confirmation de votre commande à ${forder.contact.email}. Merci de valider formellement votre commande en cliquant dans le lien de cet email`);
           window.location = 'http://debout.fr/donner';
         } else {
           dispatch({
-            type: STOP_LOADING
+            type: STOP_LOADING,
           });
-          alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email diffusion@debout.fr");
+          alert('Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email diffusion@debout.fr');
         }
       })
-      .catch(error => {
+      .catch(() => {
         dispatch({
-          type: STOP_LOADING
+          type: STOP_LOADING,
         });
-        alert("Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l'email diffusion@debout.fr");
+        alert('Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email diffusion@debout.fr');
       });
-  }
+  };
 }
 
 export function confirmOrder(id) {
   return dispatch => {
-
-    fetch("/api/order/confirm", { 
-      method: "POST", 
-      body: JSON.stringify( { order_id: id }),
-      headers: { 'Content-Type': 'application/json' } 
+    fetch('/api/order/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ order_id: id }),
+      headers: { 'Content-Type': 'application/json' },
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "OK") {
-          dispatch({
-            type: ORDER_CONFIRMED,
-            order: data.order
-          });
-        } else {
-          dispatch({
-            type: ORDER_NOT_CONFIRMED,
-            error: data.error
-          });
-        }
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'OK') {
         dispatch({
-          type: STOP_LOADING
+          type: ORDER_CONFIRMED,
+          order: data.order,
         });
-      })
-      .catch(error => {
+      } else {
         dispatch({
           type: ORDER_NOT_CONFIRMED,
-          error: error
+          error: data.error,
         });
-        dispatch({
-          type: STOP_LOADING
-        });
+      }
+      dispatch({
+        type: STOP_LOADING,
       });
-  }
+    })
+    .catch(error => {
+      dispatch({
+        type: ORDER_NOT_CONFIRMED,
+        error,
+      });
+      dispatch({
+        type: STOP_LOADING,
+      });
+    });
+  };
+}
+
+export function createSubscription(subscription) {
+  return dispatch => {
+    dispatch({
+      type: START_LOADING,
+    });
+
+//    console.log('Subscription sent', subscription);
+    let error_msg = 'Nous avons rencontré un problème. Si le problème persiste veuillez nous contacter à l\'email abonnement@debout.fr';
+
+    fetch('/api/subscription/new', {
+      method: 'POST',
+      body: JSON.stringify({ subscription }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'OK') {
+        alert(`Nous vous remercions pour votre abonnement au magazine debout. Nous espérons qu'il sera pour vous et vos proches une source de précieuses informations, de découvertes et de partage.
+
+IMPORTANT: Veuillez noter que votre abonnement ne sera actif qu'à réception de votre règlement.
+
+Vous pouvez effectuer ce règlement dès maintenant (conseillé) ou suivre les indications de paiement dans l'email que vous recevrez dans quelques minutes à ${subscription.contact.email}
+
+Merci !
+l'équipe du magazine debout`);
+        window.location = (data.response && data.response.invoice_url) || 'http://debout.fr/donner';
+      } else {
+        try {
+          if (data.error && data.error.error) {
+            const error = JSON.parse(data.error.error);
+            const errorCode = error.code;
+            if (errorCode === 3062) {
+              error_msg = `Un compte existe déjà pour ${subscription.contact.firstname} ${subscription.contact.name} avec un email different. Veuillez mettre le bon email ou choisir un autre nom de contact.`;
+            }
+          }
+        } catch (e) {
+          console.log(e);
+        }
+
+        dispatch({
+          type: STOP_LOADING,
+        });
+        alert(error_msg);
+      }
+    })
+    .catch(() => {
+      dispatch({
+        type: STOP_LOADING,
+      });
+      alert(error_msg);
+    });
+  };
 }

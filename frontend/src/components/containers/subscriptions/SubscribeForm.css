@@ -1,0 +1,9 @@
+.subscription-form .gray-row {
+    margin: 0px -20px 35px !important;
+    padding: 30px 20px 15px;
+    background-color: #fce8ef;
+}
+
+.subscription-form .gray-row:first-child {
+    margin-top: -20px !important;
+}

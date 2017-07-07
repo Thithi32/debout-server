@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --watch --compilers js:babel-core/register ./libs/**/*.test.js",
     "start": "nodemon --exec babel-node -- ./server.js"
   },
   "keywords": [],
@@ -20,8 +20,10 @@
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.11",
     "nodemon": "^1.11.0",
+    "request-promise": "^4.2.1",
     "sendgrid": "^4.8.4",
-    "uid": "0.0.2"
+    "uid": "0.0.2",
+    "utf8": "^2.1.2"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",

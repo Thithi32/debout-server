@@ -1,13 +1,17 @@
-import config from './config'
 import moment from "moment"
 import tz from "moment-timezone";
 
-const GOOGLE_DOC_KEY = process.env.GOOGLE_DOC_KEY || config.GOOGLE_DOC_KEY;
-const GOOGLE_CREDS_CLIENT_EMAIL = process.env.GOOGLE_CREDS_CLIENT_EMAIL || config.GOOGLE_CREDS_CLIENT_EMAIL;
-const GOOGLE_CREDS_PRIVATE_KEY = process.env.GOOGLE_CREDS_PRIVATE_KEY || config.GOOGLE_CREDS_PRIVATE_KEY;
+import Invoice from "./invoice";
 
-if (!GOOGLE_DOC_KEY) {
-  console.log('!!!! Missing GOOGLE_DOC_KEY configuration !!!!!');
+import config from './../config';
+const { GOOGLE_ORDER_DOC_KEY, GOOGLE_SUBSCRIPTION_DOC_KEY, GOOGLE_CREDS_CLIENT_EMAIL, GOOGLE_CREDS_PRIVATE_KEY } = config;
+
+if (!GOOGLE_ORDER_DOC_KEY) {
+  console.log('!!!! Missing GOOGLE_ORDER_DOC_KEY configuration !!!!!');
+}
+
+if (!GOOGLE_SUBSCRIPTION_DOC_KEY) {
+  console.log('!!!! Missing GOOGLE_SUBSCRIPTION_DOC_KEY configuration !!!!!');
 }
 
 if (!GOOGLE_CREDS_CLIENT_EMAIL) {
@@ -24,7 +28,7 @@ class Store {
   getFirstEmptyRow(sheet) {
     return new Promise(function(resolve, reject) {
       let offset = 0;
-      for (i = 0; i < 20; i++) { 
+      for (i = 0; i < 20; i++) {
         offset = i * 100 + 1;
         sheet.getRows({
           offset: offset,
@@ -43,9 +47,9 @@ class Store {
     });
   }
 
-  getSheets(callback) {
+  getOrderSheets(callback) {
     var GoogleSpreadsheet = require('google-spreadsheet');
-    var doc = new GoogleSpreadsheet(GOOGLE_DOC_KEY);
+    var doc = new GoogleSpreadsheet(GOOGLE_ORDER_DOC_KEY);
 
     var creds_json = {
       client_email: GOOGLE_CREDS_CLIENT_EMAIL,
@@ -73,6 +77,35 @@ class Store {
     });
   }
 
+  getSubscriptionSheets(callback) {
+    var GoogleSpreadsheet = require('google-spreadsheet');
+    var doc = new GoogleSpreadsheet(GOOGLE_SUBSCRIPTION_DOC_KEY);
+
+    var creds_json = {
+      client_email: GOOGLE_CREDS_CLIENT_EMAIL,
+      private_key: GOOGLE_CREDS_PRIVATE_KEY
+    }
+
+    doc.useServiceAccountAuth(creds_json, function(err) {
+      if (err) {
+        console.log("Google Service: authentication failed",err);
+        callback( {} );
+      } else {
+        doc.getInfo(function(err, info) {
+          if (err) {
+            console.log("Google Service: unable to get doc info",err);
+            callback( {} );
+          } else {
+            console.log('Loaded doc: '+info.title+' by '+info.author.email);
+            const subscriptionsSheet = info.worksheets.find((sheet) => { return sheet.title.toLowerCase() === "abonnements" });
+
+            callback( { subscriptionsSheet });
+          }
+        });
+      }
+    });
+  }
+
   order_confirm(order_id) {
     const self = this;
     return new Promise(function(resolve, reject) {
@@ -80,7 +113,7 @@ class Store {
         reject("La confirmation de la commande n'est pas possible sans le numéro de commande");
       }
 
-      self.getSheets(function( { ordersSheet }) {
+      self.getOrderSheets(function( { ordersSheet }) {
         if (!ordersSheet) {
           reject("No 'Commandes' sheet in spreadsheet");
         } else {
@@ -111,11 +144,11 @@ class Store {
         reject("Commande invalide pour manque d'informations");
       }
 
-      self.getSheets(function( { ordersSheet, companiesSheet }) {
+      self.getOrderSheets(function( { ordersSheet, companiesSheet }) {
         if (!ordersSheet || !companiesSheet) {
           reject("No 'Commandes' and 'Fournisseurs' sheets in spreadsheet");
         } else {
-          ordersSheet.addRow({ 
+          ordersSheet.addRow({
             commande: order.id,
             raisonsociale: order.company,
             date:order.date,
@@ -185,10 +218,69 @@ class Store {
 
               }); // End companiesSheet addRow
             }
-          }); // End orderSheet addRow
+          }); // End getOrderSheets addRow
         }
 
       }); // End getSheets
+
+    }); // End Promise
+  }
+
+  subscription_new(subscription) {
+    const self = this;
+
+    return new Promise(function(resolve, reject) {
+      if (!subscription.type) {
+        reject("Abonnement invalide pour manque d'informations");
+      }
+
+      const invoice = new Invoice();
+      invoice.subscription_new(subscription).then(({ message, contact, invoice }) => {
+        self.getSubscriptionSheets(function( { subscriptionsSheet }) {
+          if (!subscriptionsSheet) {
+            reject("No 'Abonnements' sheet in spreadsheet");
+          } else {
+//            console.log(contact,invoice);
+            let row = {
+              abonnement: subscription.id || '',
+              date: subscription.date || '',
+              type: subscription.type || '',
+              montant: '10,00',
+              civilite: subscription.contact.honorific || 'M',
+              nom: subscription.contact.name || '',
+              prenom: subscription.contact.firstname || '',
+              email: subscription.contact.email || '',
+              portable: subscription.contact.mobile || '',
+              fixe: subscription.contact.phone || '',
+              raisonsociale: subscription.company_name || '',
+              adresse1: subscription.address.address1 || '',
+              adresse2: subscription.address.address2 || '',
+              cp: subscription.address.zip || '',
+              ville: subscription.address.city || '',
+              zohoclient: contact.contact_name,
+              zohoinvoice: invoice.invoice_number,
+            };
+
+            if (subscription.type === "solidaire") {
+              row.montant = subscription.solidarity_price.toString().replace('.',',') || '';
+              row.nbexp = subscription.solidarity_nb || 0;
+              row["reçu"] = subscription.recept || '';
+            }
+
+            subscriptionsSheet.addRow(row, (err) => {
+              if (err) {
+                reject("Unable to write new row in subscriptionsSheet");
+              } else {
+                resolve({ message: "OK", invoice_url: invoice.invoice_url });
+              }
+            }); // End subscriptionSheet addRow
+          }
+
+        }); // End getSubscriptionSheets
+      })
+      .catch((error) => {
+        reject(error);
+      }) // End invoice.subscription_new
 
     }); // End Promise
   }

@@ -3,13 +3,12 @@ import { mount } from 'enzyme'
 import sinon from 'sinon'
 import { Provider } from 'react-redux'
 
-import OrderForm from './OrderForm'
+import SubscribeForm from './SubscribeForm'
 
 import { store } from './../../../store'
 
 const defaultProps = {
-  createOrder: sinon.spy(),
-  order: {},
+  subscription: {},
   store: {
     subscribe: sinon.spy(),
     getState: sinon.spy(),
@@ -20,7 +19,6 @@ const defaultProps = {
 const isRendered = (wrapper) => (expect(wrapper.find('div').length).toBeGreaterThan(0))
 
 it('renders without crashing', () => {
-  const wrapper = mount(<Provider store={store}><OrderForm {...defaultProps} /></Provider>)
+  const wrapper = mount(<Provider store={store}><SubscribeForm {...defaultProps} /></Provider>)
   isRendered(wrapper)
 })
-

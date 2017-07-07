@@ -5,8 +5,8 @@ import moment from "moment";
 import tz from "moment-timezone";
 import uid from "uid";
 
-import SendMail from "./sendmail";
-import Store from "./store";
+import SendMail from "./libs/sendmail";
+import Store from "./libs/store";
 
 const app = express();
 app.use(bodyParser.json()); // support json encoded bodies
@@ -132,6 +132,27 @@ const validOrder = (order) => {
   return order;
 }
 
+const validSubscription = (subscription) => {
+
+  let fullname = [];
+  fullname.push(subscription.contact.firstname);
+  fullname.push(subscription.contact.name);
+  subscription.contact.fullname = fullname.join(' ');
+
+  subscription.price = (subscription.type === 'solidaire') ? subscription.solidarity_price : 10;
+  const toMoney = (num) => ( parseInt(num,10).toFixed(2).replace('.',',') + "€" );
+  ['price'].map((f) => ( subscription[f] = toMoney(subscription[f])));
+
+  subscription.recept = (subscription.type === 'solidaire') ? ((subscription.donation_recept === true) ? "oui" : "non") : '';
+
+  subscription['date'] = moment().tz('Europe/Paris').format('DD/MM/YY, HH:mm:ss');
+  subscription['id'] = uid().toUpperCase();
+
+  console.log("subscription received and filtered",subscription);
+
+  return subscription;
+}
+
 const findCompany = (name) => {
   return companies.find(function(company) { return company['Raison sociale'].toLowerCase() === name.toLowerCase() })
 }
@@ -147,7 +168,7 @@ let hubs = [];
 let line = 2
 const csv=require('csvtojson');
 csv()
-.fromFile('./companies.csv')
+.fromFile('./bases/companies.csv')
 .on('json',(jsonObj)=>{
   jsonObj.line = line++;
   companies.push(jsonObj);
@@ -160,7 +181,7 @@ csv()
 
     line = 2;
     csv()
-    .fromFile('./hubs.csv')
+    .fromFile('./bases/hubs.csv')
     .on('json',(jsonObj)=>{
       jsonObj.line = line++;
       hubs.push(jsonObj);
@@ -202,43 +223,59 @@ csv()
           let mail = new SendMail();
           const order = validOrder(req.body.order);
           mail.order_new(order)
-            .then((message) => {
-              const store = new Store();
-              store.order_new(order)
-                .then((message2) => {
-                  mail.order_confirmation(order)
-                    .then((message3) => res.json({ 
-                      status: "OK", 
-                      response: {
-                        'order_new': message, 
-                        'store_order': message2,
-                        'order_confirmation': message3
-                      }
-                    }))
-                    .catch((error) => {
-                      console.log("- ERROR -- " + error,order);
-                      res.json({ status: "ERROR", error });
-                    })
-                })
-                .catch((error) => {
-                  console.log("- ERROR -- " + error,order);
-                  res.json({ status: "ERROR", error });
-                })
-            })
-            .catch((error) => {
-              console.log("- ERROR -- " + error,order);
-              res.json({ status: "ERROR", error });
-            })
+          .then((message) => {
+            const store = new Store();
+            store.order_new(order)
+              .then((message2) => {
+                mail.order_confirmation(order)
+                  .then((message3) => res.json({
+                    status: "OK",
+                    response: {
+                      'order_new': message,
+                      'store_order': message2,
+                      'order_confirmation': message3
+                    }
+                  }))
+                  .catch((error) => {
+                    console.log("- ERROR -- " + error,order);
+                    res.json({ status: "ERROR", error });
+                  })
+              })
+              .catch((error) => {
+                console.log("- ERROR -- " + error,order);
+                res.json({ status: "ERROR", error });
+              })
+          })
+          .catch((error) => {
+            console.log("- ERROR -- " + error,order);
+            res.json({ status: "ERROR", error });
+          })
         })
 
-        app.get('/test', (req,res) => {
-          const store = new Store();
-
-          store.order_new()
-            .then((message) => {
-              res.json({ status: "OK", message });
-            })
-            .catch((error) => res.json({ status: "ERROR", error }));
+        app.post('/api/subscription/new', (req,res) => {
+          let mail = new SendMail();
+          const subscription = validSubscription(req.body.subscription);
+          mail.subscription_new(subscription)
+          .then((message) => {
+            const store = new Store();
+            store.subscription_new(subscription)
+              .then(({ message2, invoice_url }) => res.json({
+                status: "OK",
+                response: {
+                  'mail_subscription_new': message,
+                  'store_subscription_new': message2,
+                  invoice_url,
+                }
+              }))
+              .catch((error) => {
+                console.log("- SUBSCRIPTION ERROR -- " + error,subscription);
+                res.json({ status: "ERROR", error });
+              })
+          })
+          .catch((error) => {
+            console.log("- SUBSCRIPTION ERROR -- " + error,subscription);
+            res.json({ status: "ERROR", error });
+          })
         })
 
         // Serve static assets

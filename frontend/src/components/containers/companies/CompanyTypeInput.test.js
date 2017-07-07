@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 
-import { CompanyTypeInput } from './CompanyTypeInput';
+import { CompanyTypeInput } from './CompanyTypeInput'
 
 const defaultProps = {
   order: {},
@@ -12,7 +12,7 @@ const defaultProps = {
   onChange: sinon.spy(),
 }
 
-const isRendered = (wrapper) => (expect(wrapper.find('.company-type-input').length).toBe(1));
+const isRendered = (wrapper) => (expect(wrapper.find('.company-type-input').length).toBe(1))
 
 it('renders without crashing', () => {
   let wrapper = shallow( <CompanyTypeInput { ...defaultProps } /> );

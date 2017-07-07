@@ -15,6 +15,11 @@
   border: inherit;
 }
 
+#form-wrapper .widget .widget-header p { 
+  line-height: 18px;
+  color: #767676;
+}
+
 #form-wrapper form button[type="submit"] {
   position: relative;
   display: block;
