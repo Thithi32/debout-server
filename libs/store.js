@@ -47,7 +47,7 @@ class Store {
     });
   }
 
-  getOrderSheets(callback) {
+  getOrderSheets(mag_num, callback) {
     var GoogleSpreadsheet = require('google-spreadsheet');
     var doc = new GoogleSpreadsheet(GOOGLE_ORDER_DOC_KEY);
 
@@ -67,7 +67,7 @@ class Store {
             callback( {} );
           } else {
             console.log('Loaded doc: '+info.title+' by '+info.author.email);
-            const ordersSheet = info.worksheets.find((sheet) => { return sheet.title.toLowerCase() === "commandes" });
+            const ordersSheet = info.worksheets.find((sheet) => { return sheet.title.toLowerCase() === `commandes ${mag_num}` });
             const companiesSheet = info.worksheets.find((sheet) => { return sheet.title.toLowerCase() === "fournisseurs" });
 
             callback( {ordersSheet, companiesSheet});
@@ -113,7 +113,9 @@ class Store {
         reject("La confirmation de la commande n'est pas possible sans le numéro de commande");
       }
 
-      self.getOrderSheets(function( { ordersSheet }) {
+      const mag_num = order_id.split('_').shift();
+
+      self.getOrderSheets(mag_num, function( { ordersSheet }) {
         if (!ordersSheet) {
           reject("No 'Commandes' sheet in spreadsheet");
         } else {
@@ -144,7 +146,7 @@ class Store {
         reject("Commande invalide pour manque d'informations");
       }
 
-      self.getOrderSheets(function( { ordersSheet, companiesSheet }) {
+      self.getOrderSheets(order.mag_num, function( { ordersSheet, companiesSheet }) {
         if (!ordersSheet || !companiesSheet) {
           reject("No 'Commandes' and 'Fournisseurs' sheets in spreadsheet");
         } else {
@@ -177,7 +179,7 @@ class Store {
                 type: (order.is_ngo ? "Association" : (order.is_ccas ? "Mairie / CCAS" : 'Entreprise')),
                 assoba: order.hasOwnProperty('hub') && (order.hub !== "BEEOTOP") ? "oui" : "non",
                 hublivraison: order.hub || '',
-                num: 12,
+                num: order.mag_num,
                 exemplaires: order.nb_products,
                 commentaires: (order.order_comment || '') + "\n" + ((order.bdd && order.bdd['Commentaires']) || '')
               }

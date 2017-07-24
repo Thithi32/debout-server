@@ -147,17 +147,15 @@ export class OrderForm extends Component {
 
         <FormOnlyHeader>
           <h2>BON DE COMMANDE</h2>
-          <h3><strong>debout n°12</strong><br /> <span className="small">juin - juillet - août 2017</span> </h3>
+          <h3><strong>debout n°13</strong><br /> <span className="small">septembre - octobre - novembre 2017</span> </h3>
         </FormOnlyHeader>
 
         <FormOnlyContent>
 
           <p>
-            { false &&
-              <span>
-                Bon de commande à remplir <strong>&rArr; AVANT le 1 juin 2017</strong><br />
-              </span>
-            }
+            <span>
+              Bon de commande à remplir <strong>&rArr; AVANT le 1 septembre 2017</strong><br />
+            </span>
             Pour toute information, contactez-nous <ContactUs />.<br />
           </p>
 

@@ -34,6 +34,8 @@ const packs = [
 
 const validOrder = (order) => {
 
+  order['mag_num'] = 13;
+
   let fullname = [];
   fullname.push(order.contact.firstname);
   fullname.push(order.contact.name);
@@ -60,7 +62,8 @@ const validOrder = (order) => {
   ['price','subtotal','shipping_price','total'].map((f) => ( order[f] = toMoney(order[f])));
 
   order['date'] = moment().tz('Europe/Paris').format('DD/MM/YY, HH:mm:ss');
-  order['id'] = uid().toUpperCase();
+  const id = uid().toUpperCase();
+  order['id'] = `${order.mag_num}_${id}`;
 
   let bdd = findCompany(order['company']);
   if (bdd) order['bdd'] = bdd;
