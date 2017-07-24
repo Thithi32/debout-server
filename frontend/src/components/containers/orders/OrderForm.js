@@ -170,7 +170,7 @@ export class OrderForm extends Component {
             />
 
             <CompanyTypeInput
-              ba_select={false}
+              ba_select={true}
               onChangeHub={this.onChangeHub.bind(this)}
               onChange={this.checkDeliveryOptions.bind(this)}
             />
