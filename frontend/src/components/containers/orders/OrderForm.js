@@ -154,7 +154,7 @@ export class OrderForm extends Component {
 
           <p>
             <span>
-              Bon de commande à remplir <strong>&rArr; AVANT le 1 septembre 2017</strong><br />
+              Bon de commande à remplir <strong>&rArr; AVANT le 15 septembre 2017</strong><br />
             </span>
             Pour toute information, contactez-nous <ContactUs />.<br />
           </p>

@@ -18,7 +18,7 @@ class OrderFormTable extends Component {
           </thead>
           <tbody>
             <tr>
-              <td><span className="hidden-xs">Debout n°12</span><span className="visible-xs-block">N°12</span></td>
+              <td><span className="hidden-xs">Debout n°13</span><span className="visible-xs-block">N°13</span></td>
               <td className="text-center">{toMoney(this.props.price)}</td>
               <td className="text-center">{this.props.nb_products}</td>
               <td className="text-right">{toMoney(this.props.price * this.props.nb_products)}</td>
