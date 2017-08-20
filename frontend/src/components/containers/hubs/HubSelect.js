@@ -25,19 +25,23 @@ export class HubSelect extends Component {
     });
   }
 
-  onChangeHub(e,option) {
+  onChangeHub(e, option) {
     let hub;
-    if (!option || option === "BEEOTOP") {
-      hub = { name: "BEEOTOP" };
+    if (!option || option === 'BEEOTOP') {
+      hub = { name: 'BEEOTOP' };
     } else {
-      hub = this.props.hubs.find((h) => {
-        let hub_name = h['NOM 1'] + " " + h['NOM 2'];
-        return hub_name.toLowerCase() === option.toLowerCase();
-      });
+      for (let i = 0; i < this.props.hubs.length; i++) {
+        const h = this.props.hubs[i];
+        const hub_name = `${h['NOM 1']} ${h['NOM 2']}`;
+        if (hub_name.toLowerCase() === option.toLowerCase()) {
+          hub = h;
+          break;
+        }
+      }
 
-      hub.name = hub['NOM 1'] + " " + hub['NOM 2'];
-      hub.address_inline = [hub['ADRESSE 1'],hub['ADRESSE 2'],hub['CP'],hub['VILLE']]
-                            .filter(function(n){ return n.trim() !== '' })
+      hub.name = `${hub['NOM 1']} ${hub['NOM 2']}`;
+      hub.address_inline = [hub['ADRESSE 1'], hub['ADRESSE 2'], hub.CP, hub.VILLE]
+                            .filter((n) => { return n.trim() !== ''; })
                             .join(' ');
     }
     this.props.onChange(hub);

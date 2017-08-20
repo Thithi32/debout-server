@@ -19,14 +19,20 @@ const packs = [
   { nb: 700, shipping: 120 },
   { nb: 800, shipping: 135 },
   { nb: 900, shipping: 150 },
-  { nb: 1000, shipping: 170 }
+  { nb: 1000, shipping: 170 },
 ];
 
 class OrderNbProducts extends Component {
 
   onChange(e, value) {
-    value = parseInt(value,10);
-    let pack = packs.find((pack) => { return (pack.nb === value); });
+    const value_int = parseInt(value, 10);
+    let pack;
+    for (let i = 0; i < packs.length; i++) {
+      if (packs[i].nb === value_int) {
+        pack = packs[i];
+        break;
+      }
+    }
     this.props.onChangeShippingPrice(pack.shipping);
   }
 
@@ -34,8 +40,8 @@ class OrderNbProducts extends Component {
     return (
       <div className="form-group">
         <label htmlFor="nb_products">Nombre d&#39;exemplaires du magazine</label>
-        <Field name="nb_products" price={this.props.price} component={FieldNbProducts} packs={packs} 
-          className="form-control" onChange={ this.onChange.bind(this) } />  
+        <Field name="nb_products" price={this.props.price} component={FieldNbProducts} packs={packs}
+          className="form-control" onChange={ this.onChange.bind(this) } />
         <small>À noter : Un paquet de 25 exemplaires du magazine pèse environ 3,5 kg.</small>
       </div>
     )
