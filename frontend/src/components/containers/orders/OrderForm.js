@@ -119,6 +119,9 @@ export class OrderForm extends Component {
     if (!is_ngo && !is_ccas) {
       this.props.change('shipping_option', '1');
     }
+    if ((target === 'has_hub')) {
+      this.setState({ has_hub: value });
+    }
   }
 
 
@@ -132,6 +135,7 @@ export class OrderForm extends Component {
 
     const is_ngo_ccas = is_ngo || is_ccas;
     const price = is_ngo_ccas ? 0.5 : 1.5;
+    const has_hub = this.state.has_hub && this.state.hub && this.state.hub.name !== 'BEEOTOP';
 
     const hub_shipping = (shipping_option === 2);
 
@@ -154,7 +158,7 @@ export class OrderForm extends Component {
 
           <p>
             <span>
-              Bon de commande à remplir <strong>&rArr; AVANT le 15 septembre 2017</strong><br />
+              Bon de commande à remplir <strong>&rArr; AVANT le 15 Octobre 2017</strong><br />
             </span>
             Pour toute information, contactez-nous <ContactUs />.<br />
           </p>
@@ -182,7 +186,7 @@ export class OrderForm extends Component {
                 price={price}
               />
 
-              { is_ngo_ccas &&
+              { is_ngo_ccas && has_hub &&
                 <OrderShippingOptions
                   hub={this.state.hub}
                   shipping_price={shipping_home_price}
