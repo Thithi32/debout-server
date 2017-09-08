@@ -114,13 +114,16 @@ export class OrderForm extends Component {
   checkDeliveryOptions(e, value) {
     const form = this.props.order;
     const target = e.target.name;
+
     const is_ngo = (target === 'is_ngo') ? value : form.values.is_ngo;
     const is_ccas = (target === 'is_ccas') ? value : form.values.is_ccas;
-    if (!is_ngo && !is_ccas) {
+    const has_hub = ((target === 'has_hub') ? value : form.values.has_hub) && form.values.hub.name !== 'BEEOTOP';
+
+    if ((!is_ngo && !is_ccas) || !has_hub) {
       this.props.change('shipping_option', '1');
     }
     if ((target === 'has_hub')) {
-      this.setState({ has_hub: value });
+      this.setState({ has_hub });
     }
   }
 
